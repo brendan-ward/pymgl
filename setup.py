@@ -31,7 +31,7 @@ ext_options = {
         str(varianthpp_include),
     ],
     "library_dirs": [str(mbgl / "build")],
-    "libraries": ["libmbgl-core"],
+    "libraries": ["mbgl-core"],
     "extra_compile_args": ["-std=c++14"],
     "extra_link_args": [],
     "language": "c++",
@@ -64,7 +64,7 @@ setup(
     extras_require={"dev": ["Cython", "pytest", "pytest-cov", "pytest-benchmark",],},
     include_package_data=True,
     ext_modules=cythonize(
-        [Extension("pyogrio._map", ["pymbgl/_map.pyx"], **ext_options),],
+        [Extension("pymbgl._map", ["pymbgl/_map.pyx"], **ext_options),],
         compiler_directives={"language_level": "3"},
     ),
 )
