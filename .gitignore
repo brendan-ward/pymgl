@@ -1,0 +1,14 @@
+*.c
+*.pyc
+*.pyd
+*.so
+
+*/__pycache__/*
+build/*
+*.egg-info/*
+.benchmarks/*
+.pytest_cache/*
+
+Pipfile.lock
+
+tests/fixtures/
