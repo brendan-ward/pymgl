@@ -2,8 +2,12 @@
 *.pyc
 *.pyd
 *.so
+*.env
+*.env.*
+
 
 */__pycache__/*
+**/build/**
 build/*
 *.egg-info/*
 .benchmarks/*

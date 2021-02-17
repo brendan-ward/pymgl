@@ -1,0 +1,8 @@
+[submodule "vendor/mapbox-gl-native"]
+	path = vendor/mapbox-gl-native
+	url = https://github.com/mapbox/mapbox-gl-native.git
+	branch = master
+[submodule "vendor/pybind11"]
+	path = vendor/pybind11
+	url = https://github.com/pybind/pybind11.git
+	branch = stable
