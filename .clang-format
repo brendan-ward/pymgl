@@ -1,0 +1,21 @@
+---
+# from: https://github.com/pybind/pybind11/blob/master/.clang-format.yaml
+# See all possible options and defaults with:
+# clang-format --style=llvm --dump-config
+BasedOnStyle: LLVM
+AccessModifierOffset: -4
+AlignConsecutiveAssignments: true
+AlwaysBreakTemplateDeclarations: Yes
+BinPackArguments: false
+BinPackParameters: false
+BreakBeforeBinaryOperators: All
+BreakConstructorInitializers: BeforeColon
+BreakConstructorInitializersBeforeComma: true
+ColumnLimit: 99
+IndentCaseLabels: true
+IndentPPDirectives: AfterHash
+IndentWidth: 4
+Language: Cpp
+SpaceAfterCStyleCast: true
+Standard: Cpp11
+TabWidth: 4
