@@ -33,6 +33,10 @@ include(${PROJECT_SOURCE_DIR}/vendor/mapbox-gl-native-core.cmake)
 
 
 add_subdirectory(vendor/pybind11)
+
+
+
+include_directories(${PROJECT_SOURCE_DIR}/include)
 pybind11_add_module(_pymbgl SHARED ${PROJECT_SOURCE_DIR}/src/_pymbgl.cpp)
 
 
