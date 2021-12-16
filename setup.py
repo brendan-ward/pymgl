@@ -5,15 +5,6 @@ import subprocess
 from setuptools import setup, Extension
 from setuptools.command.build_ext import build_ext
 
-# Convert distutils Windows platform specifiers to CMake -A arguments
-PLAT_TO_CMAKE = {
-    "win32": "Win32",
-    "win-amd64": "x64",
-    "win-arm32": "ARM",
-    "win-arm64": "ARM64",
-}
-
-
 # A CMakeExtension needs a sourcedir instead of a file list.
 # The name must be the _single_ output extension from the CMake build.
 # If you need multiple extensions, see scikit-build.
@@ -72,8 +63,6 @@ class CMakeBuild(build_ext):
         )
 
 
-# The information here can also be placed in setup.cfg - better separation of
-# logic and declaration, and simpler if you include description/version in a file.
 setup(
     name="pymbgl",
     version="0.1.0",
@@ -82,11 +71,12 @@ setup(
     license="MIT",
     author="Brendan C. Ward",
     author_email="bcward@astutespruce.com",
-    description="Python wrapper for Mapbox GL native",
+    description="Python wrapper for MapLibre GL native",
     long_description_content_type="text/markdown",
     long_description=open("README.md").read(),
-    python_requires=">=3.9",
+    python_requires=">=3.8",
     ext_modules=[CMakeExtension("_pymbgl")],
     cmdclass={"build_ext": CMakeBuild},
     zip_safe=False,
+    extras_require={"test": ["pytest", "pytest-cov", "Pillow", "python-dotenv"]},
 )
