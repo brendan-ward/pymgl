@@ -1,0 +1,74 @@
+cmake_minimum_required(VERSION 3.10 FATAL_ERROR)
+project("_pymbgl")
+
+cmake_policy(SET CMP0079 NEW)
+
+# maplibre-gl-native is in sibling directory
+set(MBGL_SOURCE_DIR ${PROJECT_SOURCE_DIR}/../maplibre-gl-native)
+message(STATUS "maplibre-gl-native dir: ${MBGL_SOURCE_DIR}")
+
+# Adapted from maplibre-gl-native
+cmake_policy(SET CMP0063 NEW)
+set(CMAKE_CXX_EXTENSIONS OFF)
+set(CMAKE_CXX_STANDARD 17)  # 14 => 17
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+set(CMAKE_CXX_VISIBILITY_PRESET hidden)
+set(CMAKE_C_EXTENSIONS OFF)
+set(CMAKE_C_STANDARD 99)
+set(CMAKE_C_STANDARD_REQUIRED ON)
+set(CMAKE_C_VISIBILITY_PRESET hidden)
+set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
+set(CMAKE_INTERPROCEDURAL_OPTIMIZATION_MINSIZEREL ON)
+set(CMAKE_POSITION_INDEPENDENT_CODE ON)
+set(CMAKE_VISIBILITY_INLINES_HIDDEN 1)
+
+# Hide warnings about no symbols
+SET(CMAKE_C_ARCHIVE_CREATE   "<CMAKE_AR> Scr <TARGET> <LINK_FLAGS> <OBJECTS>")
+SET(CMAKE_CXX_ARCHIVE_CREATE "<CMAKE_AR> Scr <TARGET> <LINK_FLAGS> <OBJECTS>")
+SET(CMAKE_C_ARCHIVE_FINISH   "<CMAKE_RANLIB> -no_warning_for_no_symbols -c <TARGET>")
+SET(CMAKE_CXX_ARCHIVE_FINISH "<CMAKE_RANLIB> -no_warning_for_no_symbols -c <TARGET>")
+
+
+### Include headers we need from from maplibre-gl-native
+include_directories(${MBGL_SOURCE_DIR}/include)
+include_directories(${MBGL_SOURCE_DIR}/platform/default/include)
+# Some headers are in the src directory, just for fun
+include_directories(${MBGL_SOURCE_DIR}/src)
+
+### Include headers we need from from maplibre-gl-native dependencies
+include_directories(${MBGL_SOURCE_DIR}/vendor/mapbox-base/include)
+include_directories(${MBGL_SOURCE_DIR}/vendor/mapbox-base/deps/geometry.hpp/include)
+include_directories(${MBGL_SOURCE_DIR}/vendor/mapbox-base/deps/optional)
+include_directories(${MBGL_SOURCE_DIR}/vendor/mapbox-base/deps/variant/include)
+
+
+### Build mbgl-core
+include(${PROJECT_SOURCE_DIR}/vendor/maplibre-gl-native-core.cmake)
+
+
+include_directories(${PROJECT_SOURCE_DIR}/include)
+
+
+### Build Python module
+add_subdirectory(vendor/pybind11)
+
+pybind11_add_module(
+    _pymbgl
+    SHARED
+    ${PROJECT_SOURCE_DIR}/src/map.cpp
+    ${PROJECT_SOURCE_DIR}/src/_pymbgl.cpp
+)
+
+target_link_libraries(
+    _pymbgl
+    PRIVATE
+    Mapbox::Base
+    mbgl-core
+)
+
+set_target_properties(_pymbgl PROPERTIES INTERPROCEDURAL_OPTIMIZATION TRUE)
+target_compile_definitions(_pymbgl PRIVATE VERSION_INFO=${VERSION_INFO})
+
+
+### Tests
+# add_subdirectory(${PROJECT_SOURCE_DIR}/src/tests)
