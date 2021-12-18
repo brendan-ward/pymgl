@@ -1,8 +1,10 @@
 #pragma once
 
 #include <exception>
+#include <iomanip>
 #include <iostream>
 #include <optional>
+#include <ostream>
 
 #include <mbgl/gfx/headless_frontend.hpp>
 #include <mbgl/map/map.hpp>
@@ -50,6 +52,9 @@ public:
     void setPitch(const double &pitch);
     void setZoom(const double &zoom);
     void setSize(const uint32_t &width, const uint32_t &height);
+    // std::string toString();
+
+    friend std::ostream &operator<<(std::ostream &os, Map &m);
 
 private:
     std::unique_ptr<mbgl::HeadlessFrontend> frontend;

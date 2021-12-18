@@ -1,6 +1,6 @@
-
 #include <pybind11/pybind11.h>
 #include <pybind11/stl.h>
+#include <sstream>
 
 #include "map.hpp"
 
@@ -8,7 +8,6 @@ namespace py = pybind11;
 using namespace pybind11::literals;
 using namespace py_mbgl;
 
-// TODO: add __str__ and __repr__ based on properties currently set
 PYBIND11_MODULE(_pymbgl, m) {
     m.doc() = "MapLibre GL native static renderer";
 
@@ -32,6 +31,18 @@ PYBIND11_MODULE(_pymbgl, m) {
              py::arg("zoom")      = 0,
              py::arg("token")     = py::none(),
              py::arg("provider")  = py::none())
+        .def("__str__",
+             [](Map &self) {
+                 std::ostringstream os;
+                 os << "pymbgl." << self;
+                 return os.str();
+             })
+        .def("__repr__",
+             [](Map &self) {
+                 std::ostringstream os;
+                 os << "pymbgl." << self;
+                 return os.str();
+             })
         .def_property_readonly("bearing", &Map::getBearing)
         .def_property_readonly("center", &Map::getCenter)
         .def_property_readonly("pitch", &Map::getPitch)

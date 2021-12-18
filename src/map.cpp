@@ -1,8 +1,12 @@
 #include <csignal>
 #include <exception>
-#include <fstream>
+// #include <fstream>
+// #include <iomanip>
 #include <iostream>
 #include <optional>
+#include <pybind11/pybind11.h>
+#include <pybind11/stl.h>
+// #include <sstream>
 
 #include <mbgl/gfx/headless_frontend.hpp>
 #include <mbgl/map/map.hpp>
@@ -104,7 +108,7 @@ Map::Map(const std::string &style,
                     .withPitch(0));
 }
 
-const double Map::getBearing() { return map->getCameraOptions().bearing.value_or(0); }
+const double Map::getBearing() { return std::abs(map->getCameraOptions().bearing.value_or(0)); }
 
 const std::pair<double, double> Map::getCenter() {
     mbgl::LatLng center = map->getCameraOptions().center.value_or(mbgl::LatLng(0, 0));
@@ -208,5 +212,22 @@ void Map::validateZoom(const double &zoom) {
         throw std::domain_error("zoom must be no greater than 24");
     }
 }
+
+std::ostream &operator<<(std::ostream &os, Map &m) {
+    os << std::setprecision(2) << "Map(size: (" << m.getSize().first << ", " << m.getSize().second
+       << "), center: (" << m.getCenter().first << ", " << m.getCenter().second
+       << "), zoom: " << m.getZoom() << ", bearing: " << m.getBearing()
+       << ", pitch: " << m.getPitch() << ")";
+    return os;
+}
+
+// std::string Map::toString() {
+//     std::ostringstream os;
+//     os << std::setprecision(2) << "pymblg.Map(size: (" << this->getSize().first << ", "
+//        << this->getSize().second << "), center: (" << this->getCenter().first << ", "
+//        << this->getCenter().second << "), zoom: " << this->getZoom()
+//        << ", bearing: " << this->getBearing() << ", pitch: " << this->getPitch() << ")";
+//     return os.str();
+// }
 
 } // namespace py_mbgl
