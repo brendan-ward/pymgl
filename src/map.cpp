@@ -1,3 +1,4 @@
+#include <csignal>
 #include <exception>
 #include <fstream>
 #include <iostream>
@@ -32,32 +33,30 @@ Map::Map(const std::string &style,
     : frontend(std::make_unique<mbgl::HeadlessFrontend>(
         mbgl::Size{width.value_or(256), height.value_or(256)}, ratio.value_or(1))) {
 
+    // immediately stop loop (doesn't need to run)
+    loop.stop();
+
     // Turn off logging
     mbgl::Log::setObserver(std::make_unique<mbgl::Log::NullObserver>());
 
-    // TODO: remove
-    std::cout << "ratio " << ratio.value_or(1) << " dims: " << frontend->getSize().width << ","
-              << frontend->getSize().height << std::endl;
-    std::cout << "token: " << (token.has_value() ? "set" : "not set ") << std::endl;
-
     // determine tile server options from provider
-    // TODO: verify this works properly
     mbgl::TileServerOptions tileServerOptions = mbgl::TileServerOptions();
 
     if (provider.has_value() && !provider.value().empty()) {
         if (provider.value().find("mapbox") != -1) {
             tileServerOptions = mbgl::TileServerOptions::MapboxConfiguration();
-            std::cout << "Set mapbox provider" << std::endl;
         } else if (provider.value().find("maptiler") != -1) {
             tileServerOptions = mbgl::TileServerOptions::MapTilerConfiguration();
-            std::cout << "Set maptiler provider" << std::endl;
         } else if (provider.value().find("maplibre") != -1) {
             tileServerOptions = mbgl::TileServerOptions::MapLibreConfiguration();
-            std::cout << "Set maplibre provider" << std::endl;
         } else {
             throw std::invalid_argument("invalid provider: " + provider.value());
         }
         // TODO: custom ?
+    }
+
+    if (tileServerOptions.requiresApiKey() && (!token.has_value() || token.value().empty())) {
+        throw std::invalid_argument("provider '" + provider.value_or("") + "' requires a token");
     }
 
     // validate parameters
@@ -88,42 +87,37 @@ Map::Map(const std::string &style,
                                           .withPixelRatio(ratio.value_or(1)),
                                       resourceOptions.withTileServerOptions(tileServerOptions));
 
-    // create loop but immediately stop it (doesn't need to run)
-    mbgl::util::RunLoop loop;
-    loop.stop();
-
     if (style.find("{") == 0) {
         // assume json
-        std::cout << "loading style JSON" << std::endl;
         map->getStyle().loadJSON(style);
-        has_style = true;
     } else if (style.find("://") != -1) {
-        // assume URL, like mapbox://
-        std::cout << "loading style URL: " << style << std::endl;
+        // otherwise must be URL-like reference, like "mapbox://styles/mapbox/streets-v11"
         map->getStyle().loadURL(style);
-        has_style = true;
-    } else if (!style.empty()) {
-        // assume simple style ID, construct URL
-        std::string url
-            = mbgl::util::mapbox::normalizeStyleURL(tileServerOptions, style, token.value_or(""));
-        std::cout << "loading style URL: " << url << std::endl;
-        map->getStyle().loadURL(url);
-        has_style = true;
     } else {
         throw std::invalid_argument("style is not valid");
     }
-
-    std::cout << "Init config, zoom: " << zoom.value_or(0) << " center: " << longitude.value_or(0)
-              << ", " << latitude.value_or(0) << std::endl;
 
     map->jumpTo(mbgl::CameraOptions()
                     .withCenter(mbgl::LatLng{latitude.value_or(0), longitude.value_or(0)})
                     .withZoom(zoom.value_or(0))
                     .withBearing(0)
                     .withPitch(0));
-
-    std::cout << "Map created" << std::endl;
 }
+
+const double Map::getBearing() { return map->getCameraOptions().bearing.value_or(0); }
+
+const std::pair<double, double> Map::getCenter() {
+    mbgl::LatLng center = map->getCameraOptions().center.value_or(mbgl::LatLng(0, 0));
+    return std::pair<double, double>(center.longitude(), center.latitude());
+}
+
+const double Map::getPitch() { return map->getCameraOptions().pitch.value_or(0); }
+
+const std::pair<uint32_t, uint32_t> Map::getSize() {
+    return std::pair<uint32_t, uint32_t>(frontend->getSize().width, frontend->getSize().height);
+}
+
+const double Map::getZoom() { return map->getCameraOptions().zoom.value_or(0); }
 
 void Map::setBearing(const double &bearing) {
     validateBearing(bearing);
@@ -164,28 +158,8 @@ void Map::setZoom(const double &zoom) {
 }
 
 std::string Map::render() {
-    // check via map
-    if (map->getStyle().getSources().empty() || map->getStyle().getLayers().empty()) {
-        throw std::runtime_error(std::string("CHECK style is not set"));
-    }
-
-    // style must be set or render will hang
-    if (!has_style) {
-        throw std::runtime_error(std::string("style is not set"));
-    }
-
-    mbgl::util::RunLoop loop;
-    loop.stop();
-
-    try {
-        std::string img = encodePNG(frontend->render(*map).image);
-        std::cout << "rendered successfully" << std::endl;
-        return img;
-
-    } catch (std::exception &e) {
-        std::cout << "ERROR: Error rendering map " << e.what() << std::endl;
-        throw e;
-    }
+    std::string img = encodePNG(frontend->render(*map).image);
+    return img;
 }
 
 // private:

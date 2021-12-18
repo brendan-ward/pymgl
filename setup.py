@@ -78,5 +78,7 @@ setup(
     ext_modules=[CMakeExtension("_pymbgl")],
     cmdclass={"build_ext": CMakeBuild},
     zip_safe=False,
-    extras_require={"test": ["pytest", "pytest-cov", "Pillow", "python-dotenv"]},
+    extras_require={
+        "test": ["pytest", "pytest-cov", "Pillow", "python-dotenv", "numpy"]
+    },
 )

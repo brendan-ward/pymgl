@@ -8,7 +8,10 @@ namespace py = pybind11;
 using namespace pybind11::literals;
 using namespace py_mbgl;
 
+// TODO: add __str__ and __repr__ based on properties currently set
 PYBIND11_MODULE(_pymbgl, m) {
+    m.doc() = "MapLibre GL native static renderer";
+
     py::class_<Map>(m, "Map")
         .def(py::init<const std::string &,
                       const std::optional<uint32_t> &,
@@ -19,6 +22,7 @@ PYBIND11_MODULE(_pymbgl, m) {
                       const std::optional<double> &,
                       const std::optional<std::string> &,
                       const std::optional<std::string> &>(),
+             "Class that provides static rendering using MapLibre GL native",
              py::arg("style"),
              py::arg("width")     = 256,
              py::arg("height")    = 256,
@@ -28,9 +32,15 @@ PYBIND11_MODULE(_pymbgl, m) {
              py::arg("zoom")      = 0,
              py::arg("token")     = py::none(),
              py::arg("provider")  = py::none())
+        .def_property_readonly("bearing", &Map::getBearing)
+        .def_property_readonly("center", &Map::getCenter)
+        .def_property_readonly("pitch", &Map::getPitch)
+        .def_property_readonly("size", &Map::getSize)
+        .def_property_readonly("zoom", &Map::getZoom)
         .def(
             "render",
             [](Map &self) -> py::bytes { return py::bytes(self.render()); },
+            py::call_guard<py::gil_scoped_release>(),
             "Render the map to PNG data")
         .def("setBearing", &Map::setBearing, "Set the bearing of the map")
         .def("setBounds",

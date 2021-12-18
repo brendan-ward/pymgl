@@ -12,6 +12,7 @@
 #include <mbgl/style/style.hpp>
 #include <mbgl/util/async_request.hpp>
 #include <mbgl/util/image.hpp>
+#include <mbgl/util/run_loop.hpp>
 
 namespace py_mbgl {
 
@@ -33,6 +34,12 @@ public:
 
     std::string render();
 
+    const double getBearing();
+    const std::pair<double, double> getCenter();
+    const double getPitch();
+    const std::pair<uint32_t, uint32_t> getSize();
+    const double getZoom();
+
     void setBearing(const double &bearing);
     void setCenter(const double &longitude, const double &latitude);
     void setBounds(const double &xmin,
@@ -44,15 +51,10 @@ public:
     void setZoom(const double &zoom);
     void setSize(const uint32_t &width, const uint32_t &height);
 
-    // TODO: check nodeJS impl?
-    // void Cancel();
-    // void Release();
-
 private:
     std::unique_ptr<mbgl::HeadlessFrontend> frontend;
     std::unique_ptr<mbgl::Map> map;
-
-    bool has_style = false;
+    mbgl::util::RunLoop loop;
 
     void validateBearing(const double &bearing);
     void validateDimension(const uint32_t &value, const std::string dimType);

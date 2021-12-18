@@ -3,22 +3,9 @@ import os
 from pathlib import Path
 
 import pytest
-from dotenv import load_dotenv
-
-load_dotenv()
 
 
 styles_dir = Path("tests/fixtures")
-
-
-@pytest.fixture(scope="session")
-def mapbox_token():
-    # Must be on defined or contained a .env file in root directory
-    token = os.getenv("MAPBOX_TOKEN", None)
-    if token is None:
-        raise ValueError("MAPBOX_TOKEN environment variable must be defined")
-
-    return token
 
 
 @pytest.fixture(scope="session")
