@@ -1,6 +1,7 @@
 find_package(CURL REQUIRED)
+find_package(ICU OPTIONAL_COMPONENTS i18n)
+find_package(ICU OPTIONAL_COMPONENTS uc)
 find_package(JPEG REQUIRED)
-find_package(OpenGL REQUIRED GLX)
 find_package(PNG REQUIRED)
 find_package(PkgConfig REQUIRED)
 find_package(X11 REQUIRED)
@@ -18,6 +19,7 @@ target_sources(
         ${MBGL_SOURCE_DIR}/platform/default/src/mbgl/layermanager/layer_manager.cpp
         ${MBGL_SOURCE_DIR}/platform/default/src/mbgl/platform/time.cpp
         ${MBGL_SOURCE_DIR}/platform/default/src/mbgl/storage/asset_file_source.cpp
+        ${MBGL_SOURCE_DIR}/platform/default/src/mbgl/storage/mbtiles_file_source.cpp
         ${MBGL_SOURCE_DIR}/platform/default/src/mbgl/storage/database_file_source.cpp
         ${MBGL_SOURCE_DIR}/platform/default/src/mbgl/storage/file_source_manager.cpp
         ${MBGL_SOURCE_DIR}/platform/default/src/mbgl/storage/file_source_request.cpp
@@ -47,7 +49,6 @@ target_sources(
         ${MBGL_SOURCE_DIR}/platform/default/src/mbgl/util/timer.cpp
         ${MBGL_SOURCE_DIR}/platform/default/src/mbgl/util/utf.cpp
         ${MBGL_SOURCE_DIR}/platform/linux/src/gl_functions.cpp
-        ${MBGL_SOURCE_DIR}/platform/linux/src/headless_backend_glx.cpp
 )
 
 # FIXME: Should not be needed, but now needed by node because of the headless frontend.
@@ -63,10 +64,54 @@ target_include_directories(
 
 # Always use vendored ICU
 # TODO: verify if ICU has been replaced / removed
-include(${MBGL_SOURCE_DIR}/vendor/icu.cmake)
-
+# include(${MBGL_SOURCE_DIR}/vendor/icu.cmake)
 include(${MBGL_SOURCE_DIR}/vendor/nunicode.cmake)
 include(${MBGL_SOURCE_DIR}/vendor/sqlite.cmake)
+
+if(NOT ${ICU_FOUND} OR "${ICU_VERSION}" VERSION_LESS 62.0)
+    message(STATUS "ICU not found or too old, using builtin.")
+
+    set(MBGL_USE_BUILTIN_ICU TRUE)
+    include(${PROJECT_SOURCE_DIR}/vendor/icu.cmake)
+
+    set_source_files_properties(
+        ${PROJECT_SOURCE_DIR}/platform/default/src/mbgl/i18n/number_format.cpp
+        PROPERTIES
+        COMPILE_DEFINITIONS
+        MBGL_USE_BUILTIN_ICU
+    )
+endif()
+
+
+if(MBGL_WITH_EGL)
+    message(STATUS "Using EGL backend")
+    find_package(OpenGL REQUIRED EGL)
+    target_sources(
+        mbgl-core
+        PRIVATE
+            ${MBGL_SOURCE_DIR}/platform/linux/src/headless_backend_egl.cpp
+    )
+    target_link_libraries(
+        mbgl-core
+        PRIVATE
+            OpenGL::EGL
+    )
+else()
+message(STATUS "Using GLX backend")
+    find_package(OpenGL REQUIRED GLX)
+    target_sources(
+        mbgl-core
+        PRIVATE
+            ${MBGL_SOURCE_DIR}/platform/linux/src/headless_backend_glx.cpp
+    )
+    target_link_libraries(
+        mbgl-core
+        PRIVATE
+            OpenGL::GLX
+    )
+endif()
+
+
 
 target_link_libraries(
     mbgl-core
@@ -75,10 +120,11 @@ target_link_libraries(
         ${JPEG_LIBRARIES}
         ${LIBUV_LIBRARIES}
         ${X11_LIBRARIES}
-        # TODO: remove GLX line here, not in maplibre linux makefile
-        OpenGL::GLX
+        $<$<NOT:$<BOOL:${MBGL_USE_BUILTIN_ICU}>>:ICU::i18n>
+        $<$<NOT:$<BOOL:${MBGL_USE_BUILTIN_ICU}>>:ICU::uc>
+        $<$<BOOL:${MBGL_USE_BUILTIN_ICU}>:mbgl-vendor-icu>
         PNG::PNG
-        mbgl-vendor-icu
+        # mbgl-vendor-icu
         mbgl-vendor-nunicode
         mbgl-vendor-sqlite
 )

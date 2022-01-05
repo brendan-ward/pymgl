@@ -1,22 +1,14 @@
 #pragma once
 
-#include <exception>
 #include <iomanip>
-#include <iostream>
 #include <optional>
 #include <ostream>
 
 #include <mbgl/gfx/headless_frontend.hpp>
 #include <mbgl/map/map.hpp>
-#include <mbgl/map/map_observer.hpp>
-#include <mbgl/map/map_options.hpp>
-#include <mbgl/storage/file_source.hpp>
-#include <mbgl/style/style.hpp>
-#include <mbgl/util/async_request.hpp>
-#include <mbgl/util/image.hpp>
 #include <mbgl/util/run_loop.hpp>
 
-namespace py_mbgl {
+namespace mbgl_wrapper {
 
 class Map {
 public:
@@ -52,13 +44,16 @@ public:
     void setPitch(const double &pitch);
     void setZoom(const double &zoom);
     void setSize(const uint32_t &width, const uint32_t &height);
-    // std::string toString();
 
     friend std::ostream &operator<<(std::ostream &os, Map &m);
 
 private:
     std::unique_ptr<mbgl::HeadlessFrontend> frontend;
     std::unique_ptr<mbgl::Map> map;
+
+    // loop must be defined on the instance or we get segfaults, but we don't
+    // need to stop it (stopping works fine on MacOS, but causes things to hang
+    // on Linux)
     mbgl::util::RunLoop loop;
 
     void validateBearing(const double &bearing);
@@ -68,4 +63,4 @@ private:
     void validateZoom(const double &zoom);
 };
 
-} // namespace py_mbgl
+} // namespace mbgl_wrapper

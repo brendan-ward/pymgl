@@ -2,3 +2,7 @@
 	path = vendor/pybind11
 	url = https://github.com/pybind/pybind11.git
 	branch = stable
+[submodule "vendor/maplibre-gl-native"]
+	path = vendor/maplibre-gl-native
+	url = https://github.com/maplibre/maplibre-gl-native
+	branch = master

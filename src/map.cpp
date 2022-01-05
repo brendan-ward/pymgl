@@ -1,29 +1,17 @@
-#include <csignal>
 #include <exception>
-// #include <fstream>
-// #include <iomanip>
 #include <iostream>
 #include <optional>
-#include <pybind11/pybind11.h>
-#include <pybind11/stl.h>
-// #include <sstream>
 
-#include <mbgl/gfx/headless_frontend.hpp>
-#include <mbgl/map/map.hpp>
 #include <mbgl/map/map_observer.hpp>
 #include <mbgl/map/map_options.hpp>
-#include <mbgl/storage/file_source_manager.hpp>
-#include <mbgl/storage/network_status.hpp>
 #include <mbgl/style/style.hpp>
-#include <mbgl/util/exception.hpp>
 #include <mbgl/util/image.hpp>
 #include <mbgl/util/logging.hpp>
 #include <mbgl/util/mapbox.hpp>
-#include <mbgl/util/run_loop.hpp>
 
 #include "map.hpp"
 
-namespace py_mbgl {
+namespace mbgl_wrapper {
 
 Map::Map(const std::string &style,
          const std::optional<uint32_t> &width,
@@ -36,9 +24,6 @@ Map::Map(const std::string &style,
          const std::optional<std::string> &provider)
     : frontend(std::make_unique<mbgl::HeadlessFrontend>(
         mbgl::Size{width.value_or(256), height.value_or(256)}, ratio.value_or(1))) {
-
-    // immediately stop loop (doesn't need to run)
-    loop.stop();
 
     // Turn off logging
     mbgl::Log::setObserver(std::make_unique<mbgl::Log::NullObserver>());
@@ -92,7 +77,7 @@ Map::Map(const std::string &style,
                                       resourceOptions.withTileServerOptions(tileServerOptions));
 
     if (style.find("{") == 0) {
-        // assume json
+        // assume content is json
         map->getStyle().loadJSON(style);
     } else if (style.find("://") != -1) {
         // otherwise must be URL-like reference, like "mapbox://styles/mapbox/streets-v11"
@@ -207,7 +192,7 @@ void Map::validateZoom(const double &zoom) {
     if (zoom < 0) {
         throw std::domain_error("zoom must be greater than 0");
     }
-    // match mapbox gl JS
+    // match mapbox gl JS max zoom
     if (zoom > 24) {
         throw std::domain_error("zoom must be no greater than 24");
     }
@@ -221,13 +206,4 @@ std::ostream &operator<<(std::ostream &os, Map &m) {
     return os;
 }
 
-// std::string Map::toString() {
-//     std::ostringstream os;
-//     os << std::setprecision(2) << "pymblg.Map(size: (" << this->getSize().first << ", "
-//        << this->getSize().second << "), center: (" << this->getCenter().first << ", "
-//        << this->getCenter().second << "), zoom: " << this->getZoom()
-//        << ", bearing: " << this->getBearing() << ", pitch: " << this->getPitch() << ")";
-//     return os.str();
-// }
-
-} // namespace py_mbgl
+} // namespace mbgl_wrapper

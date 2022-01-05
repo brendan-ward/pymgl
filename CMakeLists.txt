@@ -5,6 +5,8 @@ cmake_policy(SET CMP0079 NEW)
 
 # maplibre-gl-native is in sibling directory
 set(MBGL_SOURCE_DIR ${PROJECT_SOURCE_DIR}/../maplibre-gl-native)
+# set(MBGL_SOURCE_DIR /maplibre-gl-native)
+# set(MBGL_SOURCE_DIR ${PROJECT_SOURCE_DIR}/vendor/maplibre-gl-native)
 message(STATUS "maplibre-gl-native dir: ${MBGL_SOURCE_DIR}")
 
 # Adapted from maplibre-gl-native
@@ -50,25 +52,25 @@ include_directories(${PROJECT_SOURCE_DIR}/include)
 
 
 ### Build Python module
-add_subdirectory(vendor/pybind11)
+# add_subdirectory(vendor/pybind11)
 
-pybind11_add_module(
-    _pymbgl
-    SHARED
-    ${PROJECT_SOURCE_DIR}/src/map.cpp
-    ${PROJECT_SOURCE_DIR}/src/_pymbgl.cpp
-)
+# pybind11_add_module(
+#     _pymbgl
+#     SHARED
+#     ${PROJECT_SOURCE_DIR}/src/map.cpp
+#     ${PROJECT_SOURCE_DIR}/src/_pymbgl.cpp
+# )
 
-target_link_libraries(
-    _pymbgl
-    PRIVATE
-    Mapbox::Base
-    mbgl-core
-)
+# target_link_libraries(
+#     _pymbgl
+#     PRIVATE
+#     Mapbox::Base
+#     mbgl-core
+# )
 
-set_target_properties(_pymbgl PROPERTIES INTERPROCEDURAL_OPTIMIZATION TRUE)
-target_compile_definitions(_pymbgl PRIVATE VERSION_INFO=${VERSION_INFO})
+# set_target_properties(_pymbgl PROPERTIES INTERPROCEDURAL_OPTIMIZATION TRUE)
+# target_compile_definitions(_pymbgl PRIVATE VERSION_INFO=${VERSION_INFO})
 
 
 ### Tests
-# add_subdirectory(${PROJECT_SOURCE_DIR}/src/tests)
+add_subdirectory(${PROJECT_SOURCE_DIR}/src/tests)
