@@ -15,7 +15,7 @@
 #include <mbgl/util/logging.hpp>
 #include <mbgl/util/run_loop.hpp>
 
-#include "map.hpp"
+#include "map.h"
 
 using namespace mbgl_wrapper;
 
@@ -24,23 +24,7 @@ int main(int argc, char *argv[]) {
     auto start   = clock.now();
     auto elapsed = std::chrono::duration_cast<std::chrono::milliseconds>(clock.now() - start);
 
-    const float pixelRatio          = 1;
-    const uint32_t width            = 256;
-    const uint32_t height           = 256;
-    const std::string styleFilename = "../tests/fixtures/example-style-geojson.json";
-    const double lon                = -119.81689453125;
-    const double lat                = 39.52099229357195;
-    const double zoom               = 1;
-    const double bearing            = 0;
-    const double pitch              = 0;
-
-    // TODO: may be able to have map fit bounds instead, or call the same thing to figure out
-    // center / zoom it uses
-    const double xmin       = -100;
-    const double ymin       = -10;
-    const double xmax       = 0;
-    const double ymax       = 50;
-    const double pad_pixels = 0;
+    const std::string styleFilename = "../tests/fixtures/example-style-local-image.json";
 
     try {
         // MAPBOX_TOKEN Must always be defined
@@ -67,12 +51,18 @@ int main(int argc, char *argv[]) {
         const std::string style = buffer.str();
 
         std::cout << "#### Create map 1" << std::endl;
-        Map map = Map(style, 256, 256, 1, -100, 20, 1);
+        Map map = Map(style, 512, 512, 1, -85, 34, 6);
         // map.setSize(200, 400);
         // map.setBearing(20);
         // map.setPitch(50);
 
+        start = clock.now();
+
         auto img = map.render();
+
+        elapsed = std::chrono::duration_cast<std::chrono::milliseconds>(clock.now() - start);
+        std::cout << "rendered in: " << elapsed.count() << " ms" << std::endl;
+
         std::ofstream out("/tmp/test1.png", std::ios::binary);
         out << img;
         out.close();

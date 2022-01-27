@@ -1,13 +1,18 @@
 cmake_minimum_required(VERSION 3.10 FATAL_ERROR)
-project("_pymbgl")
+project("_pymgl")
 
 cmake_policy(SET CMP0079 NEW)
 
 # maplibre-gl-native is in sibling directory
-set(MBGL_SOURCE_DIR ${PROJECT_SOURCE_DIR}/../maplibre-gl-native)
+# set(MBGL_SOURCE_DIR ${PROJECT_SOURCE_DIR}/../maplibre-gl-native)
+
+# used for docker build, installed to root
 # set(MBGL_SOURCE_DIR /maplibre-gl-native)
-# set(MBGL_SOURCE_DIR ${PROJECT_SOURCE_DIR}/vendor/maplibre-gl-native)
+
+# use when installed into vendor folder
+set(MBGL_SOURCE_DIR ${PROJECT_SOURCE_DIR}/vendor/maplibre-gl-native)
 message(STATUS "maplibre-gl-native dir: ${MBGL_SOURCE_DIR}")
+
 
 # Adapted from maplibre-gl-native
 cmake_policy(SET CMP0063 NEW)
@@ -45,31 +50,33 @@ include_directories(${MBGL_SOURCE_DIR}/vendor/mapbox-base/deps/variant/include)
 
 
 ### Build mbgl-core
-include(${PROJECT_SOURCE_DIR}/vendor/maplibre-gl-native-core.cmake)
+include(${PROJECT_SOURCE_DIR}/mbgl-core/maplibre-gl-native-core.cmake)
 
 
+### Include headers for pymgl
 include_directories(${PROJECT_SOURCE_DIR}/include)
 
 
 ### Build Python module
-# add_subdirectory(vendor/pybind11)
+add_subdirectory(vendor/pybind11)
 
-# pybind11_add_module(
-#     _pymbgl
-#     SHARED
-#     ${PROJECT_SOURCE_DIR}/src/map.cpp
-#     ${PROJECT_SOURCE_DIR}/src/_pymbgl.cpp
-# )
+pybind11_add_module(
+    _pymgl
+    SHARED
+    ${PROJECT_SOURCE_DIR}/src/map.cpp
+    ${PROJECT_SOURCE_DIR}/src/_pymgl.cpp
+)
 
-# target_link_libraries(
-#     _pymbgl
-#     PRIVATE
-#     Mapbox::Base
-#     mbgl-core
-# )
+# link against mbgl-core
+target_link_libraries(
+    _pymgl
+    PRIVATE
+    Mapbox::Base
+    mbgl-core
+)
 
-# set_target_properties(_pymbgl PROPERTIES INTERPROCEDURAL_OPTIMIZATION TRUE)
-# target_compile_definitions(_pymbgl PRIVATE VERSION_INFO=${VERSION_INFO})
+set_target_properties(_pymgl PROPERTIES INTERPROCEDURAL_OPTIMIZATION TRUE)
+target_compile_definitions(_pymgl PRIVATE VERSION_INFO=${VERSION_INFO})
 
 
 ### Tests

@@ -37,7 +37,7 @@ class CMakeBuild(build_ext):
         build_args = []
 
         if self.compiler.compiler_type == "msvc":
-            raise NotImplementedError("pymbgl is not supported on Windows")
+            raise NotImplementedError("pymgl is not supported on Windows")
 
         else:
             if not cmake_generator:
@@ -64,10 +64,10 @@ class CMakeBuild(build_ext):
 
 
 setup(
-    name="pymbgl",
+    name="pymgl",
     version="0.1.0",
-    packages=["pymbgl"],
-    url="https://github.com/brendan-ward/pymbgl",
+    packages=["pymgl"],
+    url="https://github.com/brendan-ward/pymgl",
     license="MIT",
     author="Brendan C. Ward",
     author_email="bcward@astutespruce.com",
@@ -75,7 +75,7 @@ setup(
     long_description_content_type="text/markdown",
     long_description=open("README.md").read(),
     python_requires=">=3.8",
-    ext_modules=[CMakeExtension("_pymbgl")],
+    ext_modules=[CMakeExtension("_pymgl")],
     cmdclass={"build_ext": CMakeBuild},
     zip_safe=False,
     extras_require={

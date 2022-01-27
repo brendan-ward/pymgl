@@ -6,7 +6,7 @@ from PIL import Image
 import pytest
 import numpy as np
 
-from pymbgl import Map
+from pymgl import Map
 
 
 load_dotenv()

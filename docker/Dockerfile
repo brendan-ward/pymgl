@@ -1,6 +1,6 @@
-# docker build -f docker/Dockerfile -t pymbgl .
-# docker run -it pymbgl /bin/bash
-# docker run -it -v "$PWD/:/app" pymbgl /bin/bash
+# docker build -f docker/Dockerfile -t pymgl .
+# docker run -it pymgl /bin/bash
+# docker run -it -v "$PWD/:/app" pymgl /bin/bash
 FROM debian:bullseye-slim
 
 WORKDIR /app

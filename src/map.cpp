@@ -9,7 +9,7 @@
 #include <mbgl/util/logging.hpp>
 #include <mbgl/util/mapbox.hpp>
 
-#include "map.hpp"
+#include "map.h"
 
 namespace mbgl_wrapper {
 
@@ -146,10 +146,7 @@ void Map::setZoom(const double &zoom) {
     map->jumpTo(mbgl::CameraOptions().withZoom(zoom));
 }
 
-std::string Map::render() {
-    std::string img = encodePNG(frontend->render(*map).image);
-    return img;
-}
+std::string Map::render() { return encodePNG(frontend->render(*map).image); }
 
 // private:
 

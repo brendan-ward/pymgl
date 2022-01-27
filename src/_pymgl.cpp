@@ -2,13 +2,13 @@
 #include <pybind11/stl.h>
 #include <sstream>
 
-#include "map.hpp"
+#include "map.h"
 
 namespace py = pybind11;
 using namespace pybind11::literals;
 using namespace mbgl_wrapper;
 
-PYBIND11_MODULE(_pymbgl, m) {
+PYBIND11_MODULE(_pymgl, m) {
     m.doc() = "MapLibre GL native static renderer";
 
     py::class_<Map>(m, "Map")
@@ -34,13 +34,13 @@ PYBIND11_MODULE(_pymbgl, m) {
         .def("__str__",
              [](Map &self) {
                  std::ostringstream os;
-                 os << "pymbgl." << self;
+                 os << "pymgl." << self;
                  return os.str();
              })
         .def("__repr__",
              [](Map &self) {
                  std::ostringstream os;
-                 os << "pymbgl." << self;
+                 os << "pymgl." << self;
                  return os.str();
              })
         .def_property_readonly("bearing", &Map::getBearing)
