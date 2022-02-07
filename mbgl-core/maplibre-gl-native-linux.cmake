@@ -11,43 +11,23 @@ pkg_search_module(LIBUV libuv REQUIRED)
 target_sources(
     mbgl-core
     PRIVATE
-        ${MBGL_SOURCE_DIR}/platform/default/src/mbgl/gfx/headless_backend.cpp
-        ${MBGL_SOURCE_DIR}/platform/default/src/mbgl/gfx/headless_frontend.cpp
-        ${MBGL_SOURCE_DIR}/platform/default/src/mbgl/gl/headless_backend.cpp
+        ${MBGL_SOURCE_DIR}/platform/default/src/mbgl/storage/http_file_source.cpp
+
+
         ${MBGL_SOURCE_DIR}/platform/default/src/mbgl/i18n/collator.cpp
         ${MBGL_SOURCE_DIR}/platform/default/src/mbgl/i18n/number_format.cpp
-        ${MBGL_SOURCE_DIR}/platform/default/src/mbgl/layermanager/layer_manager.cpp
-        ${MBGL_SOURCE_DIR}/platform/default/src/mbgl/platform/time.cpp
-        ${MBGL_SOURCE_DIR}/platform/default/src/mbgl/storage/asset_file_source.cpp
-        ${MBGL_SOURCE_DIR}/platform/default/src/mbgl/storage/mbtiles_file_source.cpp
-        ${MBGL_SOURCE_DIR}/platform/default/src/mbgl/storage/database_file_source.cpp
-        ${MBGL_SOURCE_DIR}/platform/default/src/mbgl/storage/file_source_manager.cpp
-        ${MBGL_SOURCE_DIR}/platform/default/src/mbgl/storage/file_source_request.cpp
-        ${MBGL_SOURCE_DIR}/platform/default/src/mbgl/storage/http_file_source.cpp
-        ${MBGL_SOURCE_DIR}/platform/default/src/mbgl/storage/local_file_request.cpp
-        ${MBGL_SOURCE_DIR}/platform/default/src/mbgl/storage/local_file_source.cpp
-        ${MBGL_SOURCE_DIR}/platform/default/src/mbgl/storage/main_resource_loader.cpp
-        ${MBGL_SOURCE_DIR}/platform/default/src/mbgl/storage/offline.cpp
-        ${MBGL_SOURCE_DIR}/platform/default/src/mbgl/storage/offline_database.cpp
-        ${MBGL_SOURCE_DIR}/platform/default/src/mbgl/storage/offline_download.cpp
-        ${MBGL_SOURCE_DIR}/platform/default/src/mbgl/storage/online_file_source.cpp
-        ${MBGL_SOURCE_DIR}/platform/default/src/mbgl/storage/sqlite3.cpp
-        ${MBGL_SOURCE_DIR}/platform/default/src/mbgl/text/bidi.cpp
         ${MBGL_SOURCE_DIR}/platform/default/src/mbgl/text/local_glyph_rasterizer.cpp
         ${MBGL_SOURCE_DIR}/platform/default/src/mbgl/util/async_task.cpp
         ${MBGL_SOURCE_DIR}/platform/default/src/mbgl/util/compression.cpp
         ${MBGL_SOURCE_DIR}/platform/default/src/mbgl/util/image.cpp
         ${MBGL_SOURCE_DIR}/platform/default/src/mbgl/util/jpeg_reader.cpp
         ${MBGL_SOURCE_DIR}/platform/default/src/mbgl/util/logging_stderr.cpp
-        ${MBGL_SOURCE_DIR}/platform/default/src/mbgl/util/monotonic_timer.cpp
         ${MBGL_SOURCE_DIR}/platform/default/src/mbgl/util/png_reader.cpp
         ${MBGL_SOURCE_DIR}/platform/default/src/mbgl/util/png_writer.cpp
         ${MBGL_SOURCE_DIR}/platform/default/src/mbgl/util/run_loop.cpp
         ${MBGL_SOURCE_DIR}/platform/default/src/mbgl/util/string_stdlib.cpp
         ${MBGL_SOURCE_DIR}/platform/default/src/mbgl/util/thread.cpp
-        ${MBGL_SOURCE_DIR}/platform/default/src/mbgl/util/thread_local.cpp
         ${MBGL_SOURCE_DIR}/platform/default/src/mbgl/util/timer.cpp
-        ${MBGL_SOURCE_DIR}/platform/default/src/mbgl/util/utf.cpp
         ${MBGL_SOURCE_DIR}/platform/linux/src/gl_functions.cpp
 )
 
