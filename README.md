@@ -53,21 +53,37 @@ Run the following:
 ```bash
 cd vendor/maplibre-gl-native
 
-git submodule update --init --recursive --remote \
+git submodule update --init --recursive \
     vendor/earcut.hpp \
     vendor/polylabel \
     vendor/protozero \
     vendor/wagyu \
     vendor/unique_resource \
     vendor/boost \
-    vendor/eternal
+    vendor/eternal \
+    vendor/googletest
 
 git submodule update --init --recursive vendor/mapbox-base
 ```
 
+### Architecture
+
+This package is composed of 2 main parts:
+
+-   wrapper around Maplibre GL native classes to make constructing and managing
+    properties of the map easier
+-   Python bindings created using pybind11 against that wrapper
+
+The wrapper is located in `src/map.cpp`.
+
 ### Build
 
-#### Build tests using CMake / Ninja
+#### C++ tests
+
+See [tests/README](tests/README.md) for more information.
+
+Building using CMake directly is useful when building the C++ level tests of the
+Maplibre GL wrapper.
 
 ```bash
 mkdir build
@@ -76,11 +92,15 @@ cd build
 
 cmake .. -G Ninja -DCMAKE_BUILD_TYPE=Debug
 
+ctest -V
 ```
 
 #### Build Python extension
 
-from project root directory:
+The Python `setup.py` script manages building the library and extension using
+CMake.
+
+From project root directory:
 
 ```bash
 

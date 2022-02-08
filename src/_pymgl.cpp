@@ -6,7 +6,7 @@
 
 namespace py = pybind11;
 using namespace pybind11::literals;
-using namespace mbgl_wrapper;
+using namespace mgl_wrapper;
 
 PYBIND11_MODULE(_pymgl, m) {
     m.doc() = "MapLibre GL native static renderer";

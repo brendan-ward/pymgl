@@ -53,8 +53,20 @@ include_directories(${MBGL_SOURCE_DIR}/vendor/mapbox-base/deps/variant/include)
 include(${PROJECT_SOURCE_DIR}/mbgl-core/maplibre-gl-native-core.cmake)
 
 
-### Include headers for pymgl
+### Include headers for pymgl and build the wrapper
 include_directories(${PROJECT_SOURCE_DIR}/include)
+
+add_library(
+    mgl_wrapper STATIC
+    ${PROJECT_SOURCE_DIR}/src/map.cpp
+)
+
+target_link_libraries(
+    mgl_wrapper PRIVATE
+    Mapbox::Base
+    mbgl-core
+)
+
 
 
 ### Build Python module
@@ -63,7 +75,6 @@ add_subdirectory(vendor/pybind11)
 pybind11_add_module(
     _pymgl
     SHARED
-    ${PROJECT_SOURCE_DIR}/src/map.cpp
     ${PROJECT_SOURCE_DIR}/src/_pymgl.cpp
 )
 
@@ -71,13 +82,13 @@ pybind11_add_module(
 target_link_libraries(
     _pymgl
     PRIVATE
-    Mapbox::Base
-    mbgl-core
+    mgl_wrapper
 )
 
 set_target_properties(_pymgl PROPERTIES INTERPROCEDURAL_OPTIMIZATION TRUE)
 target_compile_definitions(_pymgl PRIVATE VERSION_INFO=${VERSION_INFO})
 
 
-### Tests
-add_subdirectory(${PROJECT_SOURCE_DIR}/src/tests)
+### C++ tests
+include(CTest)
+add_subdirectory(${PROJECT_SOURCE_DIR}/tests)

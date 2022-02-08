@@ -11,7 +11,7 @@
 
 #include "map.h"
 
-namespace mbgl_wrapper {
+namespace mgl_wrapper {
 
 Map::Map(const std::string &style,
          const std::optional<uint32_t> &width,
@@ -203,4 +203,4 @@ std::ostream &operator<<(std::ostream &os, Map &m) {
     return os;
 }
 
-} // namespace mbgl_wrapper
+} // namespace mgl_wrapper

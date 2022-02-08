@@ -14,5 +14,3 @@ build/*
 .pytest_cache/*
 
 Pipfile.lock
-
-tests/fixtures/

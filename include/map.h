@@ -8,7 +8,7 @@
 #include <mbgl/map/map.hpp>
 #include <mbgl/util/run_loop.hpp>
 
-namespace mbgl_wrapper {
+namespace mgl_wrapper {
 
 class Map {
 public:
@@ -63,4 +63,4 @@ private:
     void validateZoom(const double &zoom);
 };
 
-} // namespace mbgl_wrapper
+} // namespace mgl_wrapper
