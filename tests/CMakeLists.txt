@@ -25,7 +25,12 @@ add_executable(
 )
 unset(_sources)
 
-target_link_libraries(pymgl_test PRIVATE gtest_main mgl_wrapper)
+target_link_libraries(
+    pymgl_test PRIVATE
+    gtest_main
+    Mapbox::Base::pixelmatch-cpp
+    mgl_wrapper
+)
 
 file(GLOB_RECURSE _testfiles ${PROJECT_SOURCE_DIR}/tests/*Test.cpp CONFIGURE_DEPEND)
 foreach(_testfile ${_testfiles})
