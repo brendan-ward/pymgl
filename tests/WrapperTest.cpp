@@ -6,6 +6,7 @@
 
 #include <gtest/gtest.h>
 #include <mbgl/storage/sqlite3.hpp>
+#include <mbgl/util/image.hpp>
 
 #include "map.h"
 #include "util.h"
@@ -180,6 +181,34 @@ TEST(Wrapper, LocalMBtilesVectorSource) {
     EXPECT_TRUE(image_matches(img_filename, 10));
 }
 
+TEST(Wrapper, ImagePattern) {
+    const string test = "example-style-image-pattern";
+    string style      = read_style(test + ".json");
+
+    Map map = Map(style, 256, 256, 1);
+    map.setBounds(-125, 37.5, -115, 42.5);
+
+    // read and decode a PNG image, and convert the uint8_t[] data to string
+    mbgl::PremultipliedImage image = read_image(fixtures_dir + "example-pattern.png");
+    std::ostringstream image_str;
+    for (size_t i = 0; i < image.bytes(); i++) {
+        image_str << (uint8_t) image.data[i];
+    }
+
+    map.addImage("pattern", image_str.str(), image.size.width, image.size.height, 1, false);
+
+    auto img = map.render();
+
+    const string img_filename = test + ".png";
+
+    // to write out expected image, uncomment
+    // write_test_image(img, img_filename, true);
+
+    write_test_image(img, img_filename, false);
+    EXPECT_TRUE(image_matches(img_filename, 10));
+}
+
+// Tests of bad inputs
 TEST(Wrapper, BadSource) {
     // bad tile source will not render, but GeoJSON features will
     const string test  = "example-style-bad-source";

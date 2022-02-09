@@ -1,6 +1,7 @@
 #include <exception>
 #include <iostream>
 #include <optional>
+#include <string>
 
 #include <mbgl/map/map_observer.hpp>
 #include <mbgl/map/map_options.hpp>
@@ -8,6 +9,7 @@
 #include <mbgl/util/image.hpp>
 #include <mbgl/util/logging.hpp>
 #include <mbgl/util/mapbox.hpp>
+#include <mbgl/util/premultiply.hpp>
 
 #include "map.h"
 
@@ -91,6 +93,30 @@ Map::Map(const std::string &style,
                     .withZoom(zoom.value_or(0))
                     .withBearing(0)
                     .withPitch(0));
+}
+
+void Map::addImage(const std::string &name,
+                   const std::string &image,
+                   uint32_t width,
+                   uint32_t height,
+                   float ratio,
+                   bool make_sdf) {
+
+    if (width > 1024 || height > 1024) {
+        throw std::invalid_argument("width and height must be less than 1024");
+    }
+
+    if (image.length() != width * height * 4) {
+        throw std::invalid_argument("length of image bytes must be width * height * 4");
+    }
+
+    // Construct premultiplied image from string
+    mbgl::UnassociatedImage cImage(
+        {width, height}, reinterpret_cast<const uint8_t *>(image.c_str()), image.length());
+    mbgl::PremultipliedImage cPremultipliedImage = mbgl::util::premultiply(std::move(cImage));
+
+    map->getStyle().addImage(std::make_unique<mbgl::style::Image>(
+        name, std::move(cPremultipliedImage), ratio, make_sdf));
 }
 
 const double Map::getBearing() { return std::abs(map->getCameraOptions().bearing.value_or(0)); }

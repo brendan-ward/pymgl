@@ -72,6 +72,10 @@ Example:
 WARNING: providing a URI to tiles under the `tiles` key of a source is NOT currently supported by Maplibre GL Native;
 attempting to do so will fail.
 
+### Images
+
+TODO:
+
 ### Unsupported features
 
 PyMGL does not support alternative projections or 3D terrain.

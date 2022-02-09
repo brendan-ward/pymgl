@@ -34,6 +34,13 @@ public:
     const std::pair<uint32_t, uint32_t> getSize();
     const double getZoom();
 
+    void addImage(const std::string &name,
+                  const std::string &image,
+                  uint32_t width,
+                  uint32_t height,
+                  float ratio,
+                  bool make_sdf);
+
     void setBearing(const double &bearing);
     void setCenter(const double &longitude, const double &latitude);
     void setBounds(const double &xmin,
