@@ -1,12 +1,7 @@
-#include <filesystem>
 #include <fstream>
 #include <iostream>
-#include <regex>
-#include <sstream>
 
 #include <gtest/gtest.h>
-#include <mbgl/storage/sqlite3.hpp>
-#include <mbgl/util/image.hpp>
 
 #include "map.h"
 #include "util.h"
@@ -16,224 +11,162 @@ using namespace mgl_wrapper;
 using namespace testing;
 using namespace std;
 
-const string fixtures_dir = fs::absolute("../../tests/fixtures/").string();
-
 // Tests are named TEST(<group name>, <test name>)
 
-TEST(Wrapper, Empty) {
-    const string test  = "example-style-empty";
-    const string style = read_style(test + ".json");
+TEST(Wrapper, WidthHeightConstructor) {
+    const string style = read_style("example-style-empty.json");
 
-    Map map  = Map(style, 10, 10, 1, 0, 0);
-    auto img = map.render();
+    // test constructor with minimum required values
+    Map map   = Map(style, 10, 20);
+    auto size = map.getSize();
+    EXPECT_EQ(size.first, 10);
+    EXPECT_EQ(size.second, 20);
 
-    const string img_filename = test + ".png";
+    auto center = map.getCenter();
+    EXPECT_NEAR(center.first, 0, 1e-6);
+    EXPECT_NEAR(center.second, 0, 1e-6);
 
-    // to write out expected image, uncomment
-    // write_test_image(img, img_filename, true);
-
-    write_test_image(img, img_filename, false);
-    EXPECT_TRUE(image_matches(img_filename, 0));
+    EXPECT_NEAR(map.getZoom(), 0, 1e-6);
 }
 
-TEST(Wrapper, GeoJSON) {
-    const string test  = "example-style-geojson";
-    const string style = read_style(test + ".json");
+TEST(Wrapper, InvalidWidthHeightConstructor) {
+    const string style = read_style("example-style-empty.json");
 
-    Map map = Map(style, 100, 100, 1);
-    map.setBounds(-125, 37.5, -115, 42.5);
-    auto img = map.render();
-
-    const string img_filename = test + ".png";
-
-    // to write out expected image, uncomment
-    // write_test_image(img, img_filename, true);
-
-    write_test_image(img, img_filename, false);
-    EXPECT_TRUE(image_matches(img_filename, 10));
+    // invalid dimensions should fail
+    EXPECT_THROW(Map(style, 0, 0), std::domain_error);
+    EXPECT_THROW(Map(style, 0, 10), std::domain_error);
+    EXPECT_THROW(Map(style, 10, 0), std::domain_error);
 }
 
-TEST(Wrapper, FileGeoJSON) {
-    const string test = "example-style-file-geojson";
-    string style      = read_style(test + ".json");
+TEST(Wrapper, RatioConstructor) {
+    const string style = read_style("example-style-empty.json");
 
-    // update style from relative to absolute
-    style = regex_replace(style, regex("file://"), "file://" + fixtures_dir);
-    cout << style << endl;
-
-    Map map = Map(style, 100, 100, 1);
-    map.setBounds(-125, 37.5, -115, 42.5);
-    auto img = map.render();
-
-    const string img_filename = test + ".png";
-
-    // to write out expected image, uncomment
-    // write_test_image(img, img_filename, true);
-
-    write_test_image(img, img_filename, false);
-    EXPECT_TRUE(image_matches(img_filename, 10));
+    // ratio doesn't have a getter, just be sure map doesn't fail
+    EXPECT_NO_THROW(Map(style, 10, 10, 2));
 }
 
-TEST(Wrapper, RemoteRaster) {
-    const string test  = "example-style-remote-raster";
-    const string style = read_style(test + ".json");
+TEST(Wrapper, InvalidRatioConstructor) {
+    const string style = read_style("example-style-empty.json");
 
-    Map map  = Map(style, 256, 256, 1);
-    auto img = map.render();
-
-    const string img_filename = test + ".png";
-
-    // to write out expected image, uncomment
-    // write_test_image(img, img_filename, true);
-
-    write_test_image(img, img_filename, false);
-    EXPECT_TRUE(image_matches(img_filename, 10));
+    // invalid ratio should fail
+    EXPECT_THROW(Map(style, 10, 10, 0), std::domain_error);
 }
 
-TEST(Wrapper, RemoteImageSource) {
-    // remote image will render over top of raster
-    const string test  = "example-style-remote-image-source";
-    const string style = read_style(test + ".json");
+TEST(Wrapper, CenterConstructor) {
+    const string style = read_style("example-style-empty.json");
 
-    Map map  = Map(style, 256, 256, 1);
-    auto img = map.render();
-
-    const string img_filename = test + ".png";
-
-    // to write out expected image, uncomment
-    // write_test_image(img, img_filename, true);
-
-    write_test_image(img, img_filename, false);
-    EXPECT_TRUE(image_matches(img_filename, 10));
+    // ratio doesn't have a getter, just be sure map doesn't fail
+    Map map     = Map(style, 10, 10, 1, -180.0, -10.0);
+    auto center = map.getCenter();
+    EXPECT_NEAR(center.first, -180.0, 1e-6);
+    EXPECT_NEAR(center.second, -10.0, 1e-6);
 }
 
-TEST(Wrapper, MapboxSource) {
-    const string test  = "example-style-mapbox-source";
-    const string style = read_style(test + ".json");
+TEST(Wrapper, ZoomConstructor) {
+    const string style = read_style("example-style-empty.json");
 
-    const string token = get_token();
-
-    Map map  = Map(style, 256, 256, 1, 0, 0, 0, token, "mapbox");
-    auto img = map.render();
-
-    const string img_filename = test + ".png";
-
-    // to write out expected image, uncomment
-    // write_test_image(img, img_filename, true);
-
-    write_test_image(img, img_filename, false);
-    EXPECT_TRUE(image_matches(img_filename, 10));
+    Map map = Map(style, 10, 10, 1, {}, {}, 2);
+    EXPECT_NEAR(map.getZoom(), 2, 1e-6);
 }
 
-TEST(Wrapper, Labels) {
-    // should render text labels
-    const string test  = "example-style-geojson-labels";
-    const string style = read_style(test + ".json");
+TEST(Wrapper, InvalidZoomConstructor) {
+    const string style = read_style("example-style-empty.json");
 
-    Map map = Map(style, 256, 256, 1, {}, {}, {}, {}, "maplibre");
-    map.setBounds(-125, 37.5, -115, 42.5);
-    auto img = map.render();
-
-    const string img_filename = test + ".png";
-
-    // to write out expected image, uncomment
-    // write_test_image(img, img_filename, true);
-
-    write_test_image(img, img_filename, false);
-    EXPECT_TRUE(image_matches(img_filename, 10));
+    EXPECT_THROW(Map(style, 10, 10, 1, {}, {}, -2), std::domain_error);
+    EXPECT_THROW(Map(style, 10, 10, 1, {}, {}, 100), std::domain_error);
 }
 
-TEST(Wrapper, LocalMBtilesRasterSource) {
-    const string test = "example-style-mbtiles-raster-source";
-    string style      = read_style(test + ".json");
+TEST(Wrapper, RequiredTokenProvider) {
+    const string style = read_style("example-style-empty.json");
 
-    // update style from relative to mbtiles_path to absolute
-    style = regex_replace(style, regex("mbtiles://"), "mbtiles://" + fixtures_dir);
+    EXPECT_THROW(Map(style, 10, 10, 1, {}, {}, {}, {}, "mapbox"), std::invalid_argument);
+    EXPECT_THROW(Map(style, 10, 10, 1, {}, {}, {}, {}, "maptiler"), std::invalid_argument);
 
-    Map map  = Map(style, 256, 256, 1);
-    auto img = map.render();
-
-    const string img_filename = test + ".png";
-
-    // to write out expected image, uncomment
-    // write_test_image(img, img_filename, true);
-
-    write_test_image(img, img_filename, false);
-    EXPECT_TRUE(image_matches(img_filename, 10));
+    // token is not valid for provider but is present so should not fail here
+    EXPECT_NO_THROW(Map(style, 10, 10, 1, {}, {}, {}, "token", "mapbox"));
 }
 
-TEST(Wrapper, LocalMBtilesVectorSource) {
-    const string test = "example-style-mbtiles-vector-source";
-    string style      = read_style(test + ".json");
+TEST(Wrapper, SetCenter) {
+    const string style = read_style("example-style-empty.json");
 
-    // update style from relative to mbtiles_path to absolute
-    style = regex_replace(style, regex("mbtiles://"), "mbtiles://" + fixtures_dir);
+    Map map = Map(style, 10, 10);
 
-    Map map  = Map(style, 256, 256, 1);
-    auto img = map.render();
+    map.setCenter(-180, -10);
+    EXPECT_NEAR(map.getCenter().first, -180, 1e-6);
+    EXPECT_NEAR(map.getCenter().second, -10, 1e-6);
 
-    const string img_filename = test + ".png";
-
-    // to write out expected image, uncomment
-    // write_test_image(img, img_filename, true);
-
-    write_test_image(img, img_filename, false);
-    EXPECT_TRUE(image_matches(img_filename, 10));
+    map.setCenter(160, 10);
+    EXPECT_NEAR(map.getCenter().first, 160, 1e-6);
+    EXPECT_NEAR(map.getCenter().second, 10, 1e-6);
 }
 
-TEST(Wrapper, ImagePattern) {
-    const string test = "example-style-image-pattern";
-    string style      = read_style(test + ".json");
+TEST(Wrapper, SetZoom) {
+    const string style = read_style("example-style-empty.json");
 
-    Map map = Map(style, 256, 256, 1);
-    map.setBounds(-125, 37.5, -115, 42.5);
+    Map map = Map(style, 10, 10);
+    EXPECT_NEAR(map.getZoom(), 0, 1e-6);
 
-    // read and decode a PNG image, and convert the uint8_t[] data to string
-    mbgl::PremultipliedImage image = read_image(fixtures_dir + "example-pattern.png");
-    std::ostringstream image_str;
-    for (size_t i = 0; i < image.bytes(); i++) {
-        image_str << (uint8_t) image.data[i];
-    }
+    map.setZoom(2);
+    EXPECT_NEAR(map.getZoom(), 2, 1e-6);
 
-    map.addImage("pattern", image_str.str(), image.size.width, image.size.height, 1, false);
-
-    auto img = map.render();
-
-    const string img_filename = test + ".png";
-
-    // to write out expected image, uncomment
-    // write_test_image(img, img_filename, true);
-
-    write_test_image(img, img_filename, false);
-    EXPECT_TRUE(image_matches(img_filename, 10));
+    EXPECT_THROW(map.setZoom(-2), std::domain_error);
 }
 
-// Tests of bad inputs
-TEST(Wrapper, BadSource) {
-    // bad tile source will not render, but GeoJSON features will
-    const string test  = "example-style-bad-source";
-    const string style = read_style(test + ".json");
+TEST(Wrapper, SetBounds) {
+    const string style = read_style("example-style-empty.json");
 
-    Map map = Map(style, 100, 100, 1);
-    map.setBounds(-79.98, 32.64, -79.84, 32.79);
-    auto img = map.render();
+    Map map = Map(style, 512, 512);
 
-    const string img_filename = test + ".png";
-
-    // to write out expected image, uncomment
-    // write_test_image(img, img_filename, true);
-
-    write_test_image(img, img_filename, false);
-    EXPECT_TRUE(image_matches(img_filename, 10));
+    map.setBounds(-1, -1, 0, 0);
+    EXPECT_NEAR(map.getCenter().first, -0.5, 1e-2);
+    EXPECT_NEAR(map.getCenter().second, -0.5, 1e-2);
+    EXPECT_NEAR(map.getZoom(), 8.492, 1e-2);
 }
 
-TEST(Wrapper, BadGlyphs) {
-    // bad glyphs will make render fail with an exception
-    const string test  = "example-style-bad-glyphs";
-    const string style = read_style(test + ".json");
+TEST(Wrapper, SetPitch) {
+    const string style = read_style("example-style-empty.json");
 
-    Map map = Map(style, 100, 100, 1);
-    map.setBounds(-125, 37.5, -115, 42.5);
+    Map map = Map(style, 10, 10);
 
-    EXPECT_ANY_THROW(map.render());
+    map.setPitch(10);
+    EXPECT_NEAR(map.getPitch(), 10, 1e-6);
+
+    map.setPitch(40);
+    EXPECT_NEAR(map.getPitch(), 40, 1e-6);
+
+    EXPECT_THROW(map.setPitch(-1), std::domain_error);
+    EXPECT_THROW(map.setPitch(90), std::domain_error);
+}
+
+TEST(Wrapper, SetBearing) {
+    const string style = read_style("example-style-empty.json");
+
+    Map map = Map(style, 10, 10);
+
+    map.setBearing(10);
+    EXPECT_NEAR(map.getBearing(), 10, 1e-6);
+
+    map.setBearing(180);
+    EXPECT_NEAR(map.getBearing(), 180, 1e-6);
+
+    EXPECT_THROW(map.setPitch(-1), std::domain_error);
+    EXPECT_THROW(map.setPitch(361), std::domain_error);
+}
+
+TEST(Wrapper, SetSize) {
+    const string style = read_style("example-style-empty.json");
+
+    Map map = Map(style, 10, 10);
+
+    map.setSize(20, 30);
+    EXPECT_EQ(map.getSize().first, 20);
+    EXPECT_EQ(map.getSize().second, 30);
+
+    map.setSize(1000, 2000);
+    EXPECT_EQ(map.getSize().first, 1000);
+    EXPECT_EQ(map.getSize().second, 2000);
+
+    EXPECT_THROW(map.setSize(0, 0), std::domain_error);
+    EXPECT_THROW(map.setSize(0, 10), std::domain_error);
+    EXPECT_THROW(map.setSize(10, 0), std::domain_error);
 }
