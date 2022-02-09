@@ -1,15 +1,21 @@
+#include <filesystem>
 #include <fstream>
 #include <iostream>
+#include <regex>
 #include <sstream>
 
 #include <gtest/gtest.h>
+#include <mbgl/storage/sqlite3.hpp>
 
 #include "map.h"
 #include "util.h"
 
+namespace fs = std::filesystem;
 using namespace mgl_wrapper;
 using namespace testing;
 using namespace std;
+
+const string mbtiles_dir = fs::absolute("../../tests/fixtures/").string();
 
 // Tests are named TEST(<group name>, <test name>)
 
@@ -102,10 +108,46 @@ TEST(Wrapper, Labels) {
     const string test  = "example-style-geojson-labels";
     const string style = read_style(test + ".json");
 
-    // const string token = get_token();
-
     Map map = Map(style, 256, 256, 1, {}, {}, {}, {}, "maplibre");
     map.setBounds(-125, 37.5, -115, 42.5);
+    auto img = map.render();
+
+    const string img_filename = test + ".png";
+
+    // to write out expected image, uncomment
+    // write_test_image(img, img_filename, true);
+
+    write_test_image(img, img_filename, false);
+    EXPECT_TRUE(image_matches(img_filename, 10));
+}
+
+TEST(Wrapper, LocalMBtilesRasterSource) {
+    const string test = "example-style-mbtiles-raster-source";
+    string style      = read_style(test + ".json");
+
+    // update style from relative to mbtiles_path to absolute
+    style = regex_replace(style, regex("mbtiles://"), "mbtiles://" + mbtiles_dir);
+
+    Map map  = Map(style, 256, 256, 1);
+    auto img = map.render();
+
+    const string img_filename = test + ".png";
+
+    // to write out expected image, uncomment
+    // write_test_image(img, img_filename, true);
+
+    write_test_image(img, img_filename, false);
+    EXPECT_TRUE(image_matches(img_filename, 10));
+}
+
+TEST(Wrapper, LocalMBtilesVectorSource) {
+    const string test = "example-style-mbtiles-vector-source";
+    string style      = read_style(test + ".json");
+
+    // update style from relative to mbtiles_path to absolute
+    style = regex_replace(style, regex("mbtiles://"), "mbtiles://" + mbtiles_dir);
+
+    Map map  = Map(style, 256, 256, 1);
     auto img = map.render();
 
     const string img_filename = test + ".png";

@@ -1,4 +1,4 @@
-# Maplibre GL Native Static Renderer for Python
+# PyMGL: Maplibre GL Native Static Renderer for Python
 
 This package provides an interface to `mapblibre-gl-native` to render Mapbox GL
 styles to PNG images.
@@ -14,6 +14,45 @@ server-side rendering of maps for use in reports.
 ## Install
 
 Right now, this package must be built manually (below).
+
+## Styles
+
+PyMGL should support basic styles as of Mapbox GL JS 1.13.
+
+### Remote tilesets, sources, and assets
+
+Remote tilesets, tile sources, and assets (glyphs, sprites) should be well-supported.
+These are loaded by the underlying C++ library outside our control. Invalid
+URLs will generally raise errors. However, network timeouts or incorrect formats
+may crash badly.
+
+### Local mbtiles
+
+Local MBTiles are supported, but must be provided using an absolute path to the
+mbtiles file as the source `url` of a tileset; it must resolve to an actual file.
+
+Local MBTiles are denoted with a `mbtiles://` URI prefix.
+
+Example:
+
+```json
+{
+    "sources": {
+        "source_id": {
+            "url": "mbtiles:///<pymgl_root_dir>/tests/fixtures/geography-class-png.mbtiles",
+            ...
+        }
+    },
+    "layers": [...]
+}
+```
+
+WARNING: providing a URI to tiles under the `tiles` key of a source is NOT currently supported by Maplibre GL Native;
+attempting to do so will fail.
+
+### Unsupported features
+
+PyMGL does not support alternative projections or 3D terrain.
 
 ## Developing
 

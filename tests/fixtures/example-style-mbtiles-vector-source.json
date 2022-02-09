@@ -1,0 +1,21 @@
+{
+    "version": 8,
+    "sources": {
+        "land": {
+            "type": "vector",
+            "url": "mbtiles://land.mbtiles"
+        }
+    },
+    "layers": [
+        {
+            "id": "land",
+            "type": "fill",
+            "source": "land",
+            "source-layer": "land",
+            "paint": {
+                "fill-color": "#AAAAAA",
+                "fill-opacity": 1
+            }
+        }
+    ]
+}

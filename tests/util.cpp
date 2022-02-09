@@ -25,7 +25,7 @@ const string get_token() {
     return token;
 }
 
-const string read_style(string filename) {
+const string read_style(const string &filename) {
     string styleFilename = style_dir + filename;
     cout << "Read style file: " << styleFilename << endl;
     ifstream jsonFile(styleFilename);
@@ -43,7 +43,7 @@ const string read_style(string filename) {
     return buffer.str();
 }
 
-PremultipliedImage read_image(const string filename) {
+PremultipliedImage read_image(const string &filename) {
     std::ifstream file(filename, std::ios::binary);
     if (!file.good()) {
         throw invalid_argument("file not found: " + filename);
@@ -53,13 +53,13 @@ PremultipliedImage read_image(const string filename) {
     return decodeImage(data.str());
 }
 
-void write_image(const string img, const string filename) {
+void write_image(const string &img, const string &filename) {
     std::ofstream out(filename, std::ios::binary);
     out << img;
     out.close();
 }
 
-void write_test_image(const string img, const string filename, bool is_expected) {
+void write_test_image(const string &img, const string &filename, bool is_expected) {
     if (is_expected) {
         write_image(img, expected_dir + filename);
     } else {
@@ -67,7 +67,7 @@ void write_test_image(const string img, const string filename, bool is_expected)
     }
 }
 
-bool image_matches(const string filename, uint64_t tolerance) {
+bool image_matches(const string &filename, uint64_t tolerance) {
 
     auto actual   = read_image(actual_dir + filename);
     auto expected = read_image(expected_dir + filename);
@@ -81,28 +81,5 @@ bool image_matches(const string filename, uint64_t tolerance) {
                                    0.1285);
     return diff <= tolerance;
 }
-
-// mbgl::util::write_file(base + "/actual.png", metadata.actual);
-
-// mbgl::PremultipliedImage expectedImage{actualImage.size};
-// mbgl::PremultipliedImage imageDiff{actualImage.size};
-// expectedImage = mbgl::decodeImage(*maybeExpectedImage);
-
-// pixels = // implicitly converting from uint64_t
-//     mapbox::pixelmatch(actualImage.data.get(),
-//                        expectedImage.data.get(),
-//                        expectedImage.size.width,
-//                        expectedImage.size.height,
-//                        imageDiff.data.get(),
-//                        0.1285); // Defined in GL JS
-
-// metadata.diff = mbgl::encodePNG(imageDiff);
-
-// mbgl::util::write_file(base + "/diff.png", metadata.diff);
-
-// metadata.difference = pixels / expectedImage.size.area();
-// if (metadata.difference <= metadata.allowed) {
-//     break;
-// }
 
 } // namespace testing

@@ -19,13 +19,9 @@ target_sources(
         ${MBGL_SOURCE_DIR}/platform/default/src/mbgl/platform/time.cpp
         ${MBGL_SOURCE_DIR}/platform/default/src/mbgl/storage/asset_file_source.cpp
         ${MBGL_SOURCE_DIR}/platform/default/src/mbgl/storage/database_file_source.cpp
-
-        # TODO: change this once https://github.com/maplibre/maplibre-gl-native/pull/198 is merged
         ${MBGL_SOURCE_DIR}/platform/default/src/mbgl/storage/mbtiles_file_source.cpp
-
         ${MBGL_SOURCE_DIR}/platform/default/src/mbgl/storage/file_source_manager.cpp
         ${MBGL_SOURCE_DIR}/platform/default/src/mbgl/storage/file_source_request.cpp
-
         ${MBGL_SOURCE_DIR}/platform/default/src/mbgl/storage/local_file_request.cpp
         ${MBGL_SOURCE_DIR}/platform/default/src/mbgl/storage/local_file_source.cpp
         ${MBGL_SOURCE_DIR}/platform/default/src/mbgl/storage/main_resource_loader.cpp
