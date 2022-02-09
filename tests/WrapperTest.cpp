@@ -4,18 +4,6 @@
 
 #include <gtest/gtest.h>
 
-// #include <mbgl/gfx/headless_frontend.hpp>
-// #include <mbgl/map/map.hpp>
-// #include <mbgl/map/map_observer.hpp>
-// #include <mbgl/map/map_options.hpp>
-// #include <mbgl/storage/file_source_manager.hpp>
-// #include <mbgl/storage/network_status.hpp>
-// #include <mbgl/style/style.hpp>
-// #include <mbgl/util/default_style.hpp>
-// #include <mbgl/util/exception.hpp>
-// #include <mbgl/util/image.hpp>
-// #include <mbgl/util/logging.hpp>
-
 #include "map.h"
 #include "util.h"
 
@@ -38,7 +26,7 @@ TEST(Wrapper, Empty) {
     // write_test_image(img, img_filename, true);
 
     write_test_image(img, img_filename, false);
-    assert(image_matches(img_filename, 0) == true);
+    EXPECT_TRUE(image_matches(img_filename, 0));
 }
 
 TEST(Wrapper, GeoJSON) {
@@ -55,5 +43,105 @@ TEST(Wrapper, GeoJSON) {
     // write_test_image(img, img_filename, true);
 
     write_test_image(img, img_filename, false);
-    assert(image_matches(img_filename, 10) == true);
+    EXPECT_TRUE(image_matches(img_filename, 10));
+}
+
+TEST(Wrapper, RemoteRaster) {
+    const string test  = "example-style-remote-raster";
+    const string style = read_style(test + ".json");
+
+    Map map  = Map(style, 256, 256, 1);
+    auto img = map.render();
+
+    const string img_filename = test + ".png";
+
+    // to write out expected image, uncomment
+    // write_test_image(img, img_filename, true);
+
+    write_test_image(img, img_filename, false);
+    EXPECT_TRUE(image_matches(img_filename, 10));
+}
+
+TEST(Wrapper, RemoteImageSource) {
+    // remote image will render over top of raster
+    const string test  = "example-style-remote-image-source";
+    const string style = read_style(test + ".json");
+
+    Map map  = Map(style, 256, 256, 1);
+    auto img = map.render();
+
+    const string img_filename = test + ".png";
+
+    // to write out expected image, uncomment
+    // write_test_image(img, img_filename, true);
+
+    write_test_image(img, img_filename, false);
+    EXPECT_TRUE(image_matches(img_filename, 10));
+}
+
+TEST(Wrapper, MapboxSource) {
+    const string test  = "example-style-mapbox-source";
+    const string style = read_style(test + ".json");
+
+    const string token = get_token();
+
+    Map map  = Map(style, 256, 256, 1, 0, 0, 0, token, "mapbox");
+    auto img = map.render();
+
+    const string img_filename = test + ".png";
+
+    // to write out expected image, uncomment
+    // write_test_image(img, img_filename, true);
+
+    write_test_image(img, img_filename, false);
+    EXPECT_TRUE(image_matches(img_filename, 10));
+}
+
+TEST(Wrapper, Labels) {
+    // should render text labels
+    const string test  = "example-style-geojson-labels";
+    const string style = read_style(test + ".json");
+
+    // const string token = get_token();
+
+    Map map = Map(style, 256, 256, 1, {}, {}, {}, {}, "maplibre");
+    map.setBounds(-125, 37.5, -115, 42.5);
+    auto img = map.render();
+
+    const string img_filename = test + ".png";
+
+    // to write out expected image, uncomment
+    // write_test_image(img, img_filename, true);
+
+    write_test_image(img, img_filename, false);
+    EXPECT_TRUE(image_matches(img_filename, 10));
+}
+
+TEST(Wrapper, BadSource) {
+    // bad tile source will not render, but GeoJSON features will
+    const string test  = "example-style-bad-source";
+    const string style = read_style(test + ".json");
+
+    Map map = Map(style, 100, 100, 1);
+    map.setBounds(-79.98, 32.64, -79.84, 32.79);
+    auto img = map.render();
+
+    const string img_filename = test + ".png";
+
+    // to write out expected image, uncomment
+    // write_test_image(img, img_filename, true);
+
+    write_test_image(img, img_filename, false);
+    EXPECT_TRUE(image_matches(img_filename, 10));
+}
+
+TEST(Wrapper, BadGlyphs) {
+    // bad glyphs will make render fail with an exception
+    const string test  = "example-style-bad-glyphs";
+    const string style = read_style(test + ".json");
+
+    Map map = Map(style, 100, 100, 1);
+    map.setBounds(-125, 37.5, -115, 42.5);
+
+    EXPECT_ANY_THROW(map.render());
 }

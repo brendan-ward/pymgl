@@ -26,3 +26,6 @@ To run with Valgrind (Linux only):
 ```bash
 ctest --output-on-failure --overwrite MemoryCheckCommandOptions="--leak-check=full --error-exitcode=100" -C Valgrind -T memcheck
 ```
+
+Running tests requires a network connection, as the tests fetch and render
+remote map tiles and other assets.
