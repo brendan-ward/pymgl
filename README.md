@@ -43,8 +43,30 @@ Example:
             ...
         }
     },
-    "layers": [...]
+    "layers": [...],
+    ...
 }
+```
+
+### Local files
+
+GeoJSON files and other local file assets are supported, but must be provided
+using an absolute path to the file source.
+
+Example:
+
+```json
+{
+    "sources": {
+        "geojson": {
+            "type": "geojson",
+            "data": "file:///<pymgl_root_dir>/tests/fixtures/test.geojson"
+        }
+    },
+    "layers": [...],
+    ...
+}
+
 ```
 
 WARNING: providing a URI to tiles under the `tiles` key of a source is NOT currently supported by Maplibre GL Native;

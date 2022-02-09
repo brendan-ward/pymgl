@@ -27,7 +27,6 @@ const string get_token() {
 
 const string read_style(const string &filename) {
     string styleFilename = style_dir + filename;
-    cout << "Read style file: " << styleFilename << endl;
     ifstream jsonFile(styleFilename);
     if (!jsonFile) {
         throw invalid_argument("style json file does not exist: " + styleFilename);
@@ -79,7 +78,13 @@ bool image_matches(const string &filename, uint64_t tolerance) {
                                    expected.size.height,
                                    nullptr,
                                    0.1285);
-    return diff <= tolerance;
+
+    bool matches = diff <= tolerance;
+    if (diff > tolerance) {
+        cout << filename << " differs by " << diff << " pixels\n";
+    }
+
+    return matches;
 }
 
 } // namespace testing

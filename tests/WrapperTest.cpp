@@ -15,7 +15,7 @@ using namespace mgl_wrapper;
 using namespace testing;
 using namespace std;
 
-const string mbtiles_dir = fs::absolute("../../tests/fixtures/").string();
+const string fixtures_dir = fs::absolute("../../tests/fixtures/").string();
 
 // Tests are named TEST(<group name>, <test name>)
 
@@ -38,6 +38,27 @@ TEST(Wrapper, Empty) {
 TEST(Wrapper, GeoJSON) {
     const string test  = "example-style-geojson";
     const string style = read_style(test + ".json");
+
+    Map map = Map(style, 100, 100, 1);
+    map.setBounds(-125, 37.5, -115, 42.5);
+    auto img = map.render();
+
+    const string img_filename = test + ".png";
+
+    // to write out expected image, uncomment
+    // write_test_image(img, img_filename, true);
+
+    write_test_image(img, img_filename, false);
+    EXPECT_TRUE(image_matches(img_filename, 10));
+}
+
+TEST(Wrapper, FileGeoJSON) {
+    const string test = "example-style-file-geojson";
+    string style      = read_style(test + ".json");
+
+    // update style from relative to absolute
+    style = regex_replace(style, regex("file://"), "file://" + fixtures_dir);
+    cout << style << endl;
 
     Map map = Map(style, 100, 100, 1);
     map.setBounds(-125, 37.5, -115, 42.5);
@@ -126,7 +147,7 @@ TEST(Wrapper, LocalMBtilesRasterSource) {
     string style      = read_style(test + ".json");
 
     // update style from relative to mbtiles_path to absolute
-    style = regex_replace(style, regex("mbtiles://"), "mbtiles://" + mbtiles_dir);
+    style = regex_replace(style, regex("mbtiles://"), "mbtiles://" + fixtures_dir);
 
     Map map  = Map(style, 256, 256, 1);
     auto img = map.render();
@@ -145,7 +166,7 @@ TEST(Wrapper, LocalMBtilesVectorSource) {
     string style      = read_style(test + ".json");
 
     // update style from relative to mbtiles_path to absolute
-    style = regex_replace(style, regex("mbtiles://"), "mbtiles://" + mbtiles_dir);
+    style = regex_replace(style, regex("mbtiles://"), "mbtiles://" + fixtures_dir);
 
     Map map  = Map(style, 256, 256, 1);
     auto img = map.render();
