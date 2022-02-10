@@ -174,7 +174,7 @@ python setup.py build_ext --inplace
 
 ## See also
 
-[https://github.com/consbio/mbgl-renderer](https://github.com/consbio/mbgl-renderer)
+[mbgl-renderer](https://github.com/consbio/mbgl-renderer)
 provides a NodeJS API, CLI, and server based on the NodeJS bindings to Mapbox GL Native.
 
 ## Credits

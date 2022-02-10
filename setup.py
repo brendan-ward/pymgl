@@ -23,6 +23,7 @@ class CMakeBuild(build_ext):
             extdir += os.path.sep
 
         cfg = "Debug" if self.debug else "Release"
+        print(f"Build mode: {cfg}")
 
         # CMake lets you override the generator - we need to check this.
         # Can be set with Conda-Build, for example.
@@ -79,6 +80,14 @@ setup(
     cmdclass={"build_ext": CMakeBuild},
     zip_safe=False,
     extras_require={
-        "test": ["pytest", "pytest-cov", "Pillow", "python-dotenv", "numpy"]
+        "test": [
+            "pytest",
+            "pytest-benchmark",
+            "pytest-cov",
+            "Pillow",
+            "python-dotenv",
+            "numpy",
+            "requests",
+        ]
     },
 )

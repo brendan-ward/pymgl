@@ -174,6 +174,26 @@ TEST(Style, LocalMBtilesVectorSource) {
     EXPECT_TRUE(image_matches(img_filename, 10));
 }
 
+TEST(Style, LocalMBtilesVectorSourceX2) {
+    const string test = "example-style-mbtiles-vector-source";
+    string style      = read_style(test + ".json");
+
+    // update style from relative to mbtiles_path to absolute
+    style = regex_replace(style, regex("mbtiles://"), "mbtiles://" + FIXTURES_PATH);
+
+    // actual image will by 512 x 512
+    Map map  = Map(style, 256, 256, 2);
+    auto img = map.render();
+
+    const string img_filename = test + "@2x.png";
+
+    // to write out expected image, uncomment
+    // write_test_image(img, img_filename, true);
+
+    write_test_image(img, img_filename, false);
+    EXPECT_TRUE(image_matches(img_filename, 10));
+}
+
 TEST(Style, ImagePattern) {
     const string test = "example-style-image-pattern";
     string style      = read_style(test + ".json");

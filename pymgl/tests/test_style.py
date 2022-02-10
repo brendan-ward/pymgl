@@ -1,8 +1,5 @@
-from io import BytesIO
-
 from PIL import Image
 import pytest
-import numpy as np
 
 from pymgl import Map
 
@@ -83,7 +80,7 @@ def test_local_mbtiles_raster_source():
     assert image_matches(img_data, f"{test}.png")
 
 
-def test_local_mbtiles_raster_source():
+def test_local_mbtiles_vector_source():
     test = "example-style-mbtiles-vector-source"
     style = read_style(f"{test}.json")
 
@@ -93,6 +90,18 @@ def test_local_mbtiles_raster_source():
     img_data = Map(style, 256, 256).render()
 
     assert image_matches(img_data, f"{test}.png")
+
+
+def test_local_mbtiles_vector_source_2x():
+    test = "example-style-mbtiles-vector-source"
+    style = read_style(f"{test}.json")
+
+    # update style from relative to absolute path
+    style = style.replace("mbtiles://", f"mbtiles://{FIXTURES_PATH}/")
+
+    img_data = Map(style, 256, 256, 2).render()
+
+    assert image_matches(img_data, f"{test}@2x.png")
 
 
 def test_image_pattern():
