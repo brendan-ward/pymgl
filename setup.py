@@ -75,7 +75,7 @@ setup(
     long_description_content_type="text/markdown",
     long_description=open("README.md").read(),
     python_requires=">=3.8",
-    ext_modules=[CMakeExtension("_pymgl")],
+    ext_modules=[CMakeExtension("pymgl._pymgl")],
     cmdclass={"build_ext": CMakeBuild},
     zip_safe=False,
     extras_require={

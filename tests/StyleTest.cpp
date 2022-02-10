@@ -1,22 +1,16 @@
-#include <filesystem>
-#include <fstream>
 #include <iostream>
 #include <regex>
 #include <sstream>
 
 #include <gtest/gtest.h>
-#include <mbgl/storage/sqlite3.hpp>
 #include <mbgl/util/image.hpp>
 
 #include "map.h"
 #include "util.h"
 
-namespace fs = std::filesystem;
 using namespace mgl_wrapper;
 using namespace testing;
 using namespace std;
-
-const string fixtures_dir = fs::absolute("../../tests/fixtures/").string();
 
 // Tests are named TEST(<group name>, <test name>)
 
@@ -58,8 +52,7 @@ TEST(Style, FileGeoJSON) {
     string style      = read_style(test + ".json");
 
     // update style from relative to absolute
-    style = regex_replace(style, regex("file://"), "file://" + fixtures_dir);
-    cout << style << endl;
+    style = regex_replace(style, regex("file://"), "file://" + FIXTURES_PATH);
 
     Map map = Map(style, 100, 100, 1);
     map.setBounds(-125, 37.5, -115, 42.5);
@@ -130,7 +123,7 @@ TEST(Style, Labels) {
     const string test  = "example-style-geojson-labels";
     const string style = read_style(test + ".json");
 
-    Map map = Map(style, 256, 256, 1, {}, {}, {}, {}, "maplibre");
+    Map map = Map(style, 256, 256, 1);
     map.setBounds(-125, 37.5, -115, 42.5);
     auto img = map.render();
 
@@ -148,7 +141,7 @@ TEST(Style, LocalMBtilesRasterSource) {
     string style      = read_style(test + ".json");
 
     // update style from relative to mbtiles_path to absolute
-    style = regex_replace(style, regex("mbtiles://"), "mbtiles://" + fixtures_dir);
+    style = regex_replace(style, regex("mbtiles://"), "mbtiles://" + FIXTURES_PATH);
 
     Map map  = Map(style, 256, 256, 1);
     auto img = map.render();
@@ -167,7 +160,7 @@ TEST(Style, LocalMBtilesVectorSource) {
     string style      = read_style(test + ".json");
 
     // update style from relative to mbtiles_path to absolute
-    style = regex_replace(style, regex("mbtiles://"), "mbtiles://" + fixtures_dir);
+    style = regex_replace(style, regex("mbtiles://"), "mbtiles://" + FIXTURES_PATH);
 
     Map map  = Map(style, 256, 256, 1);
     auto img = map.render();
@@ -189,7 +182,7 @@ TEST(Style, ImagePattern) {
     map.setBounds(-125, 37.5, -115, 42.5);
 
     // read and decode a PNG image, and convert the uint8_t[] data to string
-    mbgl::PremultipliedImage image = read_image(fixtures_dir + "example-pattern.png");
+    mbgl::PremultipliedImage image = read_image(FIXTURES_PATH + "example-pattern.png");
     std::ostringstream image_str;
     for (size_t i = 0; i < image.bytes(); i++) {
         image_str << (uint8_t) image.data[i];

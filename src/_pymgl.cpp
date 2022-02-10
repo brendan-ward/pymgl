@@ -43,6 +43,7 @@ PYBIND11_MODULE(_pymgl, m) {
                  os << "pymgl." << self;
                  return os.str();
              })
+        .def("addImage", &Map::addImage, "add an image to the map")
         .def_property_readonly("bearing", &Map::getBearing)
         .def_property_readonly("center", &Map::getCenter)
         .def_property_readonly("pitch", &Map::getPitch)

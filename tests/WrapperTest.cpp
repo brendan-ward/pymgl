@@ -1,4 +1,3 @@
-#include <fstream>
 #include <iostream>
 
 #include <gtest/gtest.h>
@@ -6,7 +5,6 @@
 #include "map.h"
 #include "util.h"
 
-namespace fs = std::filesystem;
 using namespace mgl_wrapper;
 using namespace testing;
 using namespace std;

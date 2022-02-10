@@ -1,24 +1,8 @@
-import os
-
-from pathlib import Path
-
 import pytest
 
-
-styles_dir = Path("tests/fixtures")
-
-
-@pytest.fixture(scope="session")
-def geojson_style():
-    return (
-        open(styles_dir / "example-style-geojson.json")
-        .read()
-        .replace(" ", "")
-        .replace("\n", " ")
-    )
+from .common import read_style
 
 
 @pytest.fixture(scope="session")
-def local_vector_style():
-    # tiles are served at http://localhost:8001/services/states/tiles/{z}/{x}/{y}.pbf
-    return open(styles_dir / "example-style-local-vector.json").read()
+def empty_style():
+    return read_style("example-style-empty.json")

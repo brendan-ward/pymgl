@@ -1,3 +1,4 @@
+#include <filesystem>
 #include <fstream>
 #include <iostream>
 #include <sstream>
@@ -5,14 +6,15 @@
 #include <mapbox/pixelmatch.hpp>
 #include <mbgl/util/image.hpp>
 
+#include "util.h"
+
 namespace testing {
 
+namespace fs = std::filesystem;
 using namespace std;
 using namespace mbgl;
 
-// relative to where tests are run: build/tests
-const string style_dir    = "../../tests/fixtures/";
-const string expected_dir = "../../tests/fixtures/";
+const string expected_dir = FIXTURES_PATH;
 const string actual_dir   = "/tmp/";
 
 const string get_token() {
@@ -26,7 +28,7 @@ const string get_token() {
 }
 
 const string read_style(const string &filename) {
-    string styleFilename = style_dir + filename;
+    string styleFilename = FIXTURES_PATH + filename;
     ifstream jsonFile(styleFilename);
     if (!jsonFile) {
         throw invalid_argument("style json file does not exist: " + styleFilename);
