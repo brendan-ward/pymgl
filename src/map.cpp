@@ -1,6 +1,7 @@
 #include <exception>
 #include <iostream>
 #include <optional>
+#include <sstream>
 #include <string>
 
 #include <mbgl/map/map_observer.hpp>
@@ -11,6 +12,7 @@
 #include <mbgl/util/mapbox.hpp>
 #include <mbgl/util/premultiply.hpp>
 
+#include "fpng.h"
 #include "map.h"
 
 namespace mgl_wrapper {
@@ -172,7 +174,25 @@ void Map::setZoom(const double &zoom) {
     map->jumpTo(mbgl::CameraOptions().withZoom(zoom));
 }
 
-std::string Map::render() { return encodePNG(frontend->render(*map).image); }
+const std::string Map::render() {
+    fpng::fpng_init();
+
+    // render produces premultiplied image; unpremultiply it
+    auto image = mbgl::util::unpremultiply(frontend->render(*map).image);
+
+    std::vector<uint8_t> buf;
+
+    if (!fpng::fpng_encode_image_to_memory(reinterpret_cast<const void *>(image.data.get()),
+                                           image.size.width,
+                                           image.size.height,
+                                           4,
+                                           buf,
+                                           fpng::FPNG_ENCODE_SLOWER)) {
+        throw std::runtime_error("could not encode png");
+    }
+
+    return std::string(buf.begin(), buf.end());
+}
 
 // private:
 

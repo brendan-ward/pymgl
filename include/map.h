@@ -26,7 +26,7 @@ public:
     Map(const Map &) = delete;
     ~Map()           = default;
 
-    std::string render();
+    const std::string render();
 
     const double getBearing();
     const std::pair<double, double> getCenter();
