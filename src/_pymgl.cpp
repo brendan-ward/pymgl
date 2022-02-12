@@ -1,3 +1,5 @@
+#include <iostream>
+#include <pybind11/numpy.h>
 #include <pybind11/pybind11.h>
 #include <pybind11/stl.h>
 #include <sstream>
@@ -50,10 +52,42 @@ PYBIND11_MODULE(_pymgl, m) {
         .def_property_readonly("size", &Map::getSize)
         .def_property_readonly("zoom", &Map::getZoom)
         .def(
-            "render",
-            [](Map &self) -> py::bytes { return py::bytes(self.render()); },
+            "renderPNG",
+            [](Map &self) -> py::bytes { return py::bytes(self.renderPNG()); },
             py::call_guard<py::gil_scoped_release>(),
             "Render the map to PNG data")
+        .def(
+            "renderBuffer",
+            [](Map &self) -> py::array_t<uint8_t> {
+                std::pair<uint32_t, uint32_t> size = self.getSize();
+
+                // always returns width * height * 4 (RGBA)
+                size_t bytes = size.first * size.second * 4;
+
+                // have to hold a reference until we are done
+                auto img = self.renderBuffer();
+                auto buf = img.get();
+
+                // Alternative copy version
+                // allocate array to receive the data, then copy in memory
+                //  auto result                = py::array_t<uint8_t>(bytes);
+                //  py::buffer_info result_buf = result.request();
+                //  auto ptr                   = static_cast<uint8_t *>(result_buf.ptr);
+                //  std::memcpy(ptr, buf, bytes);
+                //  return result;
+
+                // return a view of the data instead, using capsule to handle delete of underlying
+                // memory
+                // ref: https://github.com/pybind/pybind11/issues/323#issuecomment-575717041
+                auto capsule = py::capsule(buf, [](void *p) {
+                    std::unique_ptr<uint8_t>(reinterpret_cast<uint8_t *>(p));
+                });
+                img.release();
+                auto arr = py::array(size.first * size.second * 4, buf, capsule);
+                return arr;
+            },
+            //   py::call_guard<py::gil_scoped_release>(),
+            "Render the map to a uint8 numpy array")
         .def("setBearing", &Map::setBearing, "Set the bearing of the map")
         .def("setBounds",
              &Map::setBounds,

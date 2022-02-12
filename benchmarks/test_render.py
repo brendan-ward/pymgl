@@ -20,7 +20,17 @@ def render(style, width, height, ratio=1, bounds=None, **kwargs):
     if bounds:
         map.setBounds(*bounds)
 
-    img = map.render()
+    map.renderPNG()
+
+
+def render_buffer(style, width, height, ratio=1, bounds=None, **kwargs):
+    map = Map(style, width, height, ratio, **kwargs)
+
+    if bounds:
+        map.setBounds(*bounds)
+
+    img = map.renderBuffer()
+    i = Image.frombytes("RGBA", (width, height), img)
 
 
 def render_mbgl_renderer(
@@ -41,26 +51,44 @@ def render_mbgl_renderer(
     r.raise_for_status()
 
 
-@pytest.mark.benchmark(group="render-empty")
+@pytest.mark.benchmark(group="render-empty-256")
 def test_render_empty_256(benchmark):
     style = read_style("example-style-empty.json")
     benchmark(render, style, 256, 256)
 
 
-@pytest.mark.benchmark(group="render-empty")
+@pytest.mark.benchmark(group="render-empty-1024")
 def test_render_empty_1024(benchmark):
     style = read_style("example-style-empty.json")
     benchmark(render, style, 1024, 1024)
 
 
-@pytest.mark.benchmark(group="render-empty")
+@pytest.mark.benchmark(group="render-empty-2048")
 def test_render_empty_2048(benchmark):
     style = read_style("example-style-empty.json")
     benchmark(render, style, 2048, 2048)
 
 
+@pytest.mark.benchmark(group="render-empty-256")
+def test_render_buffer_empty_256(benchmark):
+    style = read_style("example-style-empty.json")
+    benchmark(render_buffer, style, 256, 256)
+
+
+@pytest.mark.benchmark(group="render-empty-1024")
+def test_render_buffer_empty_1024(benchmark):
+    style = read_style("example-style-empty.json")
+    benchmark(render_buffer, style, 1024, 1024)
+
+
+@pytest.mark.benchmark(group="render-empty-2048")
+def test_render_buffer_empty_2048(benchmark):
+    style = read_style("example-style-empty.json")
+    benchmark(render_buffer, style, 2048, 2048)
+
+
 @pytest.mark.skipif(not COMPARE_MBGL_RENDERER, reason="Not comparing to mbgl-renderer")
-@pytest.mark.benchmark(group="render-empty")
+@pytest.mark.benchmark(group="render-empty-256")
 def test_render_empty_mbglr_256(benchmark):
     style = read_style("example-style-empty.json")
     benchmark(
@@ -72,7 +100,7 @@ def test_render_empty_mbglr_256(benchmark):
 
 
 @pytest.mark.skipif(not COMPARE_MBGL_RENDERER, reason="Not comparing to mbgl-renderer")
-@pytest.mark.benchmark(group="render-empty")
+@pytest.mark.benchmark(group="render-empty-1024")
 def test_render_empty_mbglr_1024(benchmark):
     style = read_style("example-style-empty.json")
     benchmark(
@@ -84,7 +112,7 @@ def test_render_empty_mbglr_1024(benchmark):
 
 
 @pytest.mark.skipif(not COMPARE_MBGL_RENDERER, reason="Not comparing to mbgl-renderer")
-@pytest.mark.benchmark(group="render-empty")
+@pytest.mark.benchmark(group="render-empty-2048")
 def test_render_empty_mbglr_2048(benchmark):
     style = read_style("example-style-empty.json")
     benchmark(
@@ -214,7 +242,7 @@ def test_render_labels(benchmark):
     benchmark(render, style, 256, 256)
 
 
-@pytest.mark.benchmark(group="render-local-mbtiles-raster")
+@pytest.mark.benchmark(group="render-local-mbtiles-raster-256")
 def test_render_local_mbtiles_raster_source_256(benchmark):
     style = read_style("example-style-mbtiles-raster-source.json")
     # update style from relative to absolute path
@@ -223,7 +251,7 @@ def test_render_local_mbtiles_raster_source_256(benchmark):
     benchmark(render, style, 256, 256)
 
 
-@pytest.mark.benchmark(group="render-local-mbtiles-raster")
+@pytest.mark.benchmark(group="render-local-mbtiles-raster-1024")
 def test_render_local_mbtiles_raster_source_1024(benchmark):
     style = read_style("example-style-mbtiles-raster-source.json")
     # update style from relative to absolute path
@@ -232,8 +260,41 @@ def test_render_local_mbtiles_raster_source_1024(benchmark):
     benchmark(render, style, 1024, 1024)
 
 
+@pytest.mark.benchmark(group="render-local-mbtiles-raster-2048")
+def test_render_local_mbtiles_raster_source_2048(benchmark):
+    style = read_style("example-style-mbtiles-raster-source.json")
+    # update style from relative to absolute path
+    style = style.replace("mbtiles://", f"mbtiles://{FIXTURES_PATH}/")
+
+    benchmark(render, style, 2048, 2048)
+
+
+@pytest.mark.benchmark(group="render-local-mbtiles-raster-256")
+def test_render_buffer_local_mbtiles_raster_source_256(benchmark):
+    style = read_style("example-style-mbtiles-raster-source.json")
+    style = style.replace("mbtiles://", f"mbtiles://{FIXTURES_PATH}/")
+
+    benchmark(render_buffer, style, 256, 256)
+
+
+@pytest.mark.benchmark(group="render-local-mbtiles-raster-1024")
+def test_render_buffer_local_mbtiles_raster_source_1024(benchmark):
+    style = read_style("example-style-mbtiles-raster-source.json")
+    style = style.replace("mbtiles://", f"mbtiles://{FIXTURES_PATH}/")
+
+    benchmark(render_buffer, style, 1024, 1024)
+
+
+@pytest.mark.benchmark(group="render-local-mbtiles-raster-2048")
+def test_render_buffer_local_mbtiles_raster_source_2048(benchmark):
+    style = read_style("example-style-mbtiles-raster-source.json")
+    style = style.replace("mbtiles://", f"mbtiles://{FIXTURES_PATH}/")
+
+    benchmark(render_buffer, style, 2048, 2048)
+
+
 @pytest.mark.skipif(not COMPARE_MBGL_RENDERER, reason="Not comparing to mbgl-renderer")
-@pytest.mark.benchmark(group="render-local-mbtiles-raster")
+@pytest.mark.benchmark(group="render-local-mbtiles-raster-256")
 def test_render_local_mbtiles_raster_source_mbglr_256(benchmark):
     style = read_style("example-style-mbtiles-raster-source.json")
     style = style.replace(".mbtiles", "")
@@ -246,7 +307,7 @@ def test_render_local_mbtiles_raster_source_mbglr_256(benchmark):
 
 
 @pytest.mark.skipif(not COMPARE_MBGL_RENDERER, reason="Not comparing to mbgl-renderer")
-@pytest.mark.benchmark(group="render-local-mbtiles-raster")
+@pytest.mark.benchmark(group="render-local-mbtiles-raster-1024")
 def test_render_local_mbtiles_raster_source_mbglr_1024(benchmark):
     style = read_style("example-style-mbtiles-raster-source.json")
     style = style.replace(".mbtiles", "")

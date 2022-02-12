@@ -19,7 +19,7 @@ TEST(Style, Empty) {
     const string style = read_style(test + ".json");
 
     Map map  = Map(style, 10, 10, 1, 0, 0);
-    auto img = map.render();
+    auto img = map.renderPNG();
 
     const string img_filename = test + ".png";
 
@@ -36,7 +36,7 @@ TEST(Style, GeoJSON) {
 
     Map map = Map(style, 100, 100, 1);
     map.setBounds(-125, 37.5, -115, 42.5);
-    auto img = map.render();
+    auto img = map.renderPNG();
 
     const string img_filename = test + ".png";
 
@@ -56,7 +56,7 @@ TEST(Style, FileGeoJSON) {
 
     Map map = Map(style, 100, 100, 1);
     map.setBounds(-125, 37.5, -115, 42.5);
-    auto img = map.render();
+    auto img = map.renderPNG();
 
     const string img_filename = test + ".png";
 
@@ -72,7 +72,7 @@ TEST(Style, RemoteRaster) {
     const string style = read_style(test + ".json");
 
     Map map  = Map(style, 256, 256, 1);
-    auto img = map.render();
+    auto img = map.renderPNG();
 
     const string img_filename = test + ".png";
 
@@ -89,7 +89,7 @@ TEST(Style, RemoteImageSource) {
     const string style = read_style(test + ".json");
 
     Map map  = Map(style, 256, 256, 1);
-    auto img = map.render();
+    auto img = map.renderPNG();
 
     const string img_filename = test + ".png";
 
@@ -107,7 +107,7 @@ TEST(Style, MapboxSource) {
     const string token = get_token();
 
     Map map  = Map(style, 256, 256, 1, 0, 0, 0, token, "mapbox");
-    auto img = map.render();
+    auto img = map.renderPNG();
 
     const string img_filename = test + ".png";
 
@@ -125,7 +125,7 @@ TEST(Style, Labels) {
 
     Map map = Map(style, 256, 256, 1);
     map.setBounds(-125, 37.5, -115, 42.5);
-    auto img = map.render();
+    auto img = map.renderPNG();
 
     const string img_filename = test + ".png";
 
@@ -144,7 +144,7 @@ TEST(Style, LocalMBtilesRasterSource) {
     style = regex_replace(style, regex("mbtiles://"), "mbtiles://" + FIXTURES_PATH);
 
     Map map  = Map(style, 256, 256, 1);
-    auto img = map.render();
+    auto img = map.renderPNG();
 
     const string img_filename = test + ".png";
 
@@ -163,7 +163,7 @@ TEST(Style, LocalMBtilesVectorSource) {
     style = regex_replace(style, regex("mbtiles://"), "mbtiles://" + FIXTURES_PATH);
 
     Map map  = Map(style, 256, 256, 1);
-    auto img = map.render();
+    auto img = map.renderPNG();
 
     const string img_filename = test + ".png";
 
@@ -183,7 +183,7 @@ TEST(Style, LocalMBtilesVectorSourceX2) {
 
     // actual image will by 512 x 512
     Map map  = Map(style, 256, 256, 2);
-    auto img = map.render();
+    auto img = map.renderPNG();
 
     const string img_filename = test + "@2x.png";
 
@@ -210,7 +210,7 @@ TEST(Style, ImagePattern) {
 
     map.addImage("pattern", image_str.str(), image.size.width, image.size.height, 1, false);
 
-    auto img = map.render();
+    auto img = map.renderPNG();
 
     const string img_filename = test + ".png";
 
@@ -229,7 +229,7 @@ TEST(Style, BadSource) {
 
     Map map = Map(style, 100, 100, 1);
     map.setBounds(-79.98, 32.64, -79.84, 32.79);
-    auto img = map.render();
+    auto img = map.renderPNG();
 
     const string img_filename = test + ".png";
 
@@ -248,5 +248,5 @@ TEST(Style, BadGlyphs) {
     Map map = Map(style, 100, 100, 1);
     map.setBounds(-125, 37.5, -115, 42.5);
 
-    EXPECT_ANY_THROW(map.render());
+    EXPECT_ANY_THROW(map.renderPNG());
 }

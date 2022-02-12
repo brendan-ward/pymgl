@@ -26,7 +26,8 @@ public:
     Map(const Map &) = delete;
     ~Map()           = default;
 
-    const std::string render();
+    const std::string renderPNG();
+    const std::unique_ptr<uint8_t[]> renderBuffer();
 
     const double getBearing();
     const std::pair<double, double> getCenter();

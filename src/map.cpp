@@ -174,8 +174,8 @@ void Map::setZoom(const double &zoom) {
     map->jumpTo(mbgl::CameraOptions().withZoom(zoom));
 }
 
-const std::string Map::render() {
-    fpng::fpng_init();
+const std::string Map::renderPNG() {
+    // fpng::fpng_init();
 
     // render produces premultiplied image; unpremultiply it
     auto image = mbgl::util::unpremultiply(frontend->render(*map).image);
@@ -192,6 +192,13 @@ const std::string Map::render() {
     }
 
     return std::string(buf.begin(), buf.end());
+}
+
+const std::unique_ptr<uint8_t[]> Map::renderBuffer() {
+    // render produces premultiplied image; unpremultiply it
+    auto image = mbgl::util::unpremultiply(frontend->render(*map).image);
+
+    return std::move(image.data);
 }
 
 // private:

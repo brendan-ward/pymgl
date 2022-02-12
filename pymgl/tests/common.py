@@ -36,6 +36,8 @@ def image_matches(img_data, expected_filename):
     actual = Image.open(buffer)
     expected = Image.open(FIXTURES_PATH / expected_filename)
 
+    actual.save(f"/tmp/{expected_filename}")
+
     if actual.size != expected.size:
         return False
 
