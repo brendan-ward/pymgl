@@ -4,6 +4,8 @@
 #include <sstream>
 #include <string>
 
+#include <zlib.h>
+
 #include <mbgl/map/map_observer.hpp>
 #include <mbgl/map/map_options.hpp>
 #include <mbgl/style/style.hpp>
@@ -12,8 +14,8 @@
 #include <mbgl/util/mapbox.hpp>
 #include <mbgl/util/premultiply.hpp>
 
-#include "fpng.h"
 #include "map.h"
+#include "spng.h"
 
 namespace mgl_wrapper {
 
@@ -175,23 +177,48 @@ void Map::setZoom(const double &zoom) {
 }
 
 const std::string Map::renderPNG() {
-    // fpng::fpng_init();
-
     // render produces premultiplied image; unpremultiply it
     auto image = mbgl::util::unpremultiply(frontend->render(*map).image);
 
-    std::vector<uint8_t> buf;
+    struct spng_ihdr ihdr = {0};
+    ihdr.width            = image.size.width;
+    ihdr.height           = image.size.height;
+    ihdr.bit_depth        = 8;
+    ihdr.color_type       = SPNG_COLOR_TYPE_TRUECOLOR_ALPHA;
 
-    if (!fpng::fpng_encode_image_to_memory(reinterpret_cast<const void *>(image.data.get()),
-                                           image.size.width,
-                                           image.size.height,
-                                           4,
-                                           buf,
-                                           fpng::FPNG_ENCODE_SLOWER)) {
-        throw std::runtime_error("could not encode png");
+    spng_ctx *ctx = spng_ctx_new(SPNG_CTX_ENCODER);
+    spng_set_ihdr(ctx, &ihdr);
+    spng_set_option(ctx, SPNG_ENCODE_TO_BUFFER, 1);
+    spng_set_option(ctx, SPNG_FILTER_CHOICE, SPNG_FILTER_CHOICE_NONE);
+    spng_set_option(ctx, SPNG_IMG_COMPRESSION_LEVEL, 3);
+
+    int ret = spng_encode_image(ctx,
+                                static_cast<const void *>(image.data.get()),
+                                image.bytes(),
+                                SPNG_FMT_PNG,
+                                SPNG_ENCODE_FINALIZE);
+
+    if (ret) {
+        spng_ctx_free(ctx);
+        throw std::runtime_error("could not encode image, error: "
+                                 + std::string(spng_strerror(ret)));
     }
 
-    return std::string(buf.begin(), buf.end());
+    size_t png_size;
+    auto buf = static_cast<unsigned char *>(spng_get_png_buffer(ctx, &png_size, &ret));
+
+    if (buf == NULL) {
+        spng_ctx_free(ctx);
+        throw std::runtime_error("could not get encoded image, error: "
+                                 + std::string(spng_strerror(ret)));
+    }
+
+    std::string out = std::string(buf, buf + png_size);
+
+    free(buf);
+    spng_ctx_free(ctx);
+
+    return out;
 }
 
 const std::unique_ptr<uint8_t[]> Map::renderBuffer() {

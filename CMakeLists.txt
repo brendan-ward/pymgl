@@ -3,16 +3,6 @@ project("_pymgl")
 
 cmake_policy(SET CMP0079 NEW)
 
-# FPNG encoder build options
-option(SSE "SSE 4.1 support" TRUE)
-
-if (SSE)
-    set(CMAKE_C_FLAGS  "${CMAKE_C_FLAGS} -DFPNG_NO_SSE=0 -msse4.1 -mpclmul")
-    set(CMAKE_CXX_FLAGS  "${CMAKE_CXX_FLAGS} -DFPNG_NO_SSE=0 -msse4.1 -mpclmul")
-else()
-    set(CMAKE_C_FLAGS  "${CMAKE_C_FLAGS} -DFPNG_NO_SSE=1")
-    set(CMAKE_CXX_FLAGS  "${CMAKE_CXX_FLAGS} -DFPNG_NO_SSE=1")
-endif()
 
 
 # maplibre-gl-native is in sibling directory
@@ -71,7 +61,7 @@ include_directories(${PROJECT_SOURCE_DIR}/include)
 add_library(
     mgl_wrapper STATIC
     ${PROJECT_SOURCE_DIR}/src/map.cpp
-    ${PROJECT_SOURCE_DIR}/src/fpng.cpp
+    ${PROJECT_SOURCE_DIR}/src/spng.c
 )
 
 target_link_libraries(

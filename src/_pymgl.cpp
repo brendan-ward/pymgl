@@ -53,7 +53,9 @@ PYBIND11_MODULE(_pymgl, m) {
         .def_property_readonly("zoom", &Map::getZoom)
         .def(
             "renderPNG",
-            [](Map &self) -> py::bytes { return py::bytes(self.renderPNG()); },
+            [](Map &self) -> py::bytes {
+                return py::bytes(self.renderPNG());
+            },
             py::call_guard<py::gil_scoped_release>(),
             "Render the map to PNG data")
         .def(
