@@ -16,7 +16,7 @@ FIXTURES_PATH = Path("tests/fixtures").absolute()
 
 
 def read_style(filename):
-    """Read style file from fixtures and trim extra space"""
+    """Read style file from fixtures"""
     return open(FIXTURES_PATH / filename).read()
 
 

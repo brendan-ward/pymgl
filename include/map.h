@@ -24,7 +24,7 @@ public:
 
     // Underlying constructs do not support easy copy, so prevent them here
     Map(const Map &) = delete;
-    ~Map()           = default;
+    ~Map();
 
     const std::string renderPNG();
     const std::unique_ptr<uint8_t[]> renderBuffer();
@@ -53,6 +53,8 @@ public:
     void setZoom(const double &zoom);
     void setSize(const uint32_t &width, const uint32_t &height);
 
+    void release();
+
     friend std::ostream &operator<<(std::ostream &os, Map &m);
 
 private:
@@ -62,7 +64,7 @@ private:
     // loop must be defined on the instance or we get segfaults, but we don't
     // need to stop it (stopping works fine on MacOS, but causes things to hang
     // on Linux)
-    mbgl::util::RunLoop loop;
+    std::unique_ptr<mbgl::util::RunLoop> loop;
 
     void validateBearing(const double &bearing);
     void validateDimension(const uint32_t &value, const std::string dimType);
