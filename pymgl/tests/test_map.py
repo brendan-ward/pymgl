@@ -31,6 +31,11 @@ def test_map_delete(empty_style):
     map.renderPNG()
 
 
+def test_render_buffer(empty_style):
+    img_data = Map(empty_style, 256, 256, 1).renderBuffer()
+    assert len(img_data) == 4 * 256 * 256
+
+
 def test_map_context_manager(empty_style):
     with Map(empty_style) as map:
         map.renderPNG()

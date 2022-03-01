@@ -58,6 +58,18 @@ def test_mapbox_source():
     assert image_matches(img_data, f"{test}.png")
 
 
+def test_mapbox_base_style():
+    img_data = Map(
+        "mapbox://styles/mapbox/streets-v11",
+        256,
+        256,
+        1,
+        token=MAPBOX_TOKEN,
+        provider="mapbox",
+    ).renderPNG()
+    assert image_matches(img_data, "mapbox-streets-v11.png")
+
+
 def test_labels():
     test = "example-style-geojson-labels"
 

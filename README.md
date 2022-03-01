@@ -30,11 +30,115 @@ Windows is not and will not be supported.
 
 ## Usage
 
+To create a map object, you must always provide a Mapbox GL style JSON string or
+URL to a well-known style hosted by Mapbox or Maptiler:
+
 ```Python
 from pymgl import Map
 
-map = Map(<style>, <width>, <height>)
+style = """{
+    "version": 8,
+    "sources": {
+        "basemap": {
+            "type": "raster",
+            "tiles": ["https://services.arcgisonline.com/arcgis/rest/services/Ocean/World_Ocean_Base/MapServer/tile/{z}/{y}/{x}"],
+            "tileSize": 256
+        }
+    },
+    "layers": [
+        { "id": "basemap", "source": "basemap", "type": "raster" }
+    ]
+}"""
+
+map = Map(style, <height=256>, <width=256>, <pixel_ratio=1>, <longitude=0>, <latitude=0>, <zoom=0>, <token=None>, <provider=None>)
 ```
+
+See the [styles](#styles) section for more information about map styles.
+
+Other than style, all other parameters are optional with default values.
+
+NOTE: `style` and `pixel_ratio` cannot be changed once the instance is constructed.
+
+You can use a well-known style instead of providing a style JSON string, but
+you must also provide a token and identify the correct provider:
+
+```Python
+map = Map("mapbox://styles/mapbox/streets-v11", token=<mapbox token>, provider="mapbox")
+```
+
+Valid providers are `mapbox`, `maptiler`, and `maplibre`.
+
+### Map properties
+
+You can set additional properties on the map instance after it is created:
+
+```Python
+map.setCenter(longitude, latitude)
+
+map.setZoom(zoom)
+
+map.setSize(width, height)
+
+map.setBearing(bearing)  # map bearing in degrees
+
+map.setPitch(pitch)  # map pitch in degrees
+```
+
+You can retrieve these values using attributes, if needed:
+
+```Python
+map.size  # (width, height)
+
+map.center  # (longitude, latitude)
+
+map.zoom
+
+map.bearing
+
+map.pitch
+```
+
+You can auto-fit the map to bounds instead of using center longitude / lantitude
+and zoom:
+
+```Python
+map.setBounds(xmin, ymin, xmax, ymax, <padding=0>)
+```
+
+You can register an image for use with your style by providing an ID,
+raw image bytes, width, height, pixel ratio, and indicate if it should be
+interpreted as SDF:
+
+```
+map.addImage("id", img_bytes, width, height, <pixel_ratio=1>, <is_SDF=False>)
+```
+
+See the [SDF image docs](https://docs.mapbox.com/help/troubleshooting/using-recolorable-images-in-mapbox-maps/) for more information about using SDF
+images.
+
+### Rendering
+
+You can render the map to PNG bytes:
+
+```Python
+img_bytes = map.renderPNG()
+```
+
+This returns `bytes` containing the RGBA PNG data.
+
+You can render the map to a raw buffer as a numpy array (`uint8` dtype):
+
+```Python
+array = map.renderBuffer()
+```
+
+The array is a sequence of RGBA values for each pixel in the image.
+
+This may be useful if you are going to immediately read the image data into
+another package such as `Pillow` or `pyvips` to combine with other image
+operations.
+
+### Map instances
 
 WARNING: you must manually delete the map instance if you assign a new map
 instance to that variable, or this package will segfault (not yet sure why).
@@ -53,34 +157,16 @@ map = Map(<style>, <width>, <height>)
 For this reason, you should consider using a context manager:
 
 ```Python
-
-
-
+with Map(<style>, <width>, <height>) as map:
+    map.renderPNG()
 ```
 
-To create a map object, you must always provide a Mapbox GL style JSON string or
-URL to a well-known style hosted by Mapbox or Maptiler:
+You can also use the map instance to directly render to PNG, if you don't need
+to set other properties on the map instance:
 
-```Python
-style = """{
-    "version": 8,
-    "sources": {
-        "basemap": {
-            "type": "raster",
-            "tiles": ["https://services.arcgisonline.com/arcgis/rest/services/Ocean/World_Ocean_Base/MapServer/tile/{z}/{y}/{x}"],
-            "tileSize": 256
-        }
-    },
-    "layers": [
-        { "id": "basemap", "source": "basemap", "type": "raster" }
-    ]
-}"""
-
-
-map = Map(style)
 ```
-
-See the [styles](#styles) section for more information.
+Map(<style>, <width>, <height>).renderPNG()
+```
 
 ## Styles
 
@@ -91,7 +177,7 @@ PyMGL should support basic styles as of Mapbox GL JS 1.13.
 Remote tilesets, tile sources, and assets (glyphs, sprites) should be well-supported.
 These are loaded by the underlying C++ library outside our control. Invalid
 URLs will generally raise errors. However, network timeouts or incorrect formats
-may crash badly.
+may cause the process to crash.
 
 ### Local mbtiles
 
@@ -141,7 +227,24 @@ attempting to do so will fail.
 
 ### Images
 
-TODO:
+You must register the image with the map instance before rendering the map. See
+`map.addImage()` above.
+
+```json
+{
+    "sources": {...},
+    "layers": [
+        {
+            ...,
+            "paint": {
+                "fill-pattern": "pattern"
+            }
+        },
+    ]
+}
+```
+
+You can use map images as fill patterns or icon images.
 
 ### Unsupported features
 

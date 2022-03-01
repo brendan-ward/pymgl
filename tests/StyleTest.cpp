@@ -118,6 +118,21 @@ TEST(Style, MapboxSource) {
     EXPECT_TRUE(image_matches(img_filename, 10));
 }
 
+TEST(Style, MapboxStyle) {
+    const string token = get_token();
+
+    Map map  = Map("mapbox://styles/mapbox/streets-v11", 256, 256, 1, 0, 0, 0, token, "mapbox");
+    auto img = map.renderPNG();
+
+    const string img_filename = "mapbox-streets-v11.png";
+
+    // to write out expected image, uncomment
+    // write_test_image(img, img_filename, true);
+
+    write_test_image(img, img_filename, false);
+    EXPECT_TRUE(image_matches(img_filename, 10));
+}
+
 TEST(Style, Labels) {
     // should render text labels
     const string test  = "example-style-geojson-labels";
