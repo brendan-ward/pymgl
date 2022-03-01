@@ -29,7 +29,8 @@ Map::Map(const std::string &style,
          const std::optional<std::string> &token,
          const std::optional<std::string> &provider)
     : frontend(std::make_unique<mbgl::HeadlessFrontend>(
-        mbgl::Size{width.value_or(256), height.value_or(256)}, ratio.value_or(1))) {
+        mbgl::Size{width.value_or(256), height.value_or(256)}, ratio.value_or(1)))
+    , loop(std::make_unique<mbgl::util::RunLoop>()) {
 
     // Turn off logging
     mbgl::Log::setObserver(std::make_unique<mbgl::Log::NullObserver>());
@@ -97,6 +98,12 @@ Map::Map(const std::string &style,
                     .withZoom(zoom.value_or(0))
                     .withBearing(0)
                     .withPitch(0));
+}
+
+Map::~Map() {
+    if (map) {
+        release();
+    }
 }
 
 void Map::addImage(const std::string &name,
@@ -273,6 +280,15 @@ void Map::validateZoom(const double &zoom) {
     if (zoom > 24) {
         throw std::domain_error("zoom must be no greater than 24");
     }
+}
+
+void Map::release() {
+    if (map == nullptr) {
+        return;
+    }
+    map.reset();
+    frontend.reset();
+    loop.reset();
 }
 
 std::ostream &operator<<(std::ostream &os, Map &m) {

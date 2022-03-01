@@ -8,12 +8,79 @@ WARNING: this package is under active development and the API may change without
 ## Goals
 
 This package is intended to provide a lightweight interface to `maplibre-gl-native`
-for rendering Mapbox GL to PNG image data. This is particularly useful for
+for rendering Mapbox GL to PNG image data using Python. This is particularly useful for
 server-side rendering of maps for use in reports.
+
+This package provides only the Python API for interacting with `maplibre-gl-native`;
+it does not provide higher-level functionality such as a web server or a CLI.
+
+For a stand-alone service implmenting rendering functionality, see
+[mbgl-renderer](https://github.com/consbio/mbgl-renderer) (implemented in NodeJS).
 
 ## Install
 
 Right now, this package must be built manually (below).
+
+### Supported operating systems
+
+-   MacOS 10.15+ (Arm64 / M1 support unknown)
+-   Linux Debian Bullseye and similar; Alpine Linux is not supported
+
+Windows is not and will not be supported.
+
+## Usage
+
+```Python
+from pymgl import Map
+
+map = Map(<style>, <width>, <height>)
+```
+
+WARNING: you must manually delete the map instance if you assign a new map
+instance to that variable, or this package will segfault (not yet sure why).
+This problem does not occur if separate instances are assigned to separate
+variables.
+
+```Python
+
+map = Map(<style>, <width>, <height>)
+
+del map  # must manually delete BEFORE creating a new instance assigned to this
+
+map = Map(<style>, <width>, <height>)
+```
+
+For this reason, you should consider using a context manager:
+
+```Python
+
+
+
+```
+
+To create a map object, you must always provide a Mapbox GL style JSON string or
+URL to a well-known style hosted by Mapbox or Maptiler:
+
+```Python
+style = """{
+    "version": 8,
+    "sources": {
+        "basemap": {
+            "type": "raster",
+            "tiles": ["https://services.arcgisonline.com/arcgis/rest/services/Ocean/World_Ocean_Base/MapServer/tile/{z}/{y}/{x}"],
+            "tileSize": 256
+        }
+    },
+    "layers": [
+        { "id": "basemap", "source": "basemap", "type": "raster" }
+    ]
+}"""
+
+
+map = Map(style)
+```
+
+See the [styles](#styles) section for more information.
 
 ## Styles
 
@@ -126,9 +193,9 @@ git submodule update --init --recursive \
     vendor/unique_resource \
     vendor/boost \
     vendor/eternal \
-    vendor/googletest
+    vendor/googletest \
+    vendor/mapbox-base
 
-git submodule update --init --recursive vendor/mapbox-base
 ```
 
 ### Architecture

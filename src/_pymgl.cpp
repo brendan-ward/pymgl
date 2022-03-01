@@ -68,6 +68,9 @@ PYBIND11_MODULE(_pymgl, m) {
                  os << "pymgl." << self;
                  return os.str();
              })
+        .def("__enter__", [&](Map &self) { return &self; })
+        .def("__exit__",
+             [&](Map &self, void *exc_type, void *exc_value, void *traceback) { self.release(); })
         .def("addImage",
              &Map::addImage,
              R"pbdoc(

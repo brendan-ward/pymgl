@@ -1,6 +1,3 @@
-from io import BytesIO
-
-from PIL import Image
 import pytest
 import numpy as np
 
@@ -19,6 +16,28 @@ def test_default_map(empty_style):
     assert map.bearing == 0
     assert map.pitch == 0
     assert map.zoom == 0
+
+
+def test_map_delete(empty_style):
+    map = Map(empty_style)
+    map.renderPNG()
+
+    # ensure that manually deleting map allows us to reassign; otherwise
+    # the following segfaults
+    del map
+
+    # this should not segfault
+    map = Map(empty_style)
+    map.renderPNG()
+
+
+def test_map_context_manager(empty_style):
+    with Map(empty_style) as map:
+        map.renderPNG()
+
+    # this should not segfault
+    with Map(empty_style) as map:
+        map.renderPNG()
 
 
 def test_map_create_params(empty_style):
