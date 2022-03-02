@@ -144,7 +144,7 @@ PYBIND11_MODULE(_pymgl, m) {
                 return arr;
             },
             R"pbdoc(
-                Render the map to an array of uint8 pixel values.
+                Render the map to a numpy array of uint8 pixel values.
             )pbdoc")
         .def("setBearing",
              &Map::setBearing,

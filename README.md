@@ -50,14 +50,14 @@ style = """{
     ]
 }"""
 
-map = Map(style, <height=256>, <width=256>, <pixel_ratio=1>, <longitude=0>, <latitude=0>, <zoom=0>, <token=None>, <provider=None>)
+map = Map(style, <height=256>, <width=256>, <ratio=1>, <longitude=0>, <latitude=0>, <zoom=0>, <token=None>, <provider=None>)
 ```
 
 See the [styles](#styles) section for more information about map styles.
 
 Other than style, all other parameters are optional with default values.
 
-NOTE: `style` and `pixel_ratio` cannot be changed once the instance is constructed.
+NOTE: `style` and `ratio` cannot be changed once the instance is constructed.
 
 You can use a well-known style instead of providing a style JSON string, but
 you must also provide a token and identify the correct provider:
@@ -110,7 +110,7 @@ raw image bytes, width, height, pixel ratio, and indicate if it should be
 interpreted as SDF:
 
 ```
-map.addImage("id", img_bytes, width, height, <pixel_ratio=1>, <is_SDF=False>)
+map.addImage("id", img_bytes, width, height, <ratio=1>, <make_SDF=False>)
 ```
 
 See the [SDF image docs](https://docs.mapbox.com/help/troubleshooting/using-recolorable-images-in-mapbox-maps/) for more information about using SDF
@@ -341,6 +341,15 @@ From project root directory:
 
 python setup.py build_ext --inplace
 ```
+
+#### Docstrings / type information
+
+Docstrings are maintained in both `src/_pymgl.cpp` and `pymgl/__init__.pyi`.
+
+Python-friendly type annotations are maintained in `pymgl/__init__.pyi`.
+
+Note: `pymgl/__init__.pyi` is necessary to support autocompletion and tooltips
+in VSCode.
 
 ## See also
 
