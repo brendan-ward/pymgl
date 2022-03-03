@@ -24,7 +24,7 @@ Right now, this package must be built manually (below).
 ### Supported operating systems
 
 -   MacOS 10.15+ (Arm64 / M1 support unknown)
--   Linux Debian Bullseye and similar; Alpine Linux is not supported
+-   Linux (Ubuntu 20.04); Alpine Linux is not supported
 
 Windows is not and will not be supported.
 
@@ -251,6 +251,35 @@ You can use map images as fill patterns or icon images.
 PyMGL does not support alternative projections or 3D terrain.
 
 ## Developing
+
+### Dependencies:
+
+#### MacOS:
+
+Developing on MacOS requires the following binary libraries to be installed
+via `homebrew`:
+
+-   cmake
+-   ninja
+
+#### Developing on Linux (Ubuntu 20.04) requires the following binary libraries:
+
+-   cmake
+-   ninja-build
+-   build-essential
+-   libcurl4-openssl-dev
+-   libicu-dev
+-   libpng-dev
+-   libprotobuf-dev
+-   libturbojpeg0-dev
+-   libx11-dev
+-   libegl-dev
+-   libopengl-dev
+-   xvfb
+
+To run on Linux, XVFB must also be running; otherwise the process will segfault.
+
+See `docker/Dockerfile` for more information.
 
 ### PyBind11
 

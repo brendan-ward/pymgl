@@ -27,10 +27,12 @@ Map::Map(const std::string &style,
          const std::optional<double> &latitude,
          const std::optional<double> &zoom,
          const std::optional<std::string> &token,
-         const std::optional<std::string> &provider)
-    : frontend(std::make_unique<mbgl::HeadlessFrontend>(
-        mbgl::Size{width.value_or(256), height.value_or(256)}, ratio.value_or(1)))
-    , loop(std::make_unique<mbgl::util::RunLoop>()) {
+         const std::optional<std::string> &provider) {
+
+    // loop must be created before frontend
+    loop     = std::make_unique<mbgl::util::RunLoop>();
+    frontend = std::make_unique<mbgl::HeadlessFrontend>(
+        mbgl::Size{width.value_or(256), height.value_or(256)}, ratio.value_or(1));
 
     // Turn off logging
     mbgl::Log::setObserver(std::make_unique<mbgl::Log::NullObserver>());

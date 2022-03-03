@@ -3,9 +3,6 @@ from io import BytesIO
 import pytest
 import requests
 
-# from PIL import Image
-from pyvips import Image
-
 from pymgl import Map
 
 from pymgl.tests.common import FIXTURES_PATH, MAPBOX_TOKEN, read_style
@@ -14,7 +11,14 @@ from pymgl.tests.common import FIXTURES_PATH, MAPBOX_TOKEN, read_style
 MBGL_RENDERER_PATH = "http://localhost:8002/render"
 
 
-COMPARE_MBGL_RENDERER = True
+COMPARE_MBGL_RENDERER = False
+USE_PILLOW = True
+SKIP_MAPBOX = True
+
+if USE_PILLOW:
+    from PIL import Image
+else:
+    from pyvips import Image
 
 
 def render(style, width, height, ratio=1, bounds=None, **kwargs):
@@ -33,16 +37,18 @@ def render_buffer(style, width, height, ratio=1, bounds=None, **kwargs):
         map.setBounds(*bounds)
 
     buf = map.renderBuffer()
-    # Pillow:
-    # img = Image.frombytes("RGBA", (width, height), buf)
-    # b = BytesIO()
-    # img.save(b, format="PNG")
-    # png = b.getvalue()
 
-    # pyvips (about 2x faster write):
-    img = Image.new_from_memory(buf, width, height, 4, "uchar")
-    # match compression to internal
-    b = img.pngsave_buffer(compression=3)
+    if USE_PILLOW:
+        img = Image.frombytes("RGBA", (width, height), buf)
+        b = BytesIO()
+        img.save(b, format="PNG")
+        png = b.getvalue()
+
+    else:
+        # pyvips (about 2x faster write):
+        img = Image.new_from_memory(buf, width, height, 4, "uchar")
+        # match compression to internal
+        png = img.pngsave_buffer(compression=3)
 
 
 def render_mbgl_renderer(
@@ -221,19 +227,21 @@ def test_render_remote_image_source(benchmark):
     benchmark(render, style, 256, 256)
 
 
-# Uncomment these to run tests against Mapbox; these incur hits against the token
+@pytest.mark.skipif(SKIP_MAPBOX, reason="Skipping mapbox tests")
 @pytest.mark.benchmark(group="render-mapbox-source-256")
 def test_render_mapbox_256(benchmark):
     style = read_style("example-style-mapbox-source.json")
     benchmark(render, style, 256, 256, token=MAPBOX_TOKEN, provider="mapbox")
 
 
+@pytest.mark.skipif(SKIP_MAPBOX, reason="Skipping mapbox tests")
 @pytest.mark.benchmark(group="render-mapbox-source-1024")
 def test_render_mapbox_1024(benchmark):
     style = read_style("example-style-mapbox-source.json")
     benchmark(render, style, 1024, 1024, token=MAPBOX_TOKEN, provider="mapbox")
 
 
+@pytest.mark.skipif(SKIP_MAPBOX, reason="Skipping mapbox tests")
 @pytest.mark.skipif(not COMPARE_MBGL_RENDERER, reason="Not comparing to mbgl-renderer")
 @pytest.mark.benchmark(group="render-mapbox-source-256")
 def test_render_mapbox_mbglr_256(benchmark):
@@ -241,6 +249,7 @@ def test_render_mapbox_mbglr_256(benchmark):
     benchmark(render_mbgl_renderer, style, 256, 256, token=MAPBOX_TOKEN)
 
 
+@pytest.mark.skipif(SKIP_MAPBOX, reason="Skipping mapbox tests")
 @pytest.mark.skipif(not COMPARE_MBGL_RENDERER, reason="Not comparing to mbgl-renderer")
 @pytest.mark.benchmark(group="render-mapbox-source-1024")
 def test_render_mapbox_mbglr_1024(benchmark):

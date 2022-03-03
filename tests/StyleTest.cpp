@@ -130,7 +130,7 @@ TEST(Style, MapboxStyle) {
     // write_test_image(img, img_filename, true);
 
     write_test_image(img, img_filename, false);
-    EXPECT_TRUE(image_matches(img_filename, 10));
+    EXPECT_TRUE(image_matches(img_filename, 100));
 }
 
 TEST(Style, Labels) {
@@ -186,7 +186,7 @@ TEST(Style, LocalMBtilesVectorSource) {
     // write_test_image(img, img_filename, true);
 
     write_test_image(img, img_filename, false);
-    EXPECT_TRUE(image_matches(img_filename, 10));
+    EXPECT_TRUE(image_matches(img_filename, 100));
 }
 
 TEST(Style, LocalMBtilesVectorSourceX2) {
@@ -206,7 +206,7 @@ TEST(Style, LocalMBtilesVectorSourceX2) {
     // write_test_image(img, img_filename, true);
 
     write_test_image(img, img_filename, false);
-    EXPECT_TRUE(image_matches(img_filename, 10));
+    EXPECT_TRUE(image_matches(img_filename, 100));
 }
 
 TEST(Style, ImagePattern) {

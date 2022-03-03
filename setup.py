@@ -16,6 +16,9 @@ class CMakeExtension(Extension):
 
 class CMakeBuild(build_ext):
     def build_extension(self, ext):
+        if self.compiler.compiler_type == "msvc":
+            raise NotImplementedError("pymgl is not supported on Windows")
+
         extdir = os.path.abspath(os.path.dirname(self.get_ext_fullpath(ext.name)))
 
         # required for auto-detection of auxiliary "native" libs
@@ -25,10 +28,6 @@ class CMakeBuild(build_ext):
         cfg = "Debug" if self.debug else "Release"
         print(f"Build mode: {cfg}")
 
-        # CMake lets you override the generator - we need to check this.
-        # Can be set with Conda-Build, for example.
-        cmake_generator = os.environ.get("CMAKE_GENERATOR", "")
-
         cmake_args = [
             "-DCMAKE_LIBRARY_OUTPUT_DIRECTORY={}".format(extdir),
             "-DPYTHON_EXECUTABLE={}".format(sys.executable),
@@ -37,12 +36,9 @@ class CMakeBuild(build_ext):
         ]
         build_args = []
 
-        if self.compiler.compiler_type == "msvc":
-            raise NotImplementedError("pymgl is not supported on Windows")
-
-        else:
-            if not cmake_generator:
-                cmake_args += ["-GNinja"]
+        cmake_generator = os.environ.get("CMAKE_GENERATOR", "")
+        if not cmake_generator:
+            cmake_args += ["-GNinja"]
 
         # Set CMAKE_BUILD_PARALLEL_LEVEL to control the parallel build level
         # across all generators.
@@ -53,6 +49,7 @@ class CMakeBuild(build_ext):
                 # CMake 3.12+ only.
                 build_args += ["-j{}".format(self.parallel)]
 
+        # TODO: make this configurable via env var
         if not os.path.exists(self.build_temp):
             os.makedirs(self.build_temp)
 
@@ -88,6 +85,7 @@ setup(
             "python-dotenv",
             "numpy",
             "requests",
+            "pixelmatch",
         ]
     },
 )

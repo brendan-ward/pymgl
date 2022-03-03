@@ -55,7 +55,7 @@ def test_mapbox_source():
         read_style(f"{test}.json"), 256, 256, token=MAPBOX_TOKEN, provider="mapbox"
     ).renderPNG()
 
-    assert image_matches(img_data, f"{test}.png")
+    assert image_matches(img_data, f"{test}.png", 10)
 
 
 def test_mapbox_base_style():
@@ -67,7 +67,7 @@ def test_mapbox_base_style():
         token=MAPBOX_TOKEN,
         provider="mapbox",
     ).renderPNG()
-    assert image_matches(img_data, "mapbox-streets-v11.png")
+    assert image_matches(img_data, "mapbox-streets-v11.png", 100)
 
 
 def test_labels():
@@ -101,7 +101,7 @@ def test_local_mbtiles_vector_source():
 
     img_data = Map(style, 256, 256).renderPNG()
 
-    assert image_matches(img_data, f"{test}.png")
+    assert image_matches(img_data, f"{test}.png", 100)
 
 
 def test_local_mbtiles_vector_source_2x():
@@ -113,7 +113,7 @@ def test_local_mbtiles_vector_source_2x():
 
     img_data = Map(style, 256, 256, 2).renderPNG()
 
-    assert image_matches(img_data, f"{test}@2x.png")
+    assert image_matches(img_data, f"{test}@2x.png", 100)
 
 
 def test_image_pattern():
@@ -143,9 +143,8 @@ def test_bad_source():
 
 
 def test_bad_glyphs():
-    with pytest.raises(
-        RuntimeError, match="A server with the specified hostname could not be found."
-    ):
+    # NOTE: this returns different error messages on MacOS vs Linux
+    with pytest.raises(RuntimeError):
         map = Map(read_style("example-style-bad-glyphs.json"), 100, 100, 1)
         map.setBounds(-125, 37.5, -115, 42.5)
         map.renderPNG()
