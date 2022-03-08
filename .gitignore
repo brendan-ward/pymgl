@@ -14,3 +14,5 @@ build/*
 .pytest_cache/*
 
 Pipfile.lock
+
+valgrind.log

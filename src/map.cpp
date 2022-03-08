@@ -285,7 +285,7 @@ void Map::validateZoom(const double &zoom) {
 }
 
 void Map::release() {
-    if (map == nullptr) {
+    if (!map) {
         return;
     }
     map.reset();

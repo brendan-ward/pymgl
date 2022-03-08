@@ -1,35 +1,33 @@
 cmake_minimum_required(VERSION 3.10 FATAL_ERROR)
 project("_pymgl")
 
+if(NOT CMAKE_BUILD_TYPE)
+    set(CMAKE_BUILD_TYPE Release)
+endif()
+
 cmake_policy(SET CMP0079 NEW)
 
-
-
-# maplibre-gl-native is in sibling directory
-# set(MBGL_SOURCE_DIR ${PROJECT_SOURCE_DIR}/../maplibre-gl-native)
-
-# used for docker build, installed to root
-# set(MBGL_SOURCE_DIR /maplibre-gl-native)
-
-# use when installed into vendor folder
 set(MBGL_SOURCE_DIR ${PROJECT_SOURCE_DIR}/vendor/maplibre-gl-native)
-message(STATUS "maplibre-gl-native dir: ${MBGL_SOURCE_DIR}")
 
-
-# Adapted from maplibre-gl-native
+# Adapted from maplibre-gl-native/CMakeLists.txt
 cmake_policy(SET CMP0063 NEW)
 set(CMAKE_CXX_EXTENSIONS OFF)
-set(CMAKE_CXX_STANDARD 17)  # 14 => 17
+set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_VISIBILITY_PRESET hidden)
 set(CMAKE_C_EXTENSIONS OFF)
-set(CMAKE_C_STANDARD 99)
+set(CMAKE_C_STANDARD 11)
 set(CMAKE_C_STANDARD_REQUIRED ON)
 set(CMAKE_C_VISIBILITY_PRESET hidden)
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
-set(CMAKE_INTERPROCEDURAL_OPTIMIZATION_MINSIZEREL ON)
 set(CMAKE_POSITION_INDEPENDENT_CODE ON)
 set(CMAKE_VISIBILITY_INLINES_HIDDEN 1)
+set_property(GLOBAL PROPERTY USE_FOLDERS ON)
+set_property(GLOBAL PROPERTY PREDEFINED_TARGETS_FOLDER Core)
+
+if(NOT ("${CMAKE_BUILD_TYPE}" STREQUAL "Debug"))
+    set(CMAKE_INTERPROCEDURAL_OPTIMIZATION_MINSIZEREL ON)
+endif()
 
 # Hide warnings about no symbols
 SET(CMAKE_C_ARCHIVE_CREATE   "<CMAKE_AR> Scr <TARGET> <LINK_FLAGS> <OBJECTS>")

@@ -35,4 +35,7 @@ RUN apt-get update && \
     python3.9 get-pip.py
 
 #  Install python test deps
-RUN pip3.9 install pytest pytest-benchmark python-dotenv Pillow numpy pixelmatch requests
+RUN pip3.9 install pytest pytest-benchmark pytest-valgrind python-dotenv Pillow numpy pixelmatch requests
+
+ENV BUILD_TEMP_DIR /tmp/build
+ENV PYTHONMALLOC malloc

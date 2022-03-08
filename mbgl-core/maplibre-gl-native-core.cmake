@@ -1,44 +1,482 @@
 ### Build mbgl-core
-set(MBGL_PUBLIC_BUILD TRUE)
-option(MBGL_WITH_CORE_ONLY "Build only the core bits, no platform code" ON)
-option(MBGL_WITH_OPENGL "Build with OpenGL renderer" ON)
+# Adapted from maplibre-gl-core/CMakeLists.txt
 
-# Include maplibre as a directory and build
-add_subdirectory(${MBGL_SOURCE_DIR} build)
+add_library(
+    mbgl-compiler-options INTERFACE
+)
+
+target_compile_options(
+    mbgl-compiler-options
+    INTERFACE
+    $<$<COMPILE_LANGUAGE:CXX>:-Wall>
+    $<$<COMPILE_LANGUAGE:CXX>:-Wshadow>
+    $<$<COMPILE_LANGUAGE:CXX>:-Wextra>
+    $<$<CXX_COMPILER_ID:GNU>:-Wno-error=maybe-uninitialized>
+    $<$<CXX_COMPILER_ID:GNU>:-Wno-error=return-type>
+    $<$<CXX_COMPILER_ID:GNU>:-Wno-error=unknown-pragmas>
+    $<$<CXX_COMPILER_ID:AppleClang>:-Wno-error=deprecated-declarations>
+    $<$<CXX_COMPILER_ID:AppleClang>:-Wno-error=unused-parameter>
+    $<$<CXX_COMPILER_ID:AppleClang>:-Wno-error=unused-property-ivar>
+)
+
+# NOTE: removed all *.hpp file entries from below, and merged file lists to include OpenGL section
+
+add_library(
+    mbgl-core STATIC
+    ${MBGL_SOURCE_DIR}/src/mbgl/actor/mailbox.cpp
+    ${MBGL_SOURCE_DIR}/src/mbgl/actor/scheduler.cpp
+    ${MBGL_SOURCE_DIR}/src/mbgl/annotation/annotation_manager.cpp
+    ${MBGL_SOURCE_DIR}/src/mbgl/annotation/annotation_source.cpp
+    ${MBGL_SOURCE_DIR}/src/mbgl/annotation/annotation_tile.cpp
+    ${MBGL_SOURCE_DIR}/src/mbgl/annotation/fill_annotation_impl.cpp
+    ${MBGL_SOURCE_DIR}/src/mbgl/annotation/line_annotation_impl.cpp
+    ${MBGL_SOURCE_DIR}/src/mbgl/annotation/render_annotation_source.cpp
+    ${MBGL_SOURCE_DIR}/src/mbgl/annotation/shape_annotation_impl.cpp
+    ${MBGL_SOURCE_DIR}/src/mbgl/annotation/symbol_annotation_impl.cpp
+    ${MBGL_SOURCE_DIR}/src/mbgl/geometry/dem_data.cpp
+    ${MBGL_SOURCE_DIR}/src/mbgl/geometry/feature_index.cpp
+    ${MBGL_SOURCE_DIR}/src/mbgl/geometry/line_atlas.cpp
+    ${MBGL_SOURCE_DIR}/src/mbgl/gfx/attribute.cpp
+    ${MBGL_SOURCE_DIR}/src/mbgl/gfx/renderer_backend.cpp
+    ${MBGL_SOURCE_DIR}/src/mbgl/gfx/rendering_stats.cpp
+    ${MBGL_SOURCE_DIR}/src/mbgl/layermanager/background_layer_factory.cpp
+    ${MBGL_SOURCE_DIR}/src/mbgl/layermanager/circle_layer_factory.cpp
+    ${MBGL_SOURCE_DIR}/src/mbgl/layermanager/fill_extrusion_layer_factory.cpp
+    ${MBGL_SOURCE_DIR}/src/mbgl/layermanager/fill_layer_factory.cpp
+    ${MBGL_SOURCE_DIR}/src/mbgl/layermanager/heatmap_layer_factory.cpp
+    ${MBGL_SOURCE_DIR}/src/mbgl/layermanager/hillshade_layer_factory.cpp
+    ${MBGL_SOURCE_DIR}/src/mbgl/layermanager/layer_factory.cpp
+    ${MBGL_SOURCE_DIR}/src/mbgl/layermanager/layer_manager.cpp
+    ${MBGL_SOURCE_DIR}/src/mbgl/layermanager/line_layer_factory.cpp
+    ${MBGL_SOURCE_DIR}/src/mbgl/layermanager/raster_layer_factory.cpp
+    ${MBGL_SOURCE_DIR}/src/mbgl/layermanager/symbol_layer_factory.cpp
+    ${MBGL_SOURCE_DIR}/src/mbgl/layout/clip_lines.cpp
+    ${MBGL_SOURCE_DIR}/src/mbgl/layout/merge_lines.cpp
+    ${MBGL_SOURCE_DIR}/src/mbgl/layout/symbol_instance.cpp
+    ${MBGL_SOURCE_DIR}/src/mbgl/layout/symbol_layout.cpp
+    ${MBGL_SOURCE_DIR}/src/mbgl/layout/symbol_projection.cpp
+    ${MBGL_SOURCE_DIR}/src/mbgl/map/map.cpp
+    ${MBGL_SOURCE_DIR}/src/mbgl/map/map_impl.cpp
+    ${MBGL_SOURCE_DIR}/src/mbgl/map/map_options.cpp
+    ${MBGL_SOURCE_DIR}/src/mbgl/map/transform.cpp
+    ${MBGL_SOURCE_DIR}/src/mbgl/map/transform_state.cpp
+    ${MBGL_SOURCE_DIR}/src/mbgl/math/log2.cpp
+    ${MBGL_SOURCE_DIR}/src/mbgl/platform/settings.cpp
+    ${MBGL_SOURCE_DIR}/src/mbgl/programs/background_program.cpp
+    ${MBGL_SOURCE_DIR}/src/mbgl/programs/circle_program.cpp
+    ${MBGL_SOURCE_DIR}/src/mbgl/programs/clipping_mask_program.cpp
+    ${MBGL_SOURCE_DIR}/src/mbgl/programs/collision_box_program.cpp
+    ${MBGL_SOURCE_DIR}/src/mbgl/programs/debug_program.cpp
+    ${MBGL_SOURCE_DIR}/src/mbgl/programs/fill_extrusion_program.cpp
+    ${MBGL_SOURCE_DIR}/src/mbgl/programs/fill_program.cpp
+    ${MBGL_SOURCE_DIR}/src/mbgl/programs/heatmap_program.cpp
+    ${MBGL_SOURCE_DIR}/src/mbgl/programs/heatmap_texture_program.cpp
+    ${MBGL_SOURCE_DIR}/src/mbgl/programs/hillshade_prepare_program.cpp
+    ${MBGL_SOURCE_DIR}/src/mbgl/programs/hillshade_program.cpp
+    ${MBGL_SOURCE_DIR}/src/mbgl/programs/line_program.cpp
+    ${MBGL_SOURCE_DIR}/src/mbgl/programs/program_parameters.cpp
+    ${MBGL_SOURCE_DIR}/src/mbgl/programs/programs.cpp
+    ${MBGL_SOURCE_DIR}/src/mbgl/programs/raster_program.cpp
+    ${MBGL_SOURCE_DIR}/src/mbgl/programs/symbol_program.cpp
+    ${MBGL_SOURCE_DIR}/src/mbgl/renderer/backend_scope.cpp
+    ${MBGL_SOURCE_DIR}/src/mbgl/renderer/bucket_parameters.cpp
+    ${MBGL_SOURCE_DIR}/src/mbgl/renderer/buckets/circle_bucket.cpp
+    ${MBGL_SOURCE_DIR}/src/mbgl/renderer/buckets/debug_bucket.cpp
+    ${MBGL_SOURCE_DIR}/src/mbgl/renderer/buckets/fill_bucket.cpp
+    ${MBGL_SOURCE_DIR}/src/mbgl/renderer/buckets/fill_extrusion_bucket.cpp
+    ${MBGL_SOURCE_DIR}/src/mbgl/renderer/buckets/heatmap_bucket.cpp
+    ${MBGL_SOURCE_DIR}/src/mbgl/renderer/buckets/hillshade_bucket.cpp
+    ${MBGL_SOURCE_DIR}/src/mbgl/renderer/buckets/line_bucket.cpp
+    ${MBGL_SOURCE_DIR}/src/mbgl/renderer/buckets/raster_bucket.cpp
+    ${MBGL_SOURCE_DIR}/src/mbgl/renderer/buckets/symbol_bucket.cpp
+    ${MBGL_SOURCE_DIR}/src/mbgl/renderer/cross_faded_property_evaluator.cpp
+    ${MBGL_SOURCE_DIR}/src/mbgl/renderer/group_by_layout.cpp
+    ${MBGL_SOURCE_DIR}/src/mbgl/renderer/image_atlas.cpp
+    ${MBGL_SOURCE_DIR}/src/mbgl/renderer/image_manager.cpp
+    ${MBGL_SOURCE_DIR}/src/mbgl/renderer/layers/render_background_layer.cpp
+    ${MBGL_SOURCE_DIR}/src/mbgl/renderer/layers/render_circle_layer.cpp
+    ${MBGL_SOURCE_DIR}/src/mbgl/renderer/layers/render_fill_extrusion_layer.cpp
+    ${MBGL_SOURCE_DIR}/src/mbgl/renderer/layers/render_fill_layer.cpp
+    ${MBGL_SOURCE_DIR}/src/mbgl/renderer/layers/render_heatmap_layer.cpp
+    ${MBGL_SOURCE_DIR}/src/mbgl/renderer/layers/render_hillshade_layer.cpp
+    ${MBGL_SOURCE_DIR}/src/mbgl/renderer/layers/render_line_layer.cpp
+    ${MBGL_SOURCE_DIR}/src/mbgl/renderer/layers/render_raster_layer.cpp
+    ${MBGL_SOURCE_DIR}/src/mbgl/renderer/layers/render_symbol_layer.cpp
+    ${MBGL_SOURCE_DIR}/src/mbgl/renderer/paint_parameters.cpp
+    ${MBGL_SOURCE_DIR}/src/mbgl/renderer/pattern_atlas.cpp
+    ${MBGL_SOURCE_DIR}/src/mbgl/renderer/render_layer.cpp
+    ${MBGL_SOURCE_DIR}/src/mbgl/renderer/render_light.cpp
+    ${MBGL_SOURCE_DIR}/src/mbgl/renderer/render_orchestrator.cpp
+    ${MBGL_SOURCE_DIR}/src/mbgl/renderer/render_source.cpp
+    ${MBGL_SOURCE_DIR}/src/mbgl/renderer/render_static_data.cpp
+    ${MBGL_SOURCE_DIR}/src/mbgl/renderer/render_tile.cpp
+    ${MBGL_SOURCE_DIR}/src/mbgl/renderer/renderer.cpp
+    ${MBGL_SOURCE_DIR}/src/mbgl/renderer/renderer_impl.cpp
+    ${MBGL_SOURCE_DIR}/src/mbgl/renderer/renderer_state.cpp
+    ${MBGL_SOURCE_DIR}/src/mbgl/renderer/sources/render_custom_geometry_source.cpp
+    ${MBGL_SOURCE_DIR}/src/mbgl/renderer/sources/render_geojson_source.cpp
+    ${MBGL_SOURCE_DIR}/src/mbgl/renderer/sources/render_image_source.cpp
+    ${MBGL_SOURCE_DIR}/src/mbgl/renderer/sources/render_raster_dem_source.cpp
+    ${MBGL_SOURCE_DIR}/src/mbgl/renderer/sources/render_raster_source.cpp
+    ${MBGL_SOURCE_DIR}/src/mbgl/renderer/sources/render_tile_source.cpp
+    ${MBGL_SOURCE_DIR}/src/mbgl/renderer/sources/render_vector_source.cpp
+    ${MBGL_SOURCE_DIR}/src/mbgl/renderer/source_state.cpp
+    ${MBGL_SOURCE_DIR}/src/mbgl/renderer/style_diff.cpp
+    ${MBGL_SOURCE_DIR}/src/mbgl/renderer/tile_pyramid.cpp
+    ${MBGL_SOURCE_DIR}/src/mbgl/renderer/tile_render_data.cpp
+    ${MBGL_SOURCE_DIR}/src/mbgl/sprite/sprite_loader.cpp
+    ${MBGL_SOURCE_DIR}/src/mbgl/sprite/sprite_parser.cpp
+    ${MBGL_SOURCE_DIR}/src/mbgl/storage/file_source_manager.cpp
+    ${MBGL_SOURCE_DIR}/src/mbgl/storage/network_status.cpp
+    ${MBGL_SOURCE_DIR}/src/mbgl/storage/resource.cpp
+    ${MBGL_SOURCE_DIR}/src/mbgl/storage/resource_options.cpp
+    ${MBGL_SOURCE_DIR}/src/mbgl/storage/resource_transform.cpp
+    ${MBGL_SOURCE_DIR}/src/mbgl/storage/response.cpp
+    ${MBGL_SOURCE_DIR}/src/mbgl/style/conversion/color_ramp_property_value.cpp
+    ${MBGL_SOURCE_DIR}/src/mbgl/style/conversion/constant.cpp
+    ${MBGL_SOURCE_DIR}/src/mbgl/style/conversion/coordinate.cpp
+    ${MBGL_SOURCE_DIR}/src/mbgl/style/conversion/custom_geometry_source_options.cpp
+    ${MBGL_SOURCE_DIR}/src/mbgl/style/conversion/filter.cpp
+    ${MBGL_SOURCE_DIR}/src/mbgl/style/conversion/function.cpp
+    ${MBGL_SOURCE_DIR}/src/mbgl/style/conversion/geojson.cpp
+    ${MBGL_SOURCE_DIR}/src/mbgl/style/conversion/geojson_options.cpp
+    ${MBGL_SOURCE_DIR}/src/mbgl/style/conversion/get_json_type.cpp
+    ${MBGL_SOURCE_DIR}/src/mbgl/style/conversion/layer.cpp
+    ${MBGL_SOURCE_DIR}/src/mbgl/style/conversion/light.cpp
+    ${MBGL_SOURCE_DIR}/src/mbgl/style/conversion/position.cpp
+    ${MBGL_SOURCE_DIR}/src/mbgl/style/conversion/property_value.cpp
+    ${MBGL_SOURCE_DIR}/src/mbgl/style/conversion/rotation.cpp
+    ${MBGL_SOURCE_DIR}/src/mbgl/style/conversion/source.cpp
+    ${MBGL_SOURCE_DIR}/src/mbgl/style/conversion/tileset.cpp
+    ${MBGL_SOURCE_DIR}/src/mbgl/style/conversion/transition_options.cpp
+    ${MBGL_SOURCE_DIR}/src/mbgl/style/custom_tile_loader.cpp
+    ${MBGL_SOURCE_DIR}/src/mbgl/style/expression/assertion.cpp
+    ${MBGL_SOURCE_DIR}/src/mbgl/style/expression/at.cpp
+    ${MBGL_SOURCE_DIR}/src/mbgl/style/expression/boolean_operator.cpp
+    ${MBGL_SOURCE_DIR}/src/mbgl/style/expression/case.cpp
+    ${MBGL_SOURCE_DIR}/src/mbgl/style/expression/check_subtype.cpp
+    ${MBGL_SOURCE_DIR}/src/mbgl/style/expression/coalesce.cpp
+    ${MBGL_SOURCE_DIR}/src/mbgl/style/expression/coercion.cpp
+    ${MBGL_SOURCE_DIR}/src/mbgl/style/expression/collator.cpp
+    ${MBGL_SOURCE_DIR}/src/mbgl/style/expression/collator_expression.cpp
+    ${MBGL_SOURCE_DIR}/src/mbgl/style/expression/comparison.cpp
+    ${MBGL_SOURCE_DIR}/src/mbgl/style/expression/compound_expression.cpp
+    ${MBGL_SOURCE_DIR}/src/mbgl/style/expression/distance.cpp
+    ${MBGL_SOURCE_DIR}/src/mbgl/style/expression/dsl.cpp
+    ${MBGL_SOURCE_DIR}/src/mbgl/style/expression/expression.cpp
+    ${MBGL_SOURCE_DIR}/src/mbgl/style/expression/find_zoom_curve.cpp
+    ${MBGL_SOURCE_DIR}/src/mbgl/style/expression/format_expression.cpp
+    ${MBGL_SOURCE_DIR}/src/mbgl/style/expression/formatted.cpp
+    ${MBGL_SOURCE_DIR}/src/mbgl/style/expression/get_covering_stops.cpp
+    ${MBGL_SOURCE_DIR}/src/mbgl/style/expression/image.cpp
+    ${MBGL_SOURCE_DIR}/src/mbgl/style/expression/image_expression.cpp
+    ${MBGL_SOURCE_DIR}/src/mbgl/style/expression/in.cpp
+    ${MBGL_SOURCE_DIR}/src/mbgl/style/expression/interpolate.cpp
+    ${MBGL_SOURCE_DIR}/src/mbgl/style/expression/is_constant.cpp
+    ${MBGL_SOURCE_DIR}/src/mbgl/style/expression/is_expression.cpp
+    ${MBGL_SOURCE_DIR}/src/mbgl/style/expression/length.cpp
+    ${MBGL_SOURCE_DIR}/src/mbgl/style/expression/let.cpp
+    ${MBGL_SOURCE_DIR}/src/mbgl/style/expression/literal.cpp
+    ${MBGL_SOURCE_DIR}/src/mbgl/style/expression/match.cpp
+    ${MBGL_SOURCE_DIR}/src/mbgl/style/expression/number_format.cpp
+    ${MBGL_SOURCE_DIR}/src/mbgl/style/expression/parsing_context.cpp
+    ${MBGL_SOURCE_DIR}/src/mbgl/style/expression/step.cpp
+    ${MBGL_SOURCE_DIR}/src/mbgl/style/expression/util.cpp
+    ${MBGL_SOURCE_DIR}/src/mbgl/style/expression/value.cpp
+    ${MBGL_SOURCE_DIR}/src/mbgl/style/expression/within.cpp
+    ${MBGL_SOURCE_DIR}/src/mbgl/style/filter.cpp
+    ${MBGL_SOURCE_DIR}/src/mbgl/style/image.cpp
+    ${MBGL_SOURCE_DIR}/src/mbgl/style/image_impl.cpp
+    ${MBGL_SOURCE_DIR}/src/mbgl/style/layer.cpp
+    ${MBGL_SOURCE_DIR}/src/mbgl/style/layer_impl.cpp
+    ${MBGL_SOURCE_DIR}/src/mbgl/style/layers/background_layer.cpp
+    ${MBGL_SOURCE_DIR}/src/mbgl/style/layers/background_layer_impl.cpp
+    ${MBGL_SOURCE_DIR}/src/mbgl/style/layers/background_layer_properties.cpp
+    ${MBGL_SOURCE_DIR}/src/mbgl/style/layers/circle_layer.cpp
+    ${MBGL_SOURCE_DIR}/src/mbgl/style/layers/circle_layer_impl.cpp
+    ${MBGL_SOURCE_DIR}/src/mbgl/style/layers/circle_layer_properties.cpp
+    ${MBGL_SOURCE_DIR}/src/mbgl/style/layers/fill_extrusion_layer.cpp
+    ${MBGL_SOURCE_DIR}/src/mbgl/style/layers/fill_extrusion_layer_impl.cpp
+    ${MBGL_SOURCE_DIR}/src/mbgl/style/layers/fill_extrusion_layer_properties.cpp
+    ${MBGL_SOURCE_DIR}/src/mbgl/style/layers/fill_layer.cpp
+    ${MBGL_SOURCE_DIR}/src/mbgl/style/layers/fill_layer_impl.cpp
+    ${MBGL_SOURCE_DIR}/src/mbgl/style/layers/fill_layer_properties.cpp
+    ${MBGL_SOURCE_DIR}/src/mbgl/style/layers/heatmap_layer.cpp
+    ${MBGL_SOURCE_DIR}/src/mbgl/style/layers/heatmap_layer_impl.cpp
+    ${MBGL_SOURCE_DIR}/src/mbgl/style/layers/heatmap_layer_properties.cpp
+    ${MBGL_SOURCE_DIR}/src/mbgl/style/layers/hillshade_layer.cpp
+    ${MBGL_SOURCE_DIR}/src/mbgl/style/layers/hillshade_layer_impl.cpp
+    ${MBGL_SOURCE_DIR}/src/mbgl/style/layers/hillshade_layer_properties.cpp
+    ${MBGL_SOURCE_DIR}/src/mbgl/style/layers/line_layer.cpp
+    ${MBGL_SOURCE_DIR}/src/mbgl/style/layers/line_layer_impl.cpp
+    ${MBGL_SOURCE_DIR}/src/mbgl/style/layers/line_layer_properties.cpp
+    ${MBGL_SOURCE_DIR}/src/mbgl/style/layers/raster_layer.cpp
+    ${MBGL_SOURCE_DIR}/src/mbgl/style/layers/raster_layer_impl.cpp
+    ${MBGL_SOURCE_DIR}/src/mbgl/style/layers/raster_layer_properties.cpp
+    ${MBGL_SOURCE_DIR}/src/mbgl/style/layers/symbol_layer.cpp
+    ${MBGL_SOURCE_DIR}/src/mbgl/style/layers/symbol_layer_impl.cpp
+    ${MBGL_SOURCE_DIR}/src/mbgl/style/layers/symbol_layer_properties.cpp
+    ${MBGL_SOURCE_DIR}/src/mbgl/style/light.cpp
+    ${MBGL_SOURCE_DIR}/src/mbgl/style/light_impl.cpp
+    ${MBGL_SOURCE_DIR}/src/mbgl/style/parser.cpp
+    ${MBGL_SOURCE_DIR}/src/mbgl/style/property_expression.cpp
+    ${MBGL_SOURCE_DIR}/src/mbgl/style/source.cpp
+    ${MBGL_SOURCE_DIR}/src/mbgl/style/source_impl.cpp
+    ${MBGL_SOURCE_DIR}/src/mbgl/style/sources/custom_geometry_source.cpp
+    ${MBGL_SOURCE_DIR}/src/mbgl/style/sources/custom_geometry_source_impl.cpp
+    ${MBGL_SOURCE_DIR}/src/mbgl/style/sources/geojson_source.cpp
+    ${MBGL_SOURCE_DIR}/src/mbgl/style/sources/geojson_source_impl.cpp
+    ${MBGL_SOURCE_DIR}/src/mbgl/style/sources/image_source.cpp
+    ${MBGL_SOURCE_DIR}/src/mbgl/style/sources/image_source_impl.cpp
+    ${MBGL_SOURCE_DIR}/src/mbgl/style/sources/raster_dem_source.cpp
+    ${MBGL_SOURCE_DIR}/src/mbgl/style/sources/raster_source.cpp
+    ${MBGL_SOURCE_DIR}/src/mbgl/style/sources/raster_source_impl.cpp
+    ${MBGL_SOURCE_DIR}/src/mbgl/style/sources/vector_source.cpp
+    ${MBGL_SOURCE_DIR}/src/mbgl/style/sources/vector_source_impl.cpp
+    ${MBGL_SOURCE_DIR}/src/mbgl/style/style.cpp
+    ${MBGL_SOURCE_DIR}/src/mbgl/style/style_impl.cpp
+    ${MBGL_SOURCE_DIR}/src/mbgl/style/types.cpp
+    ${MBGL_SOURCE_DIR}/src/mbgl/text/check_max_angle.cpp
+    ${MBGL_SOURCE_DIR}/src/mbgl/text/collision_feature.cpp
+    ${MBGL_SOURCE_DIR}/src/mbgl/text/collision_index.cpp
+    ${MBGL_SOURCE_DIR}/src/mbgl/text/cross_tile_symbol_index.cpp
+    ${MBGL_SOURCE_DIR}/src/mbgl/text/get_anchors.cpp
+    ${MBGL_SOURCE_DIR}/src/mbgl/text/glyph.cpp
+    ${MBGL_SOURCE_DIR}/src/mbgl/text/glyph_atlas.cpp
+    ${MBGL_SOURCE_DIR}/src/mbgl/text/glyph_manager.cpp
+    ${MBGL_SOURCE_DIR}/src/mbgl/text/glyph_pbf.cpp
+    ${MBGL_SOURCE_DIR}/src/mbgl/text/language_tag.cpp
+    ${MBGL_SOURCE_DIR}/src/mbgl/text/placement.cpp
+    ${MBGL_SOURCE_DIR}/src/mbgl/text/quads.cpp
+    ${MBGL_SOURCE_DIR}/src/mbgl/text/shaping.cpp
+    ${MBGL_SOURCE_DIR}/src/mbgl/text/tagged_string.cpp
+    ${MBGL_SOURCE_DIR}/src/mbgl/tile/custom_geometry_tile.cpp
+    ${MBGL_SOURCE_DIR}/src/mbgl/tile/geojson_tile.cpp
+    ${MBGL_SOURCE_DIR}/src/mbgl/tile/geometry_tile.cpp
+    ${MBGL_SOURCE_DIR}/src/mbgl/tile/geometry_tile_data.cpp
+    ${MBGL_SOURCE_DIR}/src/mbgl/tile/geometry_tile_worker.cpp
+    ${MBGL_SOURCE_DIR}/src/mbgl/tile/raster_dem_tile.cpp
+    ${MBGL_SOURCE_DIR}/src/mbgl/tile/raster_dem_tile_worker.cpp
+    ${MBGL_SOURCE_DIR}/src/mbgl/tile/raster_tile.cpp
+    ${MBGL_SOURCE_DIR}/src/mbgl/tile/raster_tile_worker.cpp
+    ${MBGL_SOURCE_DIR}/src/mbgl/tile/tile.cpp
+    ${MBGL_SOURCE_DIR}/src/mbgl/tile/tile_cache.cpp
+    ${MBGL_SOURCE_DIR}/src/mbgl/tile/tile_id_hash.cpp
+    ${MBGL_SOURCE_DIR}/src/mbgl/tile/tile_id_io.cpp
+    ${MBGL_SOURCE_DIR}/src/mbgl/tile/vector_tile.cpp
+    ${MBGL_SOURCE_DIR}/src/mbgl/tile/vector_tile_data.cpp
+    ${MBGL_SOURCE_DIR}/src/mbgl/util/camera.cpp
+    ${MBGL_SOURCE_DIR}/src/mbgl/util/bounding_volumes.cpp
+    ${MBGL_SOURCE_DIR}/src/mbgl/util/chrono.cpp
+    ${MBGL_SOURCE_DIR}/src/mbgl/util/color.cpp
+    ${MBGL_SOURCE_DIR}/src/mbgl/util/constants.cpp
+    ${MBGL_SOURCE_DIR}/src/mbgl/util/convert.cpp
+    ${MBGL_SOURCE_DIR}/src/mbgl/util/dtoa.cpp
+    ${MBGL_SOURCE_DIR}/src/mbgl/util/event.cpp
+    ${MBGL_SOURCE_DIR}/src/mbgl/util/font_stack.cpp
+    ${MBGL_SOURCE_DIR}/src/mbgl/util/geo.cpp
+    ${MBGL_SOURCE_DIR}/src/mbgl/util/geojson_impl.cpp
+    ${MBGL_SOURCE_DIR}/src/mbgl/util/geometry_util.cpp
+    ${MBGL_SOURCE_DIR}/src/mbgl/util/grid_index.cpp
+    ${MBGL_SOURCE_DIR}/src/mbgl/util/http_header.cpp
+    ${MBGL_SOURCE_DIR}/src/mbgl/util/http_timeout.cpp
+    ${MBGL_SOURCE_DIR}/src/mbgl/util/i18n.cpp
+    ${MBGL_SOURCE_DIR}/src/mbgl/util/interpolate.cpp
+    ${MBGL_SOURCE_DIR}/src/mbgl/util/intersection_tests.cpp
+    ${MBGL_SOURCE_DIR}/src/mbgl/util/io.cpp
+    ${MBGL_SOURCE_DIR}/src/mbgl/util/logging.cpp
+    ${MBGL_SOURCE_DIR}/src/mbgl/util/mapbox.cpp
+    ${MBGL_SOURCE_DIR}/src/mbgl/util/mat2.cpp
+    ${MBGL_SOURCE_DIR}/src/mbgl/util/mat3.cpp
+    ${MBGL_SOURCE_DIR}/src/mbgl/util/mat4.cpp
+    ${MBGL_SOURCE_DIR}/src/mbgl/util/premultiply.cpp
+    ${MBGL_SOURCE_DIR}/src/mbgl/util/quaternion.cpp
+    ${MBGL_SOURCE_DIR}/src/mbgl/util/rapidjson.cpp
+    ${MBGL_SOURCE_DIR}/src/mbgl/util/stopwatch.cpp
+    ${MBGL_SOURCE_DIR}/src/mbgl/util/string.cpp
+    ${MBGL_SOURCE_DIR}/src/mbgl/util/thread.cpp
+    ${MBGL_SOURCE_DIR}/src/mbgl/util/thread_pool.cpp
+    ${MBGL_SOURCE_DIR}/src/mbgl/util/tile_cover.cpp
+    ${MBGL_SOURCE_DIR}/src/mbgl/util/tile_cover_impl.cpp
+    ${MBGL_SOURCE_DIR}/src/mbgl/util/default_style.cpp
+    ${MBGL_SOURCE_DIR}/src/mbgl/util/tile_server_options.cpp
+    ${MBGL_SOURCE_DIR}/src/mbgl/util/tiny_sdf.cpp
+    ${MBGL_SOURCE_DIR}/src/mbgl/util/url.cpp
+    ${MBGL_SOURCE_DIR}/src/mbgl/util/version.cpp
+    ${MBGL_SOURCE_DIR}/src/mbgl/util/work_request.cpp
+
+    # OpenGL-specific files:
+    ${MBGL_SOURCE_DIR}/src/mbgl/gl/attribute.cpp
+    ${MBGL_SOURCE_DIR}/src/mbgl/gl/command_encoder.cpp
+    ${MBGL_SOURCE_DIR}/src/mbgl/gl/context.cpp
+    ${MBGL_SOURCE_DIR}/src/mbgl/gl/custom_layer.cpp
+    ${MBGL_SOURCE_DIR}/src/mbgl/gl/custom_layer_factory.cpp
+    ${MBGL_SOURCE_DIR}/src/mbgl/gl/custom_layer_impl.cpp
+    ${MBGL_SOURCE_DIR}/src/mbgl/gl/debugging_extension.cpp
+    ${MBGL_SOURCE_DIR}/src/mbgl/gl/enum.cpp
+    ${MBGL_SOURCE_DIR}/src/mbgl/gl/index_buffer_resource.cpp
+    ${MBGL_SOURCE_DIR}/src/mbgl/gl/object.cpp
+    ${MBGL_SOURCE_DIR}/src/mbgl/gl/offscreen_texture.cpp
+    ${MBGL_SOURCE_DIR}/src/mbgl/gl/render_custom_layer.cpp
+    ${MBGL_SOURCE_DIR}/src/mbgl/gl/render_pass.cpp
+    ${MBGL_SOURCE_DIR}/src/mbgl/gl/renderer_backend.cpp
+    ${MBGL_SOURCE_DIR}/src/mbgl/gl/texture.cpp
+    ${MBGL_SOURCE_DIR}/src/mbgl/gl/texture_resource.cpp
+    ${MBGL_SOURCE_DIR}/src/mbgl/gl/uniform.cpp
+    ${MBGL_SOURCE_DIR}/src/mbgl/gl/upload_pass.cpp
+    ${MBGL_SOURCE_DIR}/src/mbgl/gl/value.cpp
+    ${MBGL_SOURCE_DIR}/src/mbgl/gl/vertex_array.cpp
+    ${MBGL_SOURCE_DIR}/src/mbgl/gl/vertex_buffer_resource.cpp
+    ${MBGL_SOURCE_DIR}/src/mbgl/layermanager/location_indicator_layer_factory.cpp
+    ${MBGL_SOURCE_DIR}/src/mbgl/platform/gl_functions.cpp
+    ${MBGL_SOURCE_DIR}/src/mbgl/programs/gl/background.cpp
+    ${MBGL_SOURCE_DIR}/src/mbgl/programs/gl/background_pattern.cpp
+    ${MBGL_SOURCE_DIR}/src/mbgl/programs/gl/circle.cpp
+    ${MBGL_SOURCE_DIR}/src/mbgl/programs/gl/clipping_mask.cpp
+    ${MBGL_SOURCE_DIR}/src/mbgl/programs/gl/collision_box.cpp
+    ${MBGL_SOURCE_DIR}/src/mbgl/programs/gl/collision_circle.cpp
+    ${MBGL_SOURCE_DIR}/src/mbgl/programs/gl/debug.cpp
+    ${MBGL_SOURCE_DIR}/src/mbgl/programs/gl/fill.cpp
+    ${MBGL_SOURCE_DIR}/src/mbgl/programs/gl/fill_extrusion.cpp
+    ${MBGL_SOURCE_DIR}/src/mbgl/programs/gl/fill_extrusion_pattern.cpp
+    ${MBGL_SOURCE_DIR}/src/mbgl/programs/gl/fill_outline.cpp
+    ${MBGL_SOURCE_DIR}/src/mbgl/programs/gl/fill_outline_pattern.cpp
+    ${MBGL_SOURCE_DIR}/src/mbgl/programs/gl/fill_pattern.cpp
+    ${MBGL_SOURCE_DIR}/src/mbgl/programs/gl/heatmap.cpp
+    ${MBGL_SOURCE_DIR}/src/mbgl/programs/gl/heatmap_texture.cpp
+    ${MBGL_SOURCE_DIR}/src/mbgl/programs/gl/hillshade.cpp
+    ${MBGL_SOURCE_DIR}/src/mbgl/programs/gl/hillshade_prepare.cpp
+    ${MBGL_SOURCE_DIR}/src/mbgl/programs/gl/line.cpp
+    ${MBGL_SOURCE_DIR}/src/mbgl/programs/gl/line_gradient.cpp
+    ${MBGL_SOURCE_DIR}/src/mbgl/programs/gl/line_pattern.cpp
+    ${MBGL_SOURCE_DIR}/src/mbgl/programs/gl/line_sdf.cpp
+    ${MBGL_SOURCE_DIR}/src/mbgl/programs/gl/raster.cpp
+    ${MBGL_SOURCE_DIR}/src/mbgl/programs/gl/shader_source.cpp
+    ${MBGL_SOURCE_DIR}/src/mbgl/programs/gl/shaders.cpp
+    ${MBGL_SOURCE_DIR}/src/mbgl/programs/gl/symbol_icon.cpp
+    ${MBGL_SOURCE_DIR}/src/mbgl/programs/gl/symbol_sdf_icon.cpp
+    ${MBGL_SOURCE_DIR}/src/mbgl/programs/gl/symbol_sdf_text.cpp
+    ${MBGL_SOURCE_DIR}/src/mbgl/programs/gl/symbol_text_and_icon.cpp
+    ${MBGL_SOURCE_DIR}/src/mbgl/renderer/layers/render_location_indicator_layer.cpp
+    ${MBGL_SOURCE_DIR}/src/mbgl/style/layers/location_indicator_layer.cpp
+    ${MBGL_SOURCE_DIR}/src/mbgl/style/layers/location_indicator_layer_impl.cpp
+    ${MBGL_SOURCE_DIR}/src/mbgl/style/layers/location_indicator_layer_properties.cpp
+
+    # Consolidated from platform / default plus common ones shared between MacOS and Linux
+    ${MBGL_SOURCE_DIR}/platform/default/src/mbgl/gfx/headless_backend.cpp
+    ${MBGL_SOURCE_DIR}/platform/default/src/mbgl/gfx/headless_frontend.cpp
+    ${MBGL_SOURCE_DIR}/platform/default/src/mbgl/gl/headless_backend.cpp
+    ${MBGL_SOURCE_DIR}/platform/default/src/mbgl/layermanager/layer_manager.cpp
+    ${MBGL_SOURCE_DIR}/platform/default/src/mbgl/map/map_snapshotter.cpp
+    ${MBGL_SOURCE_DIR}/platform/default/src/mbgl/platform/time.cpp
+    ${MBGL_SOURCE_DIR}/platform/default/src/mbgl/storage/asset_file_source.cpp
+    ${MBGL_SOURCE_DIR}/platform/default/src/mbgl/storage/database_file_source.cpp
+    ${MBGL_SOURCE_DIR}/platform/default/src/mbgl/storage/mbtiles_file_source.cpp
+    ${MBGL_SOURCE_DIR}/platform/default/src/mbgl/storage/file_source_manager.cpp
+    ${MBGL_SOURCE_DIR}/platform/default/src/mbgl/storage/file_source_request.cpp
+    ${MBGL_SOURCE_DIR}/platform/default/src/mbgl/storage/local_file_request.cpp
+    ${MBGL_SOURCE_DIR}/platform/default/src/mbgl/storage/local_file_source.cpp
+    ${MBGL_SOURCE_DIR}/platform/default/src/mbgl/storage/main_resource_loader.cpp
+    ${MBGL_SOURCE_DIR}/platform/default/src/mbgl/storage/offline.cpp
+    ${MBGL_SOURCE_DIR}/platform/default/src/mbgl/storage/offline_database.cpp
+    ${MBGL_SOURCE_DIR}/platform/default/src/mbgl/storage/offline_download.cpp
+    ${MBGL_SOURCE_DIR}/platform/default/src/mbgl/storage/online_file_source.cpp
+    ${MBGL_SOURCE_DIR}/platform/default/src/mbgl/storage/sqlite3.cpp
+    ${MBGL_SOURCE_DIR}/platform/default/src/mbgl/text/bidi.cpp
+    ${MBGL_SOURCE_DIR}/platform/default/src/mbgl/util/compression.cpp
+    ${MBGL_SOURCE_DIR}/platform/default/src/mbgl/util/monotonic_timer.cpp
+    ${MBGL_SOURCE_DIR}/platform/default/src/mbgl/util/png_writer.cpp
+    ${MBGL_SOURCE_DIR}/platform/default/src/mbgl/util/thread_local.cpp
+    ${MBGL_SOURCE_DIR}/platform/default/src/mbgl/util/utf.cpp
+)
+
 set_target_properties(mbgl-core PROPERTIES POSITION_INDEPENDENT_CODE TRUE)
 
-# Build common mbgl-core
-target_sources(
+target_compile_definitions(
     mbgl-core
-    PRIVATE
-        ${MBGL_SOURCE_DIR}/platform/default/src/mbgl/gfx/headless_backend.cpp
-        ${MBGL_SOURCE_DIR}/platform/default/src/mbgl/gfx/headless_frontend.cpp
-        ${MBGL_SOURCE_DIR}/platform/default/src/mbgl/gl/headless_backend.cpp
-        ${MBGL_SOURCE_DIR}/platform/default/src/mbgl/layermanager/layer_manager.cpp
-        ${MBGL_SOURCE_DIR}/platform/default/src/mbgl/map/map_snapshotter.cpp
-        ${MBGL_SOURCE_DIR}/platform/default/src/mbgl/platform/time.cpp
-        ${MBGL_SOURCE_DIR}/platform/default/src/mbgl/storage/asset_file_source.cpp
-        ${MBGL_SOURCE_DIR}/platform/default/src/mbgl/storage/database_file_source.cpp
-        ${MBGL_SOURCE_DIR}/platform/default/src/mbgl/storage/mbtiles_file_source.cpp
-        ${MBGL_SOURCE_DIR}/platform/default/src/mbgl/storage/file_source_manager.cpp
-        ${MBGL_SOURCE_DIR}/platform/default/src/mbgl/storage/file_source_request.cpp
-        ${MBGL_SOURCE_DIR}/platform/default/src/mbgl/storage/local_file_request.cpp
-        ${MBGL_SOURCE_DIR}/platform/default/src/mbgl/storage/local_file_source.cpp
-        ${MBGL_SOURCE_DIR}/platform/default/src/mbgl/storage/main_resource_loader.cpp
-        ${MBGL_SOURCE_DIR}/platform/default/src/mbgl/storage/offline.cpp
-        ${MBGL_SOURCE_DIR}/platform/default/src/mbgl/storage/offline_database.cpp
-        ${MBGL_SOURCE_DIR}/platform/default/src/mbgl/storage/offline_download.cpp
-        ${MBGL_SOURCE_DIR}/platform/default/src/mbgl/storage/online_file_source.cpp
-        ${MBGL_SOURCE_DIR}/platform/default/src/mbgl/storage/sqlite3.cpp
-        ${MBGL_SOURCE_DIR}/platform/default/src/mbgl/text/bidi.cpp
-        ${MBGL_SOURCE_DIR}/platform/default/src/mbgl/util/compression.cpp
-        ${MBGL_SOURCE_DIR}/platform/default/src/mbgl/util/monotonic_timer.cpp
-        ${MBGL_SOURCE_DIR}/platform/default/src/mbgl/util/png_writer.cpp
-        ${MBGL_SOURCE_DIR}/platform/default/src/mbgl/util/thread_local.cpp
-        ${MBGL_SOURCE_DIR}/platform/default/src/mbgl/util/utf.cpp
+    PRIVATE MBGL_RENDER_BACKEND_OPENGL=1
+)
+
+if(EXISTS ${MBGL_SOURCE_DIR}/.git/HEAD)
+    execute_process(
+        COMMAND
+            git
+            rev-parse
+            --short=8
+            HEAD
+        WORKING_DIRECTORY ${MBGL_SOURCE_DIR}
+        OUTPUT_VARIABLE MBGL_VERSION_REV
+        OUTPUT_STRIP_TRAILING_WHITESPACE
+    )
+else()
+    set(MBGL_VERSION_REV 00000000)
+endif()
+
+set_source_files_properties(
+    ${MBGL_SOURCE_DIR}/src/mbgl/util/version.cpp
+    PROPERTIES
+    COMPILE_DEFINITIONS
+    MBGL_VERSION_REV="${MBGL_VERSION_REV}"
 )
 
 
+# TODO: not needed, already globally defined?
+# target_include_directories(
+#    mbgl-core
+#    PRIVATE ${MBGL_SOURCE_DIR}/src
+#)
+
+#target_include_directories(
+#    mbgl-core
+#    PUBLIC ${MBGL_SOURCE_DIR}/include
+#)
+
+include(${MBGL_SOURCE_DIR}/vendor/boost.cmake)
+include(${MBGL_SOURCE_DIR}/vendor/csscolorparser.cmake)
+include(${MBGL_SOURCE_DIR}/vendor/earcut.hpp.cmake)
+include(${MBGL_SOURCE_DIR}/vendor/eternal.cmake)
+include(${MBGL_SOURCE_DIR}/vendor/mapbox-base.cmake)
+include(${MBGL_SOURCE_DIR}/vendor/parsedate.cmake)
+include(${MBGL_SOURCE_DIR}/vendor/polylabel.cmake)
+include(${MBGL_SOURCE_DIR}/vendor/protozero.cmake)
+include(${MBGL_SOURCE_DIR}/vendor/unique_resource.cmake)
+include(${MBGL_SOURCE_DIR}/vendor/vector-tile.cmake)
+include(${MBGL_SOURCE_DIR}/vendor/wagyu.cmake)
+
+target_link_libraries(
+    mbgl-core
+    PRIVATE
+        Mapbox::Base::Extras::kdbush.hpp
+        Mapbox::Base::supercluster.hpp
+        Mapbox::Base::shelf-pack-cpp
+        Mapbox::Base::geojson-vt-cpp
+        Mapbox::Base::cheap-ruler-cpp
+        mbgl-compiler-options
+        mbgl-vendor-boost
+        mbgl-vendor-csscolorparser
+        mbgl-vendor-earcut.hpp
+        mbgl-vendor-eternal
+        mbgl-vendor-parsedate
+        mbgl-vendor-polylabel
+        mbgl-vendor-protozero
+        mbgl-vendor-unique_resource
+        mbgl-vendor-vector-tile
+        mbgl-vendor-wagyu
+    PUBLIC
+        Mapbox::Base
+        Mapbox::Base::Extras::expected-lite
+        Mapbox::Base::Extras::rapidjson
+        Mapbox::Base::geojson.hpp
+        Mapbox::Base::geometry.hpp
+        Mapbox::Base::optional
+        Mapbox::Base::variant
+)
+
+add_library(
+    Mapbox::Map ALIAS mbgl-core
+)
+
+### End maplibre-gl-core/CMakeLists.txt
 
 # Build mbgl-core with specific platform requirements
 if(CMAKE_SYSTEM_NAME STREQUAL Linux)

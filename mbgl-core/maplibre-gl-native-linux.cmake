@@ -13,6 +13,7 @@ find_package(X11 REQUIRED)
 # NOTE: EGL is optional and backfilled by GLX in mapblibre-gl-native, but
 # we require installing EGL to simplify build
 find_package(OpenGL REQUIRED EGL)
+# find_package(OpenGL REQUIRED GLX)
 
 pkg_search_module(LIBUV libuv REQUIRED)
 
@@ -37,6 +38,7 @@ target_sources(
         ${MBGL_SOURCE_DIR}/platform/linux/src/gl_functions.cpp
 
         ${MBGL_SOURCE_DIR}/platform/linux/src/headless_backend_egl.cpp
+        # ${MBGL_SOURCE_DIR}/platform/linux/src/headless_backend_glx.cpp
 )
 
 include(${MBGL_SOURCE_DIR}/vendor/nunicode.cmake)
@@ -55,4 +57,5 @@ target_link_libraries(
         mbgl-vendor-nunicode
         mbgl-vendor-sqlite
         OpenGL::EGL
+        # OpenGL::GLX
 )
