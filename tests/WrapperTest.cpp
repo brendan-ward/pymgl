@@ -168,3 +168,29 @@ TEST(Wrapper, SetSize) {
     EXPECT_THROW(map.setSize(0, 10), std::domain_error);
     EXPECT_THROW(map.setSize(10, 0), std::domain_error);
 }
+
+TEST(Wrapper, RepeatedRender) {
+    const string style = read_style("example-style-empty.json");
+
+    Map map = Map(style, 255, 255);
+
+    for (int i = 0; i < 5; i++) {
+        map.renderPNG();
+    }
+}
+
+TEST(Wrapper, MultipleMapInstances) {
+    const string style = read_style("example-style-empty.json");
+
+    for (int i = 0; i < 5; i++) {
+        Map map = Map(style, 255, 255);
+    }
+}
+
+TEST(Wrapper, MultipleMapRenders) {
+    const string style = read_style("example-style-empty.json");
+
+    for (int i = 0; i < 5; i++) {
+        Map(style, 255, 255).renderPNG();
+    }
+}
