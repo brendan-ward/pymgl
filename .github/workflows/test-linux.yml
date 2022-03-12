@@ -33,7 +33,8 @@ jobs:
               vendor/boost \
               vendor/eternal \
               vendor/googletest \
-              vendor/mapbox-base
+              vendor/mapbox-base \
+              vendor/vector-tile
 
       - name: Set up Python
         uses: actions/setup-python@v2
