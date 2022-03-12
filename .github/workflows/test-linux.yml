@@ -66,11 +66,14 @@ jobs:
         uses: actions/cache@v1
         id: TODO
         with:
-          path: /build
+          path: ${{ env.BUILD_TEMP_DIR }}
           key: ${{ runner.os }}-${{ matrix.platform }}
 
       - name: Build package
-        run: python setup.py develop
+        run: |
+          sudo mkdir -p $BUILD_TEMP_DIR
+          sudo chown -R $(id -u):$(id -g) $BUILD_TEMP_DIR
+          python setup.py develop
 
       - name: Run C++ tests
         run: |
