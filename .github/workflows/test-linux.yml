@@ -2,6 +2,9 @@ name: Test on Linux
 
 on: [push, pull_request, workflow_dispatch]
 
+env:
+  BUILD_TEMP_DIR: "/build"
+
 jobs:
   test:
     name: Test on ${{ matrix.os }} ${{ matrix.platform }}
@@ -61,14 +64,21 @@ jobs:
         uses: actions/cache@v1
         id: TODO
         with:
-          path: ${{ github.workspace }}/build
+          path: /build
           key: ${{ runner.os }}-${{ matrix.platform }}
 
       - name: Build package
         run: python3.9 setup.py develop
 
+      - name: Run C++ tests
+        run: |
+          xvfb-run -a --server-args="-screen 0 1024x768x24 -ac +render -noreset" \
+            /build/tests/pymgl_test
+
       - name: Install test deps
         run: pip3.9 install pytest Pillow numpy pixelmatch
 
       - name: Test package
-        run: python3.9 -m pytest pymgl/tests
+        run: |
+          xvfb-run -a --server-args="-screen 0 1024x768x24 -ac +render -noreset" \
+            python3.9 -m pytest pymgl/tests
