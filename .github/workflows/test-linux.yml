@@ -14,6 +14,7 @@ jobs:
       matrix:
         os: ["ubuntu-20.04"]
         platform: ["x86_64"]
+        python-version: ["3.9"]
 
     steps:
       - name: Checkout repository
@@ -34,6 +35,11 @@ jobs:
               vendor/googletest \
               vendor/mapbox-base
 
+      - name: Set up Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: ${{ matrix.python-version }}
+
       - name: Install deps
         run: |
           sudo apt-get update
@@ -45,8 +51,6 @@ jobs:
             cmake \
             ninja-build \
             pkg-config \
-            python3.9 \
-            python3.9-dev \
             libcurl4-openssl-dev \
             libicu-dev \
             libturbojpeg0-dev \
@@ -57,8 +61,6 @@ jobs:
             libegl-dev \
             libopengl-dev \
             xvfb
-          curl https://bootstrap.pypa.io/get-pip.py -o get-pip.py
-          python3.9 get-pip.py
 
       - name: Cache build artifacts
         uses: actions/cache@v1
@@ -68,7 +70,7 @@ jobs:
           key: ${{ runner.os }}-${{ matrix.platform }}
 
       - name: Build package
-        run: python3.9 setup.py develop
+        run: python setup.py develop
 
       - name: Run C++ tests
         run: |
@@ -76,9 +78,9 @@ jobs:
             /build/tests/pymgl_test
 
       - name: Install test deps
-        run: pip3.9 install pytest Pillow numpy pixelmatch
+        run: python -m pip install pytest Pillow numpy pixelmatch
 
       - name: Test package
         run: |
           xvfb-run -a --server-args="-screen 0 1024x768x24 -ac +render -noreset" \
-            python3.9 -m pytest pymgl/tests
+            python -m pytest pymgl/tests
