@@ -8,10 +8,6 @@ from pixelmatch.contrib.PIL import pixelmatch
 
 load_dotenv()
 MAPBOX_TOKEN = os.getenv("MAPBOX_TOKEN", None)
-if not MAPBOX_TOKEN:
-    raise RuntimeError("MAPBOX_TOKEN env var must be set")
-
-
 FIXTURES_PATH = Path("tests/fixtures").absolute()
 
 

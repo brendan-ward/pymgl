@@ -6,6 +6,9 @@ from pymgl import Map
 from .common import FIXTURES_PATH, MAPBOX_TOKEN, read_style, image_matches
 
 
+pytestmark = pytest.mark.skipif(not MAPBOX_TOKEN, reason="MAPBOX_TOKEN not available")
+
+
 def test_empty_style(empty_style):
     img_data = Map(empty_style, 10, 10).renderPNG()
 
