@@ -36,10 +36,10 @@ jobs:
 
       - name: Install deps
         run: |
-          apt-get update
-          apt-get -y install software-properties-common
-          add-apt-repository -y ppa:deadsnakes/ppa
-          apt-get -y install \
+          sudo apt-get update
+          sudo apt-get -y install software-properties-common
+          sudo add-apt-repository -y ppa:deadsnakes/ppa
+          sudo apt-get -y install \
             curl \
             build-essential \
             cmake \
