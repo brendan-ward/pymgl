@@ -2,6 +2,11 @@ name: Build wheels
 
 on:
   push:
+    paths:
+      - ".github/workflows/build_wheels.yml"
+      - "MANIFEST.in"
+      - "pyproject.toml"
+      - "setup.py"
     branches:
       - main
     tags:

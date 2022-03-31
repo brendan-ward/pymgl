@@ -1,4 +1,4 @@
-name: Test on Linux
+name: Run tests
 
 on: [push, pull_request, workflow_dispatch]
 
