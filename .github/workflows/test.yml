@@ -94,12 +94,12 @@ jobs:
         if: runner.os == 'Linux'
         run: |
           xvfb-run -a --server-args="-screen 0 1024x768x24 -ac +render -noreset" \
-            /build/tests/pymgl_test
+            build/tests/pymgl_test
           xvfb-run -a --server-args="-screen 0 1024x768x24 -ac +render -noreset" \
             python -m pytest pymgl/tests
 
       - name: Run MacOS tests
         if: runner.os == 'macOS'
         run: |
-          /build/tests/pymgl_test
+          build/tests/pymgl_test
           python -m pytest pymgl/tests
