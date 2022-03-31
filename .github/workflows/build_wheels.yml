@@ -1,0 +1,145 @@
+name: Build wheels
+
+on:
+  push:
+    branches:
+      - main
+    tags:
+      - "v*"
+  pull_request:
+    paths:
+      - ".github/workflows/build_wheels.yml"
+      - "MANIFEST.in"
+      - "pyproject.toml"
+      - "setup.py"
+  workflow_dispatch:
+
+env:
+  BUILD_TEMP_DIR: "build"
+
+jobs:
+  build-wheels:
+    name: Test on ${{ matrix.os }} ${{ matrix.platform }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: ["ubuntu-20.04", "macos-latest", "macos-10.15"]
+        platform: ["x86_64"]
+        python-version: ["3.9"]
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+
+      - name: Checkout submodules
+        run: |
+          git submodule update --init
+          cd vendor/maplibre-gl-native && \
+            git submodule update --init --recursive \
+              vendor/earcut.hpp \
+              vendor/polylabel \
+              vendor/protozero \
+              vendor/wagyu \
+              vendor/unique_resource \
+              vendor/boost \
+              vendor/eternal \
+              vendor/googletest \
+              vendor/mapbox-base \
+              vendor/vector-tile
+
+      - name: Set up Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: ${{ matrix.python-version }}
+
+      - name: Install Linux dependencies
+        if: runner.os == 'Linux'
+        run: |
+          sudo apt-get update
+          sudo apt-get -y install software-properties-common
+          sudo add-apt-repository -y ppa:deadsnakes/ppa
+          sudo apt-get -y install \
+            curl \
+            build-essential \
+            cmake \
+            ninja-build \
+            pkg-config \
+            libcurl4-openssl-dev \
+            libicu-dev \
+            libturbojpeg0-dev \
+            libpng-dev \
+            libprotobuf-dev \
+            libuv1-dev \
+            libx11-dev \
+            libegl-dev \
+            libopengl-dev \
+            xvfb
+
+      - name: Install MacOS dependencies
+        if: runner.os == 'macOS'
+        env:
+          HOMEBREW_NO_AUTO_UPDATE: 1
+          HOMEBREW_NO_INSTALL_CLEANUP: 1
+        run: |
+          brew list cmake || brew install cmake
+          brew list ninja || brew install ninja
+          brew list pkg-config || brew install pkg-config
+
+      - name: Cache build artifacts
+        uses: actions/cache@v2
+        id: pymgl
+        with:
+          path: ${{ env.BUILD_TEMP_DIR }}
+          key: ${{ runner.os }}-${{ matrix.platform }}
+
+      - name: Build package
+        run: |
+          sudo mkdir -p $BUILD_TEMP_DIR
+          sudo chown -R $(id -u):$(id -g) $BUILD_TEMP_DIR
+          python setup.py develop
+
+      - name: Build wheels
+        uses: pypa/cibuildwheel@v2.3.1
+
+      - uses: actions/upload-artifact@v2
+        with:
+          path: ./wheelhouse/*.whl
+
+  test-wheels:
+    name: Test wheels on ${{ matrix.os }} (Python ${{ matrix.python-version }})
+    needs: [build-wheels]
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: ["ubuntu-20.04", "macos-latest", "macos-10.15"]
+        python-version: ["3.9"]
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      - name: Set up Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: ${{ matrix.python-version }}
+          cache: "pip"
+          cache-dependency-path: "ci/requirements-wheel-test.txt"
+
+      - name: Download wheels from artifacts
+        uses: actions/download-artifact@v2
+        with:
+          path: wheelhouse
+
+      - name: Install dependencies and pyogrio wheel
+        shell: bash
+        run: |
+          python -m pip install --find-links wheelhouse/artifact pymgl
+          python -m pip list
+
+      - name: Run tests
+        shell: bash
+        run: |
+          cd ..
+          python -m pytest --pyargs pymgl.tests -v
