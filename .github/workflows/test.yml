@@ -3,7 +3,7 @@ name: Test on Linux
 on: [push, pull_request, workflow_dispatch]
 
 env:
-  BUILD_TEMP_DIR: "/build"
+  BUILD_TEMP_DIR: "build"
 
 jobs:
   test:
@@ -15,9 +15,6 @@ jobs:
         os: ["ubuntu-20.04", "macos-latest", "macos-10.15"]
         platform: ["x86_64"]
         python-version: ["3.9"]
-        include:
-          - os: "ubuntu-20.04"
-            xvfb: 'xvfb-run -a --server-args="-screen 0 1024x768x24 -ac +render -noreset"'
 
     steps:
       - name: Checkout repository
@@ -93,9 +90,16 @@ jobs:
       - name: Install test deps
         run: python -m pip install pytest Pillow numpy pixelmatch python-dotenv
 
-      - name: Run tests
-        env:
-          XVFB: ${{ matrix.xvfb }}
+      - name: Run Linux tests
+        if: runner.os == 'Linux'
         run: |
-          ${XVFB} /build/tests/pymgl_test
-          ${XVFB} python -m pytest pymgl/tests
+          xvfb-run -a --server-args="-screen 0 1024x768x24 -ac +render -noreset" \
+            /build/tests/pymgl_test
+          xvfb-run -a --server-args="-screen 0 1024x768x24 -ac +render -noreset" \
+            python -m pytest pymgl/tests
+
+      - name: Run MacOS tests
+        if: runner.os == 'macOS'
+        run: |
+          /build/tests/pymgl_test
+          python -m pytest pymgl/tests
