@@ -55,20 +55,20 @@ jobs:
         uses: pypa/cibuildwheel@v2.3.1
         env:
           CIBW_BEFORE_ALL_LINUX: >
-            apt-get -y install curl
-              build-essential
-              cmake
-              ninja-build
-              pkg-config
-              libcurl4-openssl-dev
-              libicu-dev
-              libturbojpeg0-dev
-              libpng-dev
-              libprotobuf-dev
-              libuv1-dev
-              libx11-dev
-              libegl-dev
-              libopengl-dev
+            apt-get -y install curl \
+              build-essential \
+              cmake \
+              ninja-build \
+              pkg-config \
+              libcurl4-openssl-dev \
+              libicu-dev \
+              libturbojpeg0-dev \
+              libpng-dev \
+              libprotobuf-dev \
+              libuv1-dev \
+              libx11-dev \
+              libegl1-mesa-dev \
+              libgl1-mesa-dev \
               xvfb
 
       - uses: actions/upload-artifact@v2
@@ -109,10 +109,8 @@ jobs:
           HOMEBREW_NO_AUTO_UPDATE: 1
           HOMEBREW_NO_INSTALL_CLEANUP: 1
         run: |
-          brew list cmake || brew install cmake
-          brew list ninja || brew install ninja
-          brew list pkg-config || brew install pkg-config
-          brew list curl || brew install curl
+          brew install -f cmake ninja pkg-config curl
+          brew link curl
 
       - name: Cache build artifacts
         uses: actions/cache@v2

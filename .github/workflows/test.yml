@@ -1,6 +1,11 @@
 name: Run tests
 
-on: [push, pull_request, workflow_dispatch]
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+  workflow_dispatch:
 
 env:
   BUILD_TEMP_DIR: "build"
