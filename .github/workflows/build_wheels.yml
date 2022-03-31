@@ -55,8 +55,7 @@ jobs:
         uses: pypa/cibuildwheel@v2.3.1
         env:
           CIBW_BEFORE_ALL_LINUX: >
-            apt-get update && \
-            apt-get -y install curl \
+            apt-get update && apt-get -y install curl \
               build-essential \
               cmake \
               ninja-build \
@@ -78,11 +77,11 @@ jobs:
 
   build-wheels-macos:
     name: Build wheels for ${{ matrix.os }} ${{ matrix.platform }}
-    runs-on: "ubuntu-20.04"
+    runs-on: ${{ matrix.os }}
     strategy:
       fail-fast: false
       matrix:
-        os: ["macos-latest", "macos-10.15"]
+        os: ["macos-10.15"] # "macos-latest",
         platform: ["x86_64"]
 
     steps:
@@ -110,7 +109,7 @@ jobs:
           HOMEBREW_NO_AUTO_UPDATE: 1
           HOMEBREW_NO_INSTALL_CLEANUP: 1
         run: |
-          brew install -f cmake ninja pkg-config curl
+          brew install cmake ninja pkg-config
 
       - name: Cache build artifacts
         uses: actions/cache@v2
@@ -121,9 +120,6 @@ jobs:
 
       - name: Build wheels
         uses: pypa/cibuildwheel@v2.3.1
-        env:
-          CURL_INCLUDE_DIR: /usr/local/opt/curl/include
-          CURL_LIBRARY: /usr/local/opt/curl/lib/libcurl.dylib
 
       - uses: actions/upload-artifact@v2
         with:
