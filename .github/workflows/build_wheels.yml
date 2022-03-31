@@ -110,7 +110,7 @@ jobs:
           HOMEBREW_NO_AUTO_UPDATE: 1
           HOMEBREW_NO_INSTALL_CLEANUP: 1
         run: |
-          brew install -f cmake ninja pkg-config
+          brew install -f cmake ninja pkg-config curl
 
       - name: Cache build artifacts
         uses: actions/cache@v2
