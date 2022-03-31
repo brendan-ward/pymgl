@@ -79,7 +79,7 @@ jobs:
         id: pymgl
         with:
           path: ${{ env.BUILD_TEMP_DIR }}
-          key: ${{ runner.os }}-${{ matrix.platform }}-${{ matrix.python-version }}
+          key: ${{ matrix.os }}-${{ matrix.platform }}-${{ matrix.python-version }}
 
       - name: Build package
         run: |

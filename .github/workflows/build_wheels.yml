@@ -54,7 +54,22 @@ jobs:
       - name: Build wheels
         uses: pypa/cibuildwheel@v2.3.1
         env:
-          CIBW_BEFORE_ALL: "apt-get update && apt-get install curl build-essential cmake ninja-build pkg-config libcurl4-openssl-dev libicu-dev libturbojpeg0-dev libpng-dev  libprotobuf-dev libuv1-dev  libx11-dev  libegl-dev libopengl-dev xvfb"
+          CIBW_BEFORE_ALL_LINUX: >
+            apt-get -y install curl
+              build-essential
+              cmake
+              ninja-build
+              pkg-config
+              libcurl4-openssl-dev
+              libicu-dev
+              libturbojpeg0-dev
+              libpng-dev
+              libprotobuf-dev
+              libuv1-dev
+              libx11-dev
+              libegl-dev
+              libopengl-dev
+              xvfb
 
       - uses: actions/upload-artifact@v2
         with:
@@ -103,13 +118,7 @@ jobs:
         id: pymgl
         with:
           path: ${{ env.BUILD_TEMP_DIR }}
-          key: ${{ runner.os }}-${{ matrix.platform }}-wheels
-
-      - name: Build package
-        run: |
-          sudo mkdir -p $BUILD_TEMP_DIR
-          sudo chown -R $(id -u):$(id -g) $BUILD_TEMP_DIR
-          python setup.py develop
+          key: ${{ matrix.os }}-${{ matrix.platform }}-wheels
 
       - name: Build wheels
         uses: pypa/cibuildwheel@v2.3.1
