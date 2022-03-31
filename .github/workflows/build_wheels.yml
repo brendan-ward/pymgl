@@ -120,7 +120,7 @@ jobs:
 
   test-wheels:
     name: Test wheels on ${{ matrix.os }} ${{ matrix.platform }} (Python ${{ matrix.python-version }})
-    needs: [build-wheels]
+    needs: [build-wheels-linux, build-wheels-macos]
     runs-on: ${{ matrix.os }}
     strategy:
       fail-fast: false
