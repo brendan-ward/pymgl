@@ -7,14 +7,14 @@ env:
 
 jobs:
   test:
-    name: Test on ${{ matrix.os }} ${{ matrix.platform }}
+    name: Test on ${{ matrix.os }} ${{ matrix.platform }}  (Python ${{ matrix.python-version }})
     runs-on: ${{ matrix.os }}
     strategy:
       fail-fast: false
       matrix:
         os: ["ubuntu-20.04", "macos-latest", "macos-10.15"]
         platform: ["x86_64"]
-        python-version: ["3.9"]
+        python-version: ["3.8", "3.9", "3.10"]
 
     steps:
       - name: Checkout repository
@@ -79,7 +79,7 @@ jobs:
         id: pymgl
         with:
           path: ${{ env.BUILD_TEMP_DIR }}
-          key: ${{ runner.os }}-${{ matrix.platform }}
+          key: ${{ runner.os }}-${{ matrix.platform }}-${{ matrix.python-version }}
 
       - name: Build package
         run: |

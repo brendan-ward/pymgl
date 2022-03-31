@@ -21,17 +21,15 @@ on:
 
 env:
   BUILD_TEMP_DIR: "build"
+  CIBW_MANYLINUX_*_IMAGE: "manylinux_2_24"
+  CIBW_SKIP: "cp36-* cp37-*, p* *musllinux*"
+  CIBW_ARCHS: "auto64"
+  CIBW_BUILD_VERBOSITY: 3
 
 jobs:
-  build-wheels:
-    name: Test on ${{ matrix.os }} ${{ matrix.platform }}
-    runs-on: ${{ matrix.os }}
-    strategy:
-      fail-fast: false
-      matrix:
-        os: ["ubuntu-20.04", "macos-latest", "macos-10.15"]
-        platform: ["x86_64"]
-        python-version: ["3.9"]
+  build-wheels-linux:
+    name: Build wheels for Linux
+    runs-on: "ubuntu-20.04"
 
     steps:
       - name: Checkout repository
@@ -53,36 +51,45 @@ jobs:
               vendor/mapbox-base \
               vendor/vector-tile
 
-      - name: Set up Python
-        uses: actions/setup-python@v2
-        with:
-          python-version: ${{ matrix.python-version }}
+      - name: Build wheels
+        uses: pypa/cibuildwheel@v2.3.1
+        env:
+          CIBW_BEFORE_ALL: "apt-get update && apt-get install curl build-essential cmake ninja-build pkg-config libcurl4-openssl-dev libicu-dev libturbojpeg0-dev libpng-dev  libprotobuf-dev libuv1-dev  libx11-dev  libegl-dev libopengl-dev xvfb"
 
-      - name: Install Linux dependencies
-        if: runner.os == 'Linux'
+      - uses: actions/upload-artifact@v2
+        with:
+          path: ./wheelhouse/*.whl
+
+  build-wheels-macos:
+    name: Build wheels for ${{ matrix.os }} ${{ matrix.platform }}
+    runs-on: "ubuntu-20.04"
+    strategy:
+      fail-fast: false
+      matrix:
+        os: ["macos-latest", "macos-10.15"]
+        platform: ["x86_64"]
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+
+      - name: Checkout submodules
         run: |
-          sudo apt-get update
-          sudo apt-get -y install software-properties-common
-          sudo add-apt-repository -y ppa:deadsnakes/ppa
-          sudo apt-get -y install \
-            curl \
-            build-essential \
-            cmake \
-            ninja-build \
-            pkg-config \
-            libcurl4-openssl-dev \
-            libicu-dev \
-            libturbojpeg0-dev \
-            libpng-dev \
-            libprotobuf-dev \
-            libuv1-dev \
-            libx11-dev \
-            libegl-dev \
-            libopengl-dev \
-            xvfb
+          git submodule update --init
+          cd vendor/maplibre-gl-native && \
+            git submodule update --init --recursive \
+              vendor/earcut.hpp \
+              vendor/polylabel \
+              vendor/protozero \
+              vendor/wagyu \
+              vendor/unique_resource \
+              vendor/boost \
+              vendor/eternal \
+              vendor/googletest \
+              vendor/mapbox-base \
+              vendor/vector-tile
 
       - name: Install MacOS dependencies
-        if: runner.os == 'macOS'
         env:
           HOMEBREW_NO_AUTO_UPDATE: 1
           HOMEBREW_NO_INSTALL_CLEANUP: 1
@@ -96,7 +103,7 @@ jobs:
         id: pymgl
         with:
           path: ${{ env.BUILD_TEMP_DIR }}
-          key: ${{ runner.os }}-${{ matrix.platform }}
+          key: ${{ runner.os }}-${{ matrix.platform }}-wheels
 
       - name: Build package
         run: |
@@ -112,14 +119,14 @@ jobs:
           path: ./wheelhouse/*.whl
 
   test-wheels:
-    name: Test wheels on ${{ matrix.os }} (Python ${{ matrix.python-version }})
+    name: Test wheels on ${{ matrix.os }} ${{ matrix.platform }} (Python ${{ matrix.python-version }})
     needs: [build-wheels]
     runs-on: ${{ matrix.os }}
     strategy:
       fail-fast: false
       matrix:
         os: ["ubuntu-20.04", "macos-latest", "macos-10.15"]
-        python-version: ["3.9"]
+        python-version: ["3.8", "3.9", "3.10"]
 
     steps:
       - name: Checkout
