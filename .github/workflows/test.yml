@@ -15,6 +15,9 @@ jobs:
         os: ["ubuntu-20.04"]
         platform: ["x86_64"]
         python-version: ["3.9"]
+        include:
+          - os: "ubuntu-20.04"
+            xvfb: 'xvfb-run -a --server-args="-screen 0 1024x768x24 -ac +render -noreset"'
 
     steps:
       - name: Checkout repository
@@ -41,7 +44,8 @@ jobs:
         with:
           python-version: ${{ matrix.python-version }}
 
-      - name: Install deps
+      - name: Install Linux dependencies
+        if: runner.os == 'Linux'
         run: |
           sudo apt-get update
           sudo apt-get -y install software-properties-common
@@ -63,6 +67,16 @@ jobs:
             libopengl-dev \
             xvfb
 
+      - name: Install MacOS dependencies
+        if: runner.os == 'macOS'
+        env:
+          HOMEBREW_NO_AUTO_UPDATE: 1
+          HOMEBREW_NO_INSTALL_CLEANUP: 1
+        run: |
+          brew list cmake || brew install cmake
+          brew list ninja || brew install ninja
+          brew list pkg-config || brew install pkg-config
+
       - name: Cache build artifacts
         uses: actions/cache@v2
         id: pymgl
@@ -76,15 +90,12 @@ jobs:
           sudo chown -R $(id -u):$(id -g) $BUILD_TEMP_DIR
           python setup.py develop
 
-      - name: Run C++ tests
-        run: |
-          xvfb-run -a --server-args="-screen 0 1024x768x24 -ac +render -noreset" \
-            /build/tests/pymgl_test
-
       - name: Install test deps
         run: python -m pip install pytest Pillow numpy pixelmatch python-dotenv
 
-      - name: Test package
+      - name: Run tests
+        env:
+          XVFB: ${{ matrix.xvfb }}
         run: |
-          xvfb-run -a --server-args="-screen 0 1024x768x24 -ac +render -noreset" \
-            python -m pytest pymgl/tests
+          ${XVFB} /build/tests/pymgl_test
+          ${XVFB} python -m pytest pymgl/tests
