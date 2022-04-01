@@ -125,7 +125,6 @@ jobs:
         uses: actions/setup-python@v2
         with:
           python-version: ${{ matrix.python-version }}
-          cache: "pip"
 
       - name: Download wheels from artifacts
         uses: actions/download-artifact@v2
