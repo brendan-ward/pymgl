@@ -1,0 +1,3 @@
+include versioneer.py
+include pymgl/_version.py
+exclude MANIFEST.in

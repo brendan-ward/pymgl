@@ -68,6 +68,7 @@ jobs:
             curl \
             build-essential \
             cmake \
+            ccache \
             ninja-build \
             pkg-config \
             libcurl4-openssl-dev \
@@ -80,6 +81,7 @@ jobs:
             libegl-dev \
             libopengl-dev \
             xvfb
+          sudo /usr/sbin/update-ccache-symlinks
 
       - name: Install MacOS dependencies
         if: runner.os == 'macOS'
@@ -87,16 +89,38 @@ jobs:
           HOMEBREW_NO_AUTO_UPDATE: 1
           HOMEBREW_NO_INSTALL_CLEANUP: 1
         run: |
-          brew install cmake ninja pkg-config
+          brew install cmake ninja pkg-config ccache
 
-      - name: Cache build artifacts
+      # - name: Cache build artifacts
+      #   uses: actions/cache@v2
+      #   id: pymgl
+      #   with:
+      #     path: ${{ env.BUILD_TEMP_DIR }}
+      #     key: ${{ matrix.os }}-${{ matrix.platform }}-${{ matrix.python-version }}-wheels
+
+      - name: Prepare ccache
+        run: ccache --clear --set-config cache_dir=~/.ccache
+
+      - name: Cache ccache
         uses: actions/cache@v2
-        id: pymgl
+        env:
+          cache-name: ccache-v1
         with:
-          path: ${{ env.BUILD_TEMP_DIR }}
-          key: ${{ matrix.os }}-${{ matrix.platform }}-${{ matrix.python-version }}-wheels
+          path: ~/.ccache
+          key: ${{ env.cache-name }}-${{ matrix.os }}-${{ github.job }}-${{ github.ref }}-${{ github.sha }}-${{ github.head_ref }}
+          restore-keys: |
+            ${{ env.cache-name }}-${{ matrix.os }}-${{ github.job }}-${{ github.ref }}-${{ github.sha }}
+            ${{ env.cache-name }}-${{ matrix.os }}-${{ github.job }}-${{ github.ref }}
+            ${{ env.cache-name }}-${{ matrix.os }}-${{ github.job }}
+      - name: Clear ccache statistics
+        run: |
+          ccache --zero-stats --set-config cache_dir=~/.ccache
+          ccache --max-size=2G --set-config cache_dir=~/.ccache
+          ccache --show-stats --set-config cache_dir=~/.ccache
 
       - name: Build package
+        env:
+          CMAKE_CXX_COMPILER_LAUNCHER: ccache
         run: |
           sudo mkdir -p $BUILD_TEMP_DIR
           sudo chown -R $(id -u):$(id -g) $BUILD_TEMP_DIR
@@ -134,7 +158,7 @@ jobs:
       - name: Install dependencies and pyogrio wheel
         shell: bash
         run: |
-          python -m pip install pytest
+          python -m pip install pytest Pillow numpy pixelmatch python-dotenv
           python -m pip install --find-links wheelhouse/artifact pymgl
           python -m pip list
 

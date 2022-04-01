@@ -10,7 +10,7 @@ namespace testing {
 using namespace std;
 namespace fs = std::filesystem;
 
-const string FIXTURES_PATH = fs::absolute("tests/fixtures/").string();
+const string FIXTURES_PATH = fs::absolute("pymgl/tests/fixtures/").string();
 
 const string get_token(bool required);
 mbgl::PremultipliedImage read_image(const string &filename);
