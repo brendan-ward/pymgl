@@ -1,3 +1,6 @@
 include versioneer.py
 include pymgl/_version.py
 exclude MANIFEST.in
+include *.pyi
+recursive-include pymgl/tests *.py *.json *.png
+prune **/__pycache__
