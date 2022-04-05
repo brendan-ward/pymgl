@@ -163,7 +163,7 @@ jobs:
         with:
           path: wheelhouse
 
-      - name: Install dependencies and pyogrio wheel
+      - name: Install dependencies and pymgl wheel
         shell: bash
         run: |
           python -m pip install pytest Pillow numpy pixelmatch python-dotenv
@@ -173,10 +173,12 @@ jobs:
       - name: Run Linux tests
         if: runner.os == 'Linux'
         run: |
+          cd ..
           xvfb-run -a --server-args="-screen 0 1024x768x24 -ac +render -noreset" \
             python -m pytest --pyargs pymgl -v
 
       - name: Run MacOS tests
         if: runner.os == 'macOS'
         run: |
-          python -m pytest --pyargs pymgl.tests -v
+          cd ..
+          python -m pytest --pyargs pymgl -v
