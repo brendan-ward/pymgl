@@ -4,6 +4,7 @@ import subprocess
 
 from setuptools import setup, Extension
 from setuptools.command.build_ext import build_ext
+import versioneer
 
 # A CMakeExtension needs a sourcedir instead of a file list.
 # The name must be the _single_ output extension from the CMake build.
@@ -57,9 +58,12 @@ class CMakeBuild(build_ext):
         subprocess.check_call(["cmake", "--build", "."] + build_args, cwd=tmp_dir)
 
 
+cmdclass = versioneer.get_cmdclass()
+cmdclass.update({"build_ext": CMakeBuild})
+
 setup(
     name="pymgl",
-    version="0.1.0",
+    version=versioneer.get_version(),
     packages=["pymgl"],
     include_package_data=True,
     url="https://github.com/brendan-ward/pymgl",
@@ -72,7 +76,7 @@ setup(
     long_description=open("README.md").read(),
     python_requires=">=3.8",
     ext_modules=[CMakeExtension("pymgl._pymgl")],
-    cmdclass={"build_ext": CMakeBuild},
+    cmdclass=cmdclass,
     zip_safe=False,
     extras_require={
         "test": [
