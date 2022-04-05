@@ -29,7 +29,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: ["ubuntu-20.04", "macos-10.15"] # "macos-latest",
+        os: ["ubuntu-20.04", "macos-10.15"] # "macos-latest"
         platform: ["x86_64"]
         python-version: ["3.9"] # "3.8", "3.10"
 
@@ -131,7 +131,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: ["ubuntu-20.04", "macos-10.15"] # "macos-latest",
+        os: ["ubuntu-20.04", "macos-10.15"] # , "macos-latest"
         python-version: ["3.9"] # "3.8", "3.10"
 
     steps:
@@ -194,10 +194,14 @@ jobs:
       - uses: actions/download-artifact@v2
         with:
           name: artifact
-          path: dist
+          path: wheels
+
+      - name: Copy MacOS wheel
+        run: |
+          mkdir dist
+          cp wheels/*macos*.whl /dist
 
       - name: Publish MacOS wheel to PyPI
-        if: runner.os == 'macOS'
         uses: pypa/gh-action-pypi-publish@master
         with:
           user: __token__
@@ -208,10 +212,8 @@ jobs:
       - name: Release
         uses: softprops/action-gh-release@v1
         with:
-          name: ${{ github.ref }}
-          tag_name: ${{ github.ref }}
           token: ${{ secrets.GITHUB_TOKEN }}
           draft: false
           prerelease: false
           files: |
-            ./dist/*.whl
+            ./wheels/*.whl
