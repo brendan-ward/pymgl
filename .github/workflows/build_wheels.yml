@@ -198,8 +198,8 @@ jobs:
 
       - name: Copy MacOS wheel
         run: |
-          mkdir dist
-          cp wheels/*macos*.whl /dist
+          mkdir wheels/dist
+          cp wheels/*macos*.whl wheels/dist
 
       - name: Publish MacOS wheel to PyPI
         uses: pypa/gh-action-pypi-publish@master
@@ -208,6 +208,7 @@ jobs:
           # FIXME: main pypi
           password: ${{ secrets.TEST_PYPI_API_TOKEN }}
           repository_url: https://test.pypi.org/legacy/
+          packages_dir: wheels/dist/
 
       - name: Release
         uses: softprops/action-gh-release@v1
