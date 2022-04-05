@@ -1,0 +1,217 @@
+name: Build wheels
+
+on:
+  push:
+    paths:
+      - ".github/workflows/build_wheels.yml"
+      - "MANIFEST.in"
+      - "pyproject.toml"
+      - "setup.py"
+    branches:
+      - main
+    tags:
+      - "v*"
+  pull_request:
+    paths:
+      - ".github/workflows/build_wheels.yml"
+      - "MANIFEST.in"
+      - "pyproject.toml"
+      - "setup.py"
+  workflow_dispatch:
+
+env:
+  BUILD_TEMP_DIR: "build"
+
+jobs:
+  build_wheels:
+    name: Build wheels for ${{ matrix.os }} ${{ matrix.platform }}  (Python ${{ matrix.python-version }})
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: ["ubuntu-20.04", "macos-10.15"] # "macos-latest",
+        platform: ["x86_64"]
+        python-version: ["3.9"] # "3.8", "3.10"
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+
+      - name: Checkout submodules
+        run: |
+          git submodule update --init
+          cd vendor/maplibre-gl-native && \
+            git submodule update --init --recursive \
+              vendor/earcut.hpp \
+              vendor/polylabel \
+              vendor/protozero \
+              vendor/wagyu \
+              vendor/unique_resource \
+              vendor/boost \
+              vendor/eternal \
+              vendor/googletest \
+              vendor/mapbox-base \
+              vendor/vector-tile
+
+      - name: Set up Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: ${{ matrix.python-version }}
+
+      - name: Install Linux dependencies
+        if: runner.os == 'Linux'
+        run: |
+          sudo apt-get update
+          sudo apt-get -y install software-properties-common
+          sudo add-apt-repository -y ppa:deadsnakes/ppa
+          sudo apt-get -y install \
+            curl \
+            build-essential \
+            cmake \
+            ccache \
+            ninja-build \
+            pkg-config \
+            libcurl4-openssl-dev \
+            libicu-dev \
+            libturbojpeg0-dev \
+            libpng-dev \
+            libprotobuf-dev \
+            libuv1-dev \
+            libx11-dev \
+            libegl-dev \
+            libopengl-dev \
+            xvfb
+          sudo /usr/sbin/update-ccache-symlinks
+
+      - name: Install MacOS dependencies
+        if: runner.os == 'macOS'
+        env:
+          HOMEBREW_NO_AUTO_UPDATE: 1
+          HOMEBREW_NO_INSTALL_CLEANUP: 1
+        run: |
+          brew install cmake ninja pkg-config ccache
+
+      - name: Prepare ccache
+        run: ccache --clear --set-config cache_dir=~/.ccache
+
+      - name: Cache ccache
+        uses: actions/cache@v2
+        env:
+          cache-name: ccache-v1
+        with:
+          path: ~/.ccache
+          key: ${{ env.cache-name }}-${{ matrix.os }}-${{ github.job }}-${{ github.ref }}-${{ github.sha }}-${{ github.head_ref }}
+          restore-keys: |
+            ${{ env.cache-name }}-${{ matrix.os }}-${{ github.job }}-${{ github.ref }}-${{ github.sha }}
+            ${{ env.cache-name }}-${{ matrix.os }}-${{ github.job }}-${{ github.ref }}
+            ${{ env.cache-name }}-${{ matrix.os }}-${{ github.job }}
+      - name: Clear ccache statistics
+        run: |
+          ccache --zero-stats --set-config cache_dir=~/.ccache
+          ccache --max-size=2G --set-config cache_dir=~/.ccache
+          ccache --show-stats --set-config cache_dir=~/.ccache
+
+      - name: Build package
+        env:
+          CMAKE_CXX_COMPILER_LAUNCHER: ccache
+        run: |
+          sudo mkdir -p $BUILD_TEMP_DIR
+          sudo chown -R $(id -u):$(id -g) $BUILD_TEMP_DIR
+          pip install wheel
+          python setup.py bdist_wheel
+
+      - uses: actions/upload-artifact@v2
+        with:
+          path: ./dist/*.whl
+
+  test-wheels:
+    name: Test wheels on ${{ matrix.os }} ${{ matrix.platform }} (Python ${{ matrix.python-version }})
+    needs: [build_wheels]
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: ["ubuntu-20.04", "macos-10.15"] # "macos-latest",
+        python-version: ["3.9"] # "3.8", "3.10"
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      - name: Install Linux runtime dependencies
+        if: runner.os == 'Linux'
+        run: |
+          sudo apt-get update
+          sudo apt-get -y install \
+            libicu66 \
+            libjpeg-turbo8 \
+            libpng16-16 \
+            libprotobuf17 \
+            libuv1 \
+            libx11-6 \
+            libegl1 \
+            libopengl0 \
+            xvfb
+
+      - name: Set up Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: ${{ matrix.python-version }}
+
+      - name: Download wheels from artifacts
+        uses: actions/download-artifact@v2
+        with:
+          path: wheelhouse
+
+      - name: Install dependencies and pymgl wheel
+        shell: bash
+        run: |
+          python -m pip install pytest Pillow numpy pixelmatch python-dotenv
+          python -m pip install --find-links wheelhouse/artifact pymgl
+          python -m pip list
+
+      - name: Run Linux tests
+        if: runner.os == 'Linux'
+        run: |
+          cd ..
+          xvfb-run -a --server-args="-screen 0 1024x768x24 -ac +render -noreset" \
+            python -m pytest --pyargs pymgl -v
+
+      - name: Run MacOS tests
+        if: runner.os == 'macOS'
+        run: |
+          cd ..
+          python -m pytest --pyargs pymgl -v
+
+  publish:
+    name: Publish to GitHub / PyPI
+    needs: [test-wheels]
+    runs-on: ubuntu-latest
+    # only publish on tags
+    if: github.event_name == 'push' && startsWith(github.event.ref, 'refs/tags/')
+
+    steps:
+      - uses: actions/download-artifact@v2
+        with:
+          name: artifact
+          path: dist
+
+      - name: Publish MacOS wheel to PyPI
+        if: runner.os == 'macOS'
+        uses: pypa/gh-action-pypi-publish@release/v1.5.0
+        with:
+          user: __token__
+          # FIXME: main pypi
+          password: ${{ secrets.TEST_PYPI_API_TOKEN }}
+          repository_url: https://test.pypi.org/legacy/
+
+      - name: Release
+        uses: softprops/action-gh-release@v1
+        with:
+          name: ${{ github.ref }}
+          tag_name: ${{ github.ref }}
+          token: ${{ secrets.GITHUB_TOKEN }}
+          draft: false
+          prerelease: false
+          files: |
+            ./dist/*.whl

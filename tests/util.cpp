@@ -17,12 +17,16 @@ using namespace mbgl;
 const string expected_dir = FIXTURES_PATH;
 const string actual_dir   = "/tmp/";
 
-const string get_token() {
+const string get_token(bool required) {
     // MAPBOX_TOKEN Must always be defined
     char *token = getenv("MAPBOX_TOKEN");
     if (token == NULL) {
-        cout << "ERROR: MAPBOX_TOKEN env var must be set" << endl;
-        throw invalid_argument("MAPBOX_TOKEN env var must be set");
+        if (required) {
+            cout << "ERROR: MAPBOX_TOKEN env var must be set" << endl;
+            throw invalid_argument("MAPBOX_TOKEN env var must be set");
+        }
+
+        return "";
     }
     return token;
 }

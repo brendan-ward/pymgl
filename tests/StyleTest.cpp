@@ -104,7 +104,10 @@ TEST(Style, MapboxSource) {
     const string test  = "example-style-mapbox-source";
     const string style = read_style(test + ".json");
 
-    const string token = get_token();
+    const string token = get_token(false);
+    if (token == "") {
+        GTEST_SKIP_("Missing Mapbox Token");
+    }
 
     Map map  = Map(style, 256, 256, 1, 0, 0, 0, token, "mapbox");
     auto img = map.renderPNG();
@@ -119,7 +122,10 @@ TEST(Style, MapboxSource) {
 }
 
 TEST(Style, MapboxStyle) {
-    const string token = get_token();
+    const string token = get_token(false);
+    if (token == "") {
+        GTEST_SKIP_("Missing Mapbox Token");
+    }
 
     Map map  = Map("mapbox://styles/mapbox/streets-v11", 256, 256, 1, 0, 0, 0, token, "mapbox");
     auto img = map.renderPNG();
