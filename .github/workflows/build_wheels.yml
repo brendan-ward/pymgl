@@ -182,3 +182,36 @@ jobs:
         run: |
           cd ..
           python -m pytest --pyargs pymgl -v
+
+  publish:
+    name: Publish to GitHub / PyPI
+    needs: [test-wheels]
+    runs-on: ubuntu-latest
+    # only publish on tags
+    if: github.event_name == 'push' && startsWith(github.event.ref, 'refs/tags/')
+
+    steps:
+      - uses: actions/download-artifact@v2
+        with:
+          name: artifact
+          path: dist
+
+      - name: Publish MacOS wheel to PyPI
+        if: runner.os == 'macOS'
+        uses: pypa/gh-action-pypi-publish@release/v1.5.0
+        with:
+          user: __token__
+          # FIXME: main pypi
+          password: ${{ secrets.TEST_PYPI_API_TOKEN }}
+          repository_url: https://test.pypi.org/legacy/
+
+      - name: Release
+        uses: softprops/action-gh-release@v1
+        with:
+          name: ${{ github.ref }}
+          tag_name: ${{ github.ref }}
+          token: ${{ secrets.GITHUB_TOKEN }}
+          draft: false
+          prerelease: false
+          files: |
+            ./dist/*.whl
