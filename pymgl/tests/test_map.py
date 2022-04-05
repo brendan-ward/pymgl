@@ -55,29 +55,6 @@ def test_map_create_params(empty_style):
     assert Map(empty_style, zoom=2).zoom == 2
 
 
-def test_mapbox_style():
-    Map("mapbox://styles/mapbox/streets-v11", provider="mapbox", token=MAPBOX_TOKEN)
-
-
-def test_mapbox_style_missing_token():
-    with pytest.raises(ValueError, match="provider 'mapbox' requires a token"):
-        Map("mapbox://styles/mapbox/streets-v11", provider="mapbox")
-
-
-def test_missing_style():
-    with pytest.raises(ValueError, match="style is not valid"):
-        Map("")
-
-
-def test_invalid_style():
-    with pytest.raises(ValueError, match="style is not valid"):
-        Map("foo")
-
-    # also for short mapbox style IDs
-    with pytest.raises(ValueError, match="style is not valid"):
-        Map("streets-v11")
-
-
 def test_invalid_size(empty_style):
     with pytest.raises(ValueError, match="width must be greater than 0"):
         Map(empty_style, width=0)

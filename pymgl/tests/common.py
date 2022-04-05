@@ -8,7 +8,7 @@ from pixelmatch.contrib.PIL import pixelmatch
 
 load_dotenv()
 MAPBOX_TOKEN = os.getenv("MAPBOX_TOKEN", None)
-FIXTURES_PATH = Path("tests/fixtures").absolute()
+FIXTURES_PATH = Path(__file__).parent.resolve() / "fixtures"
 
 
 def read_style(filename):

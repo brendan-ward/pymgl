@@ -6,9 +6,6 @@ from pymgl import Map
 from .common import FIXTURES_PATH, MAPBOX_TOKEN, read_style, image_matches
 
 
-pytestmark = pytest.mark.skipif(not MAPBOX_TOKEN, reason="MAPBOX_TOKEN not available")
-
-
 def test_empty_style(empty_style):
     img_data = Map(empty_style, 10, 10).renderPNG()
 
@@ -52,6 +49,7 @@ def test_remote_image_source():
     assert image_matches(img_data, f"{test}.png")
 
 
+@pytest.mark.skipif(not MAPBOX_TOKEN, reason="MAPBOX_TOKEN not available")
 def test_mapbox_source():
     test = "example-style-mapbox-source"
     img_data = Map(
@@ -61,6 +59,7 @@ def test_mapbox_source():
     assert image_matches(img_data, f"{test}.png", 10)
 
 
+@pytest.mark.skipif(not MAPBOX_TOKEN, reason="MAPBOX_TOKEN not available")
 def test_mapbox_base_style():
     img_data = Map(
         "mapbox://styles/mapbox/streets-v11",
@@ -71,6 +70,11 @@ def test_mapbox_base_style():
         provider="mapbox",
     ).renderPNG()
     assert image_matches(img_data, "mapbox-streets-v11.png", 100)
+
+
+def test_mapbox_style_missing_token():
+    with pytest.raises(ValueError, match="provider 'mapbox' requires a token"):
+        Map("mapbox://styles/mapbox/streets-v11", provider="mapbox")
 
 
 def test_labels():
@@ -151,3 +155,17 @@ def test_bad_glyphs():
         map = Map(read_style("example-style-bad-glyphs.json"), 100, 100, 1)
         map.setBounds(-125, 37.5, -115, 42.5)
         map.renderPNG()
+
+
+def test_missing_style():
+    with pytest.raises(ValueError, match="style is not valid"):
+        Map("")
+
+
+def test_invalid_style():
+    with pytest.raises(ValueError, match="style is not valid"):
+        Map("foo")
+
+    # also for short mapbox style IDs
+    with pytest.raises(ValueError, match="style is not valid"):
+        Map("streets-v11")

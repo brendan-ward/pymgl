@@ -326,7 +326,8 @@ git submodule update --init --recursive \
     vendor/boost \
     vendor/eternal \
     vendor/googletest \
-    vendor/mapbox-base
+    vendor/mapbox-base \
+    vendor/vector-tile
 
 ```
 
