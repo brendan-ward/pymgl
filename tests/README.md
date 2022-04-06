@@ -39,3 +39,39 @@ from the root directory run all tests using:
 ```bash
 pytest pymgl/tests
 ```
+
+## Manual network tests
+
+To test network-related issues issues, in one terminal do the following:
+
+```
+pip install poorconn[full]
+
+python -m poorconn close_upon_acceptance
+```
+
+Given a style JSON:
+
+Then in another terminal, run this as needed across different combinations of poorconn settings:
+
+```
+python -c "from pymgl import Map; Map(open('pymgl/tests/fixtures/example-style-bad-remote.json').read()).renderPNG()"
+```
+
+This will error with a connection lost.
+
+In the first terminal, run the following:
+
+```bash
+python -m poorconn delay_before_sending_upon_acceptance --t=1 --length=1024
+```
+
+This should not fail.
+
+To make it really slow:
+
+```
+python -m poorconn delay_before_sending_upon_acceptance --t=1 --length=10
+```
+
+This should have an error for request timing out.

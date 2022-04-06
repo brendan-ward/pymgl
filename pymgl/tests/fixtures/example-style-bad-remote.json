@@ -1,0 +1,16 @@
+{
+    "version": 8,
+    "sources": {
+        "basemap": {
+            "type": "raster",
+            "tiles": ["http://localhost:8080/{z}/{y}/{x}"]
+        }
+    },
+    "layers": [
+        {
+            "id": "basemap",
+            "source": "basemap",
+            "type": "raster"
+        }
+    ]
+}

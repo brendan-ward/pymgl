@@ -1,9 +1,21 @@
+import os
+
 from PIL import Image
 import pytest
 
 from pymgl import Map
 
 from .common import FIXTURES_PATH, MAPBOX_TOKEN, read_style, image_matches
+
+
+has_poorconn = False
+try:
+    import poorconn
+
+    pytest_plugins = ("poorconn",)
+    has_poorconn = True
+except ImportError:
+    pass
 
 
 def test_empty_style(empty_style):
@@ -169,3 +181,16 @@ def test_invalid_style():
     # also for short mapbox style IDs
     with pytest.raises(ValueError, match="style is not valid"):
         Map("streets-v11")
+
+
+@pytest.mark.skipif(not has_poorconn, reason="poorconn test lib not available")
+@pytest.mark.poorconn_http_server_config(port=8080, t=1, length=10)
+def test_slow_tile_server(poorconn_http_server, tmp_path, capsys):
+    # write fake tile
+    tile_path = tmp_path / "0/0"
+    os.makedirs(tile_path)
+    (tile_path / "0").write_bytes(b"h" * 1024)
+
+    with pytest.raises(RuntimeError, match="request timed out"):
+        Map(read_style("example-style-bad-remote.json")).renderPNG()
+        # NOTE: this emits errors from poorconn
