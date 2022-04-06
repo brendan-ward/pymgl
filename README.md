@@ -19,12 +19,63 @@ For a stand-alone service implmenting rendering functionality, see
 
 ## Install
 
-Right now, this package must be built manually (below).
-
 ### Supported operating systems
 
--   MacOS 10.15+ (Arm64 / M1 support unknown)
--   Linux (Ubuntu 20.04); Alpine Linux is not supported
+#### MacOS 10.15+ (x86_64 only)
+
+Wheels are available on PyPI:
+
+```bash
+pip install pymgl
+```
+
+To verify that it installed correctly, run the included test suite:
+
+```bash
+python -m pip install pytest
+python -m pytest --pyargs pymgl -v
+```
+
+#### Ubuntu 20.04
+
+Due to the complexity of building manylinux wheels that include OpenGL and
+successfully compile `maplibre-gl-native`, wheels are only available for Ubuntu 20.04.
+
+Wheels are available on the release page in Github. Download and install from there.
+
+Something like:
+
+```bash
+pip install https://github.com/brendan-ward/pymgl/releases/download/<release>/pymgl-<release>-<Python version>-<Python version>-linux_x86_64.whl
+```
+
+You also need to install the following runtime dependencies:
+
+```bash
+apt-get install
+    libicu66 \
+    libjpeg-turbo8 \
+    libpng16-16 \
+    libprotobuf17 \
+    libuv1 \
+    libx11-6 \
+    libegl1 \
+    libopengl0 \
+    xvfb
+```
+
+You must have Xvfb running in order to successfully use `pymgl`. You can
+setup and run Xvfb manually, or wrap calls to python in `Xvfb-run`.
+
+To verify that it installed correctly, run the included test suite:
+
+```bash
+python -m pip install pytest
+xvfb-run -a --server-args="-screen 0 1024x768x24 -ac +render -noreset" \
+    python -m pytest --pyargs pymgl -v
+```
+
+#### Windows
 
 Windows is not and will not be supported.
 
@@ -389,7 +440,7 @@ provides a NodeJS API, CLI, and server based on the NodeJS bindings to Mapbox GL
 ## Credits
 
 This project was developed with the support of the
-[U.S. Fish and Wildlife Service]https://www.fws.gov/)
+[U.S. Fish and Wildlife Service](https://www.fws.gov/)
 [Southeast Conservation Adaptation Strategy](https://secassoutheast.org/) for
 use in the
 [Southeast Conservation Blueprint Viewer](https://blueprint.geoplatform.gov/southeast/)
