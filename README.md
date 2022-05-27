@@ -32,7 +32,7 @@ pip install pymgl
 To verify that it installed correctly, run the included test suite:
 
 ```bash
-python -m pip install pytest
+python -m pip install pytest Pillow numpy pixelmatch python-dotenv
 python -m pytest --pyargs pymgl -v
 ```
 
@@ -70,7 +70,7 @@ setup and run Xvfb manually, or wrap calls to python in `Xvfb-run`.
 To verify that it installed correctly, run the included test suite:
 
 ```bash
-python -m pip install pytest
+python -m pip install pytest Pillow numpy pixelmatch python-dotenv
 xvfb-run -a --server-args="-screen 0 1024x768x24 -ac +render -noreset" \
     python -m pytest --pyargs pymgl -v
 ```
@@ -379,7 +379,17 @@ git submodule update --init --recursive \
     vendor/googletest \
     vendor/mapbox-base \
     vendor/vector-tile
+```
 
+To later update `maplibre-gl-native`:
+
+```bash
+cd vendor/maplibre-gl-native
+git checkout main
+git pull origin
+
+cd ../..
+git commit -am "update maplibre-gl-native" to latest
 ```
 
 ### Architecture

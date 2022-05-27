@@ -4,5 +4,7 @@
 	branch = stable
 [submodule "vendor/maplibre-gl-native"]
 	path = vendor/maplibre-gl-native
-	url = https://github.com/maplibre/maplibre-gl-native
-	branch = master
+	# url = https://github.com/maplibre/maplibre-gl-native
+	# branch = master
+	url = https://github.com/brendan-ward/maplibre-gl-native
+	branch = handle_nonexistent_mbtiles

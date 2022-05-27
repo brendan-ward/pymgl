@@ -215,6 +215,26 @@ TEST(Style, LocalMBtilesVectorSourceX2) {
     EXPECT_TRUE(image_matches(img_filename, 100));
 }
 
+TEST(Style, InvalidLocalMBtilesRasterSource) {
+    const string test = "example-style-mbtiles-raster-source";
+    string style      = read_style(test + ".json");
+
+    style = regex_replace(style, regex("mbtiles://"), "mbtiles:///invalid/");
+
+    Map map = Map(style, 256, 256, 1);
+
+    EXPECT_THROW(
+        {
+            try {
+                map.renderPNG();
+            } catch (const std::exception &e) {
+                EXPECT_NE(std::string(e.what()).find("path not found"), std::string::npos);
+                throw;
+            }
+        },
+        std::exception);
+}
+
 TEST(Style, ImagePattern) {
     const string test = "example-style-image-pattern";
     string style      = read_style(test + ".json");
