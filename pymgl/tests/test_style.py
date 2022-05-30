@@ -135,6 +135,16 @@ def test_local_mbtiles_vector_source_2x():
     assert image_matches(img_data, f"{test}@2x.png", 100)
 
 
+def test_invalid_local_mbtiles_raster_source():
+    test = "example-style-mbtiles-raster-source"
+    style = read_style(f"{test}.json")
+
+    style = style.replace("mbtiles://", f"mbtiles:///invalid/")
+
+    with pytest.raises(RuntimeError, match="path not found"):
+        img_data = Map(style, 256, 256).renderPNG()
+
+
 def test_image_pattern():
     test = "example-style-image-pattern"
     style = read_style(f"{test}.json")
