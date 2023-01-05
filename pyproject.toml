@@ -1,8 +1,30 @@
+[tool.poetry]
+name = "pymgl"
+version = "0.0.0"
+description = "Python wrapper for MapLibre GL native"
+authors = ["Brendan C. Ward <bcward@astutespruce.com>"]
+license = "MIT"
+
+[tool.poetry.dependencies]
+python = "^3.8"
+
+[tool.poetry.dev-dependencies]
+black = "^22.6.0"
+pylint = "^2.14.5"
+Cython = "^0.29.30"
+pytest = "^7.1.2"
+python-dotenv = "^0.20.0"
+Pillow = "^9.2.0"
+poorconn = "^0.2.1"
+pixelmatch = "^0.3.0"
+numpy = "^1.23.1"
+
 [build-system]
 requires = [
+    "poetry-core>=1.0.0",
     "setuptools>=42",
     "wheel",
     "ninja; sys_platform != 'win32'",
     "cmake>=3.12",
 ]
-build-backend = "setuptools.build_meta"
+build-backend = "poetry.core.masonry.api"

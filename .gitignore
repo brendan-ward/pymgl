@@ -14,5 +14,6 @@ dist/*
 .pytest_cache/*
 
 Pipfile.lock
+poetry.lock
 
 valgrind.log
