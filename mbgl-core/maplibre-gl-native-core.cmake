@@ -1,4 +1,4 @@
-### Build mbgl-core
+# ## Build mbgl-core
 # Adapted from maplibre-gl-core/CMakeLists.txt
 
 add_library(
@@ -20,7 +20,6 @@ target_compile_options(
 )
 
 # NOTE: removed all *.hpp file entries from below, and merged file lists to include OpenGL section
-
 add_library(
     mbgl-core STATIC
     ${MBGL_SOURCE_DIR}/src/mbgl/actor/mailbox.cpp
@@ -266,6 +265,7 @@ add_library(
     ${MBGL_SOURCE_DIR}/src/mbgl/tile/vector_tile.cpp
     ${MBGL_SOURCE_DIR}/src/mbgl/tile/vector_tile_data.cpp
     ${MBGL_SOURCE_DIR}/src/mbgl/util/camera.cpp
+    ${MBGL_SOURCE_DIR}/src/mbgl/util/client_options.cpp
     ${MBGL_SOURCE_DIR}/src/mbgl/util/bounding_volumes.cpp
     ${MBGL_SOURCE_DIR}/src/mbgl/util/chrono.cpp
     ${MBGL_SOURCE_DIR}/src/mbgl/util/color.cpp
@@ -400,10 +400,10 @@ target_compile_definitions(
 if(EXISTS ${MBGL_SOURCE_DIR}/.git/HEAD)
     execute_process(
         COMMAND
-            git
-            rev-parse
-            --short=8
-            HEAD
+        git
+        rev-parse
+        --short=8
+        HEAD
         WORKING_DIRECTORY ${MBGL_SOURCE_DIR}
         OUTPUT_VARIABLE MBGL_VERSION_REV
         OUTPUT_STRIP_TRAILING_WHITESPACE
@@ -419,18 +419,16 @@ set_source_files_properties(
     MBGL_VERSION_REV="${MBGL_VERSION_REV}"
 )
 
-
 # TODO: not needed, already globally defined?
 # target_include_directories(
-#    mbgl-core
-#    PRIVATE ${MBGL_SOURCE_DIR}/src
-#)
+# mbgl-core
+# PRIVATE ${MBGL_SOURCE_DIR}/src
+# )
 
-#target_include_directories(
-#    mbgl-core
-#    PUBLIC ${MBGL_SOURCE_DIR}/include
-#)
-
+# target_include_directories(
+# mbgl-core
+# PUBLIC ${MBGL_SOURCE_DIR}/include
+# )
 include(${MBGL_SOURCE_DIR}/vendor/boost.cmake)
 include(${MBGL_SOURCE_DIR}/vendor/csscolorparser.cmake)
 include(${MBGL_SOURCE_DIR}/vendor/earcut.hpp.cmake)
@@ -446,37 +444,37 @@ include(${MBGL_SOURCE_DIR}/vendor/wagyu.cmake)
 target_link_libraries(
     mbgl-core
     PRIVATE
-        Mapbox::Base::Extras::kdbush.hpp
-        Mapbox::Base::supercluster.hpp
-        Mapbox::Base::shelf-pack-cpp
-        Mapbox::Base::geojson-vt-cpp
-        Mapbox::Base::cheap-ruler-cpp
-        mbgl-compiler-options
-        mbgl-vendor-boost
-        mbgl-vendor-csscolorparser
-        mbgl-vendor-earcut.hpp
-        mbgl-vendor-eternal
-        mbgl-vendor-parsedate
-        mbgl-vendor-polylabel
-        mbgl-vendor-protozero
-        mbgl-vendor-unique_resource
-        mbgl-vendor-vector-tile
-        mbgl-vendor-wagyu
+    Mapbox::Base::Extras::kdbush.hpp
+    Mapbox::Base::supercluster.hpp
+    Mapbox::Base::shelf-pack-cpp
+    Mapbox::Base::geojson-vt-cpp
+    Mapbox::Base::cheap-ruler-cpp
+    mbgl-compiler-options
+    mbgl-vendor-boost
+    mbgl-vendor-csscolorparser
+    mbgl-vendor-earcut.hpp
+    mbgl-vendor-eternal
+    mbgl-vendor-parsedate
+    mbgl-vendor-polylabel
+    mbgl-vendor-protozero
+    mbgl-vendor-unique_resource
+    mbgl-vendor-vector-tile
+    mbgl-vendor-wagyu
     PUBLIC
-        Mapbox::Base
-        Mapbox::Base::Extras::expected-lite
-        Mapbox::Base::Extras::rapidjson
-        Mapbox::Base::geojson.hpp
-        Mapbox::Base::geometry.hpp
-        Mapbox::Base::optional
-        Mapbox::Base::variant
+    Mapbox::Base
+    Mapbox::Base::Extras::expected-lite
+    Mapbox::Base::Extras::rapidjson
+    Mapbox::Base::geojson.hpp
+    Mapbox::Base::geometry.hpp
+    Mapbox::Base::optional
+    Mapbox::Base::variant
 )
 
 add_library(
     Mapbox::Map ALIAS mbgl-core
 )
 
-### End maplibre-gl-core/CMakeLists.txt
+# ## End maplibre-gl-core/CMakeLists.txt
 
 # Build mbgl-core with specific platform requirements
 if(CMAKE_SYSTEM_NAME STREQUAL Linux)

@@ -194,7 +194,7 @@ def test_invalid_style():
 
 
 @pytest.mark.skipif(not has_poorconn, reason="poorconn test lib not available")
-@pytest.mark.poorconn_http_server_config(port=8080, t=1, length=10)
+@pytest.mark.poorconn_http_server_config(port=8111, t=1, length=10)
 def test_slow_tile_server(poorconn_http_server, tmp_path, capsys):
     # write fake tile
     tile_path = tmp_path / "0/0"

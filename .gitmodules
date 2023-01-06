@@ -5,4 +5,4 @@
 [submodule "vendor/maplibre-gl-native"]
 	path = vendor/maplibre-gl-native
 	url = https://github.com/maplibre/maplibre-gl-native
-	branch = master
+	branch = main

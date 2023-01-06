@@ -369,16 +369,18 @@ Run the following:
 cd vendor/maplibre-gl-native
 
 git submodule update --init --recursive \
-    vendor/earcut.hpp \
-    vendor/polylabel \
-    vendor/protozero \
-    vendor/wagyu \
-    vendor/unique_resource \
     vendor/boost \
+    vendor/cpp-httplib \
+    vendor/earcut.hpp \
     vendor/eternal \
     vendor/googletest \
+    vendor/polylabel \
+    vendor/protozero \
     vendor/mapbox-base \
-    vendor/vector-tile
+    vendor/unique_resource \
+    vendor/vector-tile \
+    vendor/wagyu \
+    vendor/zip-archive
 ```
 
 To later update `maplibre-gl-native`:
