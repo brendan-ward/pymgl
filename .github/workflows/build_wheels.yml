@@ -36,7 +36,11 @@ jobs:
 
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
+
+      - name: list dir
+        if: runner.os == 'Linux'
+        run: ls $pythonLocation
 
       - name: Checkout submodules
         run: |
@@ -57,7 +61,7 @@ jobs:
               vendor/zip-archive
 
       - name: Set up Python
-        uses: actions/setup-python@v2
+        uses: actions/setup-python@v4
         with:
           python-version: ${{ matrix.python-version }}
 
@@ -98,7 +102,7 @@ jobs:
         run: ccache --clear --set-config cache_dir=~/.ccache
 
       - name: Cache ccache
-        uses: actions/cache@v2
+        uses: actions/cache@v3
         env:
           cache-name: ccache-v1
         with:
@@ -131,6 +135,7 @@ jobs:
           sudo chown -R $(id -u):$(id -g) $BUILD_TEMP_DIR
           pip install wheel
           python setup.py bdist_wheel --plat-name=$PLATFORM_TAG
+          rm ./dist/*linux*.whl
 
       - name: Build package for MacOS
         env:
@@ -141,7 +146,7 @@ jobs:
           pip install wheel
           python setup.py bdist_wheel
 
-      - uses: actions/upload-artifact@v2
+      - uses: actions/upload-artifact@v3
         with:
           path: ./dist/*.whl
 
@@ -156,9 +161,6 @@ jobs:
         python-version: ["3.8", "3.9", "3.10", "3.11"]
 
     steps:
-      - name: Checkout
-        uses: actions/checkout@v2
-
       - name: Install Ubuntu 22.04 runtime dependencies
         if: matrix.os == 'ubuntu-22.04'
         run: |
@@ -194,12 +196,12 @@ jobs:
           echo "PLATFORM_TAG=ubuntu20_04_x86_64" >> $GITHUB_ENV
 
       - name: Set up Python
-        uses: actions/setup-python@v2
+        uses: actions/setup-python@v4
         with:
           python-version: ${{ matrix.python-version }}
 
       - name: Download wheels from artifacts
-        uses: actions/download-artifact@v2
+        uses: actions/download-artifact@v3
         with:
           path: wheelhouse
 
@@ -211,9 +213,8 @@ jobs:
       - name: Install and test wheels on Ubuntu
         if: runner.os == 'Linux'
         run: |
-          python -m pip install --find-links wheelhouse/artifact --platform $PLATFORM_TAG --target /tmp/pymgl --no-deps pymgl
+          python -m pip install --find-links wheelhouse/artifact --platform $PLATFORM_TAG --target $pythonLocation/dist-packages --no-deps --upgrade pymgl
           python -m pip list
-          cd ..
           xvfb-run -a --server-args="-screen 0 1024x768x24 -ac +render -noreset" \
             python -m pytest --pyargs pymgl -v
 
@@ -235,7 +236,7 @@ jobs:
     if: github.event_name == 'push' && startsWith(github.event.ref, 'refs/tags/')
 
     steps:
-      - uses: actions/download-artifact@v2
+      - uses: actions/download-artifact@v3
         with:
           name: artifact
           path: wheels
