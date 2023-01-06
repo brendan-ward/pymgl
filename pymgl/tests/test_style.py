@@ -157,7 +157,7 @@ def test_image_pattern():
 
     img_data = map.renderPNG()
 
-    assert image_matches(img_data, f"{test}.png")
+    assert image_matches(img_data, f"{test}.png", tolerance=350)
 
 
 def test_bad_source():

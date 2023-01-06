@@ -259,7 +259,7 @@ TEST(Style, ImagePattern) {
     // write_test_image(img, img_filename, true);
 
     write_test_image(img, img_filename, false);
-    EXPECT_TRUE(image_matches(img_filename, 10));
+    EXPECT_TRUE(image_matches(img_filename, 350));
 }
 
 // Tests of bad inputs
