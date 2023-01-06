@@ -3,7 +3,7 @@
     "sources": {
         "basemap": {
             "type": "raster",
-            "tiles": ["http://localhost:8080/{z}/{y}/{x}"]
+            "tiles": ["http://localhost:8111/{z}/{y}/{x}"]
         }
     },
     "layers": [
