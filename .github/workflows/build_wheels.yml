@@ -165,6 +165,7 @@ jobs:
           sudo apt-get update
           sudo apt-get -y install \
             libicu70 \
+            libcurl4 \
             libjpeg-turbo8 \
             libpng16-16 \
             libprotobuf23 \
@@ -181,6 +182,7 @@ jobs:
           sudo apt-get update
           sudo apt-get -y install \
             libicu66 \
+            libcurl4 \
             libjpeg-turbo8 \
             libpng16-16 \
             libprotobuf17 \
@@ -209,7 +211,7 @@ jobs:
       - name: Install and test wheels on Ubuntu
         if: runner.os == 'Linux'
         run: |
-          python -m pip install --find-links wheelhouse/artifact --platform $PLATFORM_TAG --target . --no-deps pymgl
+          python -m pip install --find-links wheelhouse/artifact --platform $PLATFORM_TAG --target /tmp/pymgl --no-deps pymgl
           python -m pip list
           cd ..
           xvfb-run -a --server-args="-screen 0 1024x768x24 -ac +render -noreset" \
