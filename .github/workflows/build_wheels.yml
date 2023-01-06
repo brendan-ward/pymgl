@@ -116,11 +116,11 @@ jobs:
 
       - name: Set platform tag for Ubuntu 22.04
         if: matrix.os == 'ubuntu-22.04'
-        run: echo "PLATFORM_TAG=ubuntu22_04_x86_64"
+        run: echo "PLATFORM_TAG=ubuntu22_04_x86_64" >> $GITHUB_ENV
 
       - name: Set platform tag for Ubuntu 20.04
         if: matrix.os == 'ubuntu-20.04'
-        run: echo "PLATFORM_TAG=ubuntu20_04_x86_64"
+        run: echo "PLATFORM_TAG=ubuntu20_04_x86_64">> $GITHUB_ENV
 
       - name: Build package for Ubuntu
         if: runner.os == 'Linux'
@@ -173,7 +173,7 @@ jobs:
             libegl1 \
             libopengl0 \
             xvfb
-          echo "PLATFORM_TAG=ubuntu22_04_x86_64"
+          echo "PLATFORM_TAG=ubuntu22_04_x86_64" >> $GITHUB_ENV
 
       - name: Install Ubuntu 20.04 runtime dependencies
         if: matrix.os == 'ubuntu-20.04'
@@ -189,7 +189,7 @@ jobs:
             libegl1 \
             libopengl0 \
             xvfb
-          echo "PLATFORM_TAG=ubuntu20_04_x86_64"
+          echo "PLATFORM_TAG=ubuntu20_04_x86_64" >> $GITHUB_ENV
 
       - name: Set up Python
         uses: actions/setup-python@v2
