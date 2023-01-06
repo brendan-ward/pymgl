@@ -39,7 +39,8 @@ python -m pytest --pyargs pymgl -v
 #### Ubuntu 20.04
 
 Due to the complexity of building manylinux wheels that include OpenGL and
-successfully compile `maplibre-gl-native`, wheels are only available for Ubuntu 20.04.
+successfully compile `maplibre-gl-native`, wheels are only available for
+Ubuntu 20.04 and 22.04.
 
 Wheels are available on the release page in Github. Download and install from there.
 
