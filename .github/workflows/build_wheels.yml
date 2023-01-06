@@ -114,7 +114,25 @@ jobs:
           ccache --max-size=2G --set-config cache_dir=~/.ccache
           ccache --show-stats --set-config cache_dir=~/.ccache
 
-      - name: Build package
+      - name: Set platform tag for Ubuntu 22.04
+        if: matrix.os == 'ubuntu-22.04'
+        run: echo "PLATFORM_TAG=ubuntu22_04_x86_64"
+
+      - name: Set platform tag for Ubuntu 20.04
+        if: matrix.os == 'ubuntu-20.04'
+        run: echo "PLATFORM_TAG=ubuntu20_04_x86_64"
+
+      - name: Build package for Ubuntu
+        if: runner.os == 'Linux'
+        env:
+          CMAKE_CXX_COMPILER_LAUNCHER: ccache
+        run: |
+          sudo mkdir -p $BUILD_TEMP_DIR
+          sudo chown -R $(id -u):$(id -g) $BUILD_TEMP_DIR
+          pip install wheel
+          python setup.py bdist_wheel --plat-name=$PLATFORM_TAG
+
+      - name: Build package for MacOS
         env:
           CMAKE_CXX_COMPILER_LAUNCHER: ccache
         run: |
@@ -141,8 +159,24 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v2
 
-      - name: Install Linux runtime dependencies
-        if: runner.os == 'Linux'
+      - name: Install Ubuntu 22.04 runtime dependencies
+        if: matrix.os == 'ubuntu-22.04'
+        run: |
+          sudo apt-get update
+          sudo apt-get -y install \
+            libicu70 \
+            libjpeg-turbo8 \
+            libpng16-16 \
+            libprotobuf23 \
+            libuv1 \
+            libx11-6 \
+            libegl1 \
+            libopengl0 \
+            xvfb
+          echo "PLATFORM_TAG=ubuntu22_04_x86_64"
+
+      - name: Install Ubuntu 20.04 runtime dependencies
+        if: matrix.os == 'ubuntu-20.04'
         run: |
           sudo apt-get update
           sudo apt-get -y install \
@@ -155,6 +189,7 @@ jobs:
             libegl1 \
             libopengl0 \
             xvfb
+          echo "PLATFORM_TAG=ubuntu20_04_x86_64"
 
       - name: Set up Python
         uses: actions/setup-python@v2
@@ -166,26 +201,30 @@ jobs:
         with:
           path: wheelhouse
 
-      - name: Install dependencies and pymgl wheel
+      - name: Install dependencies
         shell: bash
         run: |
           python -m pip install pytest Pillow numpy pixelmatch python-dotenv
-          python -m pip install --find-links wheelhouse/artifact pymgl
-          python -m pip list
 
-      - name: Run Linux tests
+      - name: Install and test wheels on Ubuntu
         if: runner.os == 'Linux'
         run: |
+          python -m pip install --find-links /wheelhouse/artifact --platform $PLATFORM_TAG --target . --no-deps pymgl
+          python -m pip list
           cd ..
           xvfb-run -a --server-args="-screen 0 1024x768x24 -ac +render -noreset" \
             python -m pytest --pyargs pymgl -v
 
-      - name: Run MacOS tests
+      - name: Install and test wheels on MacOS
         if: runner.os == 'macOS'
         run: |
+          python -m pip install --find-links /wheelhouse/artifact pymgl
+          python -m pip list
           cd ..
           python -m pytest --pyargs pymgl -v
 
+  # NOTE: publish is limited to MacOS wheels because Linux wheels are not accepted
+  # for only Ubuntu, must be manylinux
   publish:
     name: Publish to GitHub / PyPI
     needs: [test-wheels]
