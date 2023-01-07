@@ -181,6 +181,7 @@ jobs:
             libopengl0 \
             xvfb
           echo "PLATFORM_TAG=ubuntu22_04_x86_64" >> $GITHUB_ENV
+          echo "PYTHON_SITE_PACKAGES=$pythonLocation/lib/python$PYTHON_VERSION/site-packages" >> $GITHUB_ENV
 
       - name: Install Ubuntu 20.04 runtime dependencies
         if: matrix.os == 'ubuntu-20.04'
@@ -198,6 +199,7 @@ jobs:
             libopengl0 \
             xvfb
           echo "PLATFORM_TAG=ubuntu20_04_x86_64" >> $GITHUB_ENV
+          echo "PYTHON_SITE_PACKAGES=$pythonLocation/lib/python$PYTHON_VERSION/site-packages" >> $GITHUB_ENV
 
       - name: Set up Python
         uses: actions/setup-python@v4
@@ -217,8 +219,9 @@ jobs:
       - name: Install and test wheels on Ubuntu
         if: runner.os == 'Linux'
         run: |
-          python -m pip install --find-links wheelhouse/artifact --platform $PLATFORM_TAG --target $pythonLocation/lib/python$PYTHON_VERSION/site-packages --no-deps --upgrade pymgl
+          python -m pip install --find-links wheelhouse/artifact --platform $PLATFORM_TAG --target $PYTHON_SITE_PACKAGES --no-deps --upgrade pymgl
           python -m pip list
+          python -m pip list --path $PYTHON_SITE_PACKAGES
           xvfb-run -a --server-args="-screen 0 1024x768x24 -ac +render -noreset" \
             python -m pytest --pyargs pymgl -v
 
