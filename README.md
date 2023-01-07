@@ -36,25 +36,44 @@ python -m pip install pytest Pillow numpy pixelmatch python-dotenv
 python -m pytest --pyargs pymgl -v
 ```
 
-#### Ubuntu 20.04
+#### Ubuntu 22.04 & 20.04
 
 Due to the complexity of building manylinux wheels that include OpenGL and
 successfully compile `maplibre-gl-native`, wheels are only available for
-Ubuntu 20.04 and 22.04.
+Ubuntu 22.04 and 20.04.
 
 Wheels are available on the release page in Github. Download and install from there.
 
 Something like:
 
 ```bash
-pip install https://github.com/brendan-ward/pymgl/releases/download/<release>/pymgl-<release>-<Python version>-<Python version>-linux_x86_64.whl
+pip install https://github.com/brendan-ward/pymgl/releases/download/<release>/pymgl-<release>-<Python version>-<Python version>-ubuntu<Ubuntu version>_x86_64.whl
 ```
 
 You also need to install the following runtime dependencies:
 
+**Ubuntu 22.04:**
+
+```bash
+apt-get install
+    libicu70 \
+    libcurl4 \
+    libjpeg-turbo8 \
+    libpng16-16 \
+    libprotobuf23 \
+    libuv1 \
+    libx11-6 \
+    libegl1 \
+    libopengl0 \
+    xvfb
+```
+
+**Ubuntu 20.04:**
+
 ```bash
 apt-get install
     libicu66 \
+    libcurl4 \
     libjpeg-turbo8 \
     libpng16-16 \
     libprotobuf17 \
@@ -314,7 +333,7 @@ via `homebrew`:
 -   cmake
 -   ninja
 
-#### Developing on Linux (Ubuntu 20.04) requires the following binary libraries:
+#### Developing on Ubuntu 22.04 or 20.04 requires the following binary libraries:
 
 -   cmake
 -   ninja-build
@@ -331,7 +350,61 @@ via `homebrew`:
 
 To run on Linux, XVFB must also be running; otherwise the process will segfault.
 
-See `docker/Dockerfile` for more information.
+See [`docker/README.md`](./docker/README.md) for more information.
+
+#### Developing on other Linux versions
+
+See `.github/workflows/build_wheels.yml` for the overall structure for building
+and testing on Linux. You will most likely need to adapt the names of the
+packages to the package manager for your version of Linux.
+
+##### Debian Bullseye
+
+We've heard (#7) that it is possible to successfully build and operate PyMGL
+on Debian Bullseye with the following dependencies:
+
+Build:
+
+```bash
+apt-get -y install \
+    curl \
+    build-essential \
+    cmake \
+    ccache \
+    ninja-build \
+    pkg-config \
+    libcurl4-openssl-dev \
+    libicu-dev \
+    libturbojpeg0-dev \
+    libpng-dev \
+    libprotobuf-dev \
+    libuv1-dev \
+    libx11-dev \
+    libegl-dev \
+    libopengl-dev \
+    xvfb \
+    libjpeg-dev \
+    libsqlite3-dev \
+    libopengl0 \
+    git
+```
+
+Runtime:
+
+```bash
+apt install --no-install-recommends -y \
+    xvfb \
+    xauth \
+    curl \
+    libicu67 \
+    libjpeg-turbo-progs \
+    libpng16-16 \
+    libprotobuf23 \
+    libuv1 \
+    libx11-6 \
+    libegl1 \
+    libopengl0
+```
 
 ### PyBind11
 
