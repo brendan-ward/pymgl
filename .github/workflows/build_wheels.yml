@@ -135,6 +135,7 @@ jobs:
           ls ./dist
 
       - name: Build package for MacOS
+        if: runner.os == 'macOS'
         env:
           CMAKE_CXX_COMPILER_LAUNCHER: ccache
         run: |
