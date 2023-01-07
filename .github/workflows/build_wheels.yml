@@ -30,12 +30,10 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: ["ubuntu-22.04"] # ["ubuntu-22.04", "ubuntu-20.04", "macos-12"]
+        os: ["ubuntu-22.04", "ubuntu-20.04", "macos-12"]
         platform: ["x86_64"]
-        python-version: ["3.10"] # ["3.8", "3.9", "3.10", "3.11"]
+        python-version: ["3.8", "3.9", "3.10", "3.11"]
 
-    env:
-      PYTHON_VERSION: ${{ matrix.python-version }}
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3
@@ -62,12 +60,6 @@ jobs:
         uses: actions/setup-python@v4
         with:
           python-version: ${{ matrix.python-version }}
-
-      - name: find python site packages dir
-        if: runner.os == 'Linux'
-        run: |
-          python -c 'import site; print(site.getsitepackages())'
-          ls $pythonLocation/lib/python$PYTHON_VERSION/site-packages
 
       - name: Install Linux dependencies
         if: runner.os == 'Linux'
@@ -139,6 +131,7 @@ jobs:
           sudo chown -R $(id -u):$(id -g) $BUILD_TEMP_DIR
           pip install wheel
           python setup.py bdist_wheel --plat-name=$PLATFORM_TAG
+          echo "List wheels"
           ls ./dist
 
       - name: Build package for MacOS
@@ -161,8 +154,8 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: ["ubuntu-22.04"] # ["ubuntu-22.04", "ubuntu-20.04", "macos-12", "macos-11"]
-        python-version: ["3.10"] # ["3.8", "3.9", "3.10", "3.11"]
+        os: ["ubuntu-22.04", "ubuntu-20.04", "macos-12", "macos-11"]
+        python-version: ["3.8", "3.9", "3.10", "3.11"]
     env:
       PYTHON_VERSION: ${{ matrix.python-version }}
 
