@@ -181,7 +181,6 @@ jobs:
             libopengl0 \
             xvfb
           echo "PLATFORM_TAG=ubuntu22_04_x86_64" >> $GITHUB_ENV
-          echo "PYTHON_SITE_PACKAGES=$pythonLocation/lib/python$PYTHON_VERSION/site-packages" >> $GITHUB_ENV
 
       - name: Install Ubuntu 20.04 runtime dependencies
         if: matrix.os == 'ubuntu-20.04'
@@ -199,7 +198,6 @@ jobs:
             libopengl0 \
             xvfb
           echo "PLATFORM_TAG=ubuntu20_04_x86_64" >> $GITHUB_ENV
-          echo "PYTHON_SITE_PACKAGES=$pythonLocation/lib/python$PYTHON_VERSION/site-packages" >> $GITHUB_ENV
 
       - name: Set up Python
         uses: actions/setup-python@v4
@@ -214,6 +212,7 @@ jobs:
       - name: Install dependencies
         shell: bash
         run: |
+          echo "PYTHON_SITE_PACKAGES=$pythonLocation/lib/python$PYTHON_VERSION/site-packages" >> $GITHUB_ENV
           python -m pip install pytest Pillow numpy pixelmatch python-dotenv
 
       - name: Install and test wheels on Ubuntu
