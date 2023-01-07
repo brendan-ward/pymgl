@@ -3,7 +3,7 @@
     "sources": {
         "basemap": {
             "type": "raster",
-            "tiles": ["http://google.com/bad-endpoint/{z}/{x}/{y}.png"],
+            "tiles": ["https://google.com/bad-endpoint/{z}/{x}/{y}.png"],
             "tileSize": 256
         },
         "geojson": {

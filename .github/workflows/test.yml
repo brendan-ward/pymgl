@@ -17,13 +17,17 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: ["ubuntu-20.04", "macos-11", "macos-10.15"]
+        os:
+          - "ubuntu-22.04"
+          - "ubuntu-20.04"
+          - "macos-12"
+          - "macos-11"
         platform: ["x86_64"]
-        python-version: ["3.8", "3.9", "3.10"]
+        python-version: ["3.8", "3.9", "3.10", "3.11"]
 
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
 
       - name: Checkout submodules
         run: |
@@ -44,7 +48,7 @@ jobs:
               vendor/zip-archive
 
       - name: Set up Python
-        uses: actions/setup-python@v2
+        uses: actions/setup-python@v4
         with:
           python-version: ${{ matrix.python-version }}
 
@@ -85,7 +89,7 @@ jobs:
         run: ccache --clear --set-config cache_dir=~/.ccache
 
       - name: Cache ccache
-        uses: actions/cache@v2
+        uses: actions/cache@v3
         env:
           cache-name: ccache-v1
         with:
