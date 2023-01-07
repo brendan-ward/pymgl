@@ -63,7 +63,10 @@ jobs:
 
       - name: list dir
         if: runner.os == 'Linux'
-        run: ls $pythonLocation/share
+        run: |
+          ls $pythonLocation
+          ls $pythonLocation/lib
+          ls $pythonLocation/python
 
       - name: Install Linux dependencies
         if: runner.os == 'Linux'
