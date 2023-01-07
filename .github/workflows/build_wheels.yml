@@ -61,12 +61,10 @@ jobs:
         with:
           python-version: ${{ matrix.python-version }}
 
-      - name: list dir
+      - name: find python site packages dir
         if: runner.os == 'Linux'
         run: |
-          ls $pythonLocation
-          ls $pythonLocation/lib
-          ls $pythonLocation/python
+          python -c 'import site; print(site.getsitepackages())'
 
       - name: Install Linux dependencies
         if: runner.os == 'Linux'
