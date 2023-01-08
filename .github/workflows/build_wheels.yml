@@ -217,7 +217,7 @@ jobs:
       - name: Install and test wheels on Ubuntu
         if: runner.os == 'Linux'
         run: |
-          find ./artifact -type f -name  "*.whl.$PLATFORM_OS" -print0 -exec bash -c 'mv "${0}" "${0//.$PLATFORM_OS/}"' {} \;
+          find ./wheelhouse/artifact -type f -name  "*.whl.$PLATFORM_OS" -print0 -exec bash -c 'mv "${0}" "${0//.$PLATFORM_OS/}"' {} \;
           python -m pip install --find-links wheelhouse/artifact pymgl
           python -m pip list
           python -m pip list --path $PYTHON_SITE_PACKAGES
