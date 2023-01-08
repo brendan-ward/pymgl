@@ -135,7 +135,9 @@ jobs:
           python setup.py bdist_wheel
           echo "List wheels"
           ls ./dist
-          find ./dist -type f -name '*.whl' -exec mv {} {}.${PLATFORM_OS} \;
+          find ./dist -type f -name '*.whl' -exec mv {} {}.$PLATFORM_OS \;
+          echo "Renamed with $PLATFORM_OS suffix"
+          ls ./dist
 
       - name: Build package for MacOS
         if: runner.os == 'macOS'
@@ -150,8 +152,7 @@ jobs:
       - name: "Upload artifacts"
         uses: actions/upload-artifact@v3
         with:
-          path: |
-            ./dist/*.whl
+          path: ./dist/*
 
   test-wheels:
     name: Test wheels on ${{ matrix.os }} ${{ matrix.platform }} (Python ${{ matrix.python-version }})
