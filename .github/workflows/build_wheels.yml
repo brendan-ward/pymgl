@@ -135,8 +135,7 @@ jobs:
           python setup.py bdist_wheel
           echo "List wheels"
           ls ./dist
-          mkdir ./dist/$PLATFORM_OS
-          mv ./dist/*.whl ./dist/$PLATFORM_OS
+          find ./dist -type f -name '*.whl' -exec mv {} {}.${PLATFORM_OS} \;
 
       - name: Build package for MacOS
         if: runner.os == 'macOS'
@@ -152,120 +151,118 @@ jobs:
         uses: actions/upload-artifact@v3
         with:
           path: |
-            ./dist/*
+            ./dist/*.whl
 
-  # test-wheels:
-  #   name: Test wheels on ${{ matrix.os }} ${{ matrix.platform }} (Python ${{ matrix.python-version }})
-  #   needs: [build_wheels]
-  #   runs-on: ${{ matrix.os }}
-  #   strategy:
-  #     fail-fast: false
-  #     matrix:
-  #       os: ["ubuntu-22.04", "ubuntu-20.04", "macos-12", "macos-11"]
-  #       python-version: ["3.8", "3.9", "3.10", "3.11"]
-  #   env:
-  #     PYTHON_VERSION: ${{ matrix.python-version }}
+  test-wheels:
+    name: Test wheels on ${{ matrix.os }} ${{ matrix.platform }} (Python ${{ matrix.python-version }})
+    needs: [build_wheels]
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: ["ubuntu-22.04", "ubuntu-20.04", "macos-12", "macos-11"]
+        python-version: ["3.10"] # ["3.8", "3.9", "3.10", "3.11"]
+    env:
+      PLATFORM_OS: ${{ matrix.os }}
 
-  #   steps:
-  #     - name: Install Ubuntu 22.04 runtime dependencies
-  #       if: matrix.os == 'ubuntu-22.04'
-  #       run: |
-  #         sudo apt-get update
-  #         sudo apt-get -y install \
-  #           libicu70 \
-  #           libcurl4 \
-  #           libjpeg-turbo8 \
-  #           libpng16-16 \
-  #           libprotobuf23 \
-  #           libuv1 \
-  #           libx11-6 \
-  #           libegl1 \
-  #           libopengl0 \
-  #           xvfb
-  #         echo "PLATFORM_TAG=ubuntu22_04_x86_64" >> $GITHUB_ENV
+    steps:
+      - name: Install Ubuntu 22.04 runtime dependencies
+        if: matrix.os == 'ubuntu-22.04'
+        run: |
+          sudo apt-get update
+          sudo apt-get -y install \
+            libicu70 \
+            libcurl4 \
+            libjpeg-turbo8 \
+            libpng16-16 \
+            libprotobuf23 \
+            libuv1 \
+            libx11-6 \
+            libegl1 \
+            libopengl0 \
+            xvfb
 
-  #     - name: Install Ubuntu 20.04 runtime dependencies
-  #       if: matrix.os == 'ubuntu-20.04'
-  #       run: |
-  #         sudo apt-get update
-  #         sudo apt-get -y install \
-  #           libicu66 \
-  #           libcurl4 \
-  #           libjpeg-turbo8 \
-  #           libpng16-16 \
-  #           libprotobuf17 \
-  #           libuv1 \
-  #           libx11-6 \
-  #           libegl1 \
-  #           libopengl0 \
-  #           xvfb
-  #         echo "PLATFORM_TAG=ubuntu20_04_x86_64" >> $GITHUB_ENV
+      - name: Install Ubuntu 20.04 runtime dependencies
+        if: matrix.os == 'ubuntu-20.04'
+        run: |
+          sudo apt-get update
+          sudo apt-get -y install \
+            libicu66 \
+            libcurl4 \
+            libjpeg-turbo8 \
+            libpng16-16 \
+            libprotobuf17 \
+            libuv1 \
+            libx11-6 \
+            libegl1 \
+            libopengl0 \
+            xvfb
 
-  #     - name: Set up Python
-  #       uses: actions/setup-python@v4
-  #       with:
-  #         python-version: ${{ matrix.python-version }}
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: ${{ matrix.python-version }}
 
-  #     - name: Download wheels from artifacts
-  #       uses: actions/download-artifact@v3
-  #       with:
-  #         path: wheelhouse
+      - name: Download wheels from artifacts
+        uses: actions/download-artifact@v3
+        with:
+          path: wheelhouse
 
-  #     - name: Install dependencies
-  #       shell: bash
-  #       run: |
-  #         echo "PYTHON_SITE_PACKAGES=$pythonLocation/lib/python$PYTHON_VERSION/site-packages" >> $GITHUB_ENV
-  #         python -m pip install pytest Pillow numpy pixelmatch python-dotenv
+      - name: Install dependencies
+        shell: bash
+        run: |
+          python -m pip install pytest Pillow numpy pixelmatch python-dotenv
 
-  #     - name: Install and test wheels on Ubuntu
-  #       if: runner.os == 'Linux'
-  #       run: |
-  #         python -m pip install --find-links wheelhouse/artifact --platform $PLATFORM_TAG --target $PYTHON_SITE_PACKAGES --no-deps --upgrade pymgl
-  #         python -m pip list
-  #         python -m pip list --path $PYTHON_SITE_PACKAGES
-  #         xvfb-run -a --server-args="-screen 0 1024x768x24 -ac +render -noreset" \
-  #           python -m pytest --pyargs pymgl -v
+      - name: Install and test wheels on Ubuntu
+        if: runner.os == 'Linux'
+        run: |
+          find ./artifact -type f -name  "*.whl.$PLATFORM_OS" -print0 -exec bash -c 'mv "${0}" "${0//.$PLATFORM_OS/}"' {} \;
+          python -m pip install --find-links wheelhouse/artifact pymgl
+          python -m pip list
+          python -m pip list --path $PYTHON_SITE_PACKAGES
+          xvfb-run -a --server-args="-screen 0 1024x768x24 -ac +render -noreset" \
+            python -m pytest --pyargs pymgl -v
 
-  #     - name: Install and test wheels on MacOS
-  #       if: runner.os == 'macOS'
-  #       run: |
-  #         python -m pip install --find-links wheelhouse/artifact pymgl
-  #         python -m pip list
-  #         cd ..
-  #         python -m pytest --pyargs pymgl -v
+      - name: Install and test wheels on MacOS
+        if: runner.os == 'macOS'
+        run: |
+          python -m pip install --find-links wheelhouse/artifact pymgl
+          python -m pip list
+          cd ..
+          python -m pytest --pyargs pymgl -v
 
-  # # NOTE: publish is limited to MacOS wheels because Linux wheels are not accepted
-  # # for only Ubuntu, must be manylinux
-  # publish:
-  #   name: Publish to GitHub / PyPI
-  #   needs: [test-wheels]
-  #   runs-on: ubuntu-latest
-  #   # only publish on tags
-  #   if: github.event_name == 'push' && startsWith(github.event.ref, 'refs/tags/')
+  # NOTE: publish is limited to MacOS wheels because Linux wheels are not accepted
+  # for only Ubuntu, must be manylinux
+  publish:
+    name: Publish to GitHub / PyPI
+    needs: [test-wheels]
+    runs-on: ubuntu-latest
+    # only publish on tags
+    if: github.event_name == 'push' && startsWith(github.event.ref, 'refs/tags/')
 
-  #   steps:
-  #     - uses: actions/download-artifact@v3
-  #       with:
-  #         name: artifact
-  #         path: wheels
+    steps:
+      - uses: actions/download-artifact@v3
+        with:
+          name: artifact
+          path: wheels
 
-  #     - name: Copy MacOS wheel
-  #       run: |
-  #         mkdir wheels/dist
-  #         cp wheels/*macos*.whl wheels/dist
+      - name: Copy MacOS wheel
+        run: |
+          mkdir wheels/dist
+          cp wheels/*macos*.whl wheels/dist
 
-  #     - name: Publish MacOS wheel to PyPI
-  #       uses: pypa/gh-action-pypi-publish@master
-  #       with:
-  #         user: __token__
-  #         password: ${{ secrets.PYPI_API_TOKEN }}
-  #         packages_dir: wheels/dist/
+      - name: Publish MacOS wheel to PyPI
+        uses: pypa/gh-action-pypi-publish@master
+        with:
+          user: __token__
+          password: ${{ secrets.PYPI_API_TOKEN }}
+          packages_dir: wheels/dist/
 
-  #     - name: Release
-  #       uses: softprops/action-gh-release@v1
-  #       with:
-  #         token: ${{ secrets.GITHUB_TOKEN }}
-  #         draft: false
-  #         prerelease: false
-  #         files: |
-  #           ./wheels/*.whl
+      - name: Release
+        uses: softprops/action-gh-release@v1
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          draft: false
+          prerelease: false
+          files: |
+            ./wheels/*.whl
