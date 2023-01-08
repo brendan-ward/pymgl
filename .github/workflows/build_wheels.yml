@@ -220,7 +220,6 @@ jobs:
           find ./wheelhouse/artifact -type f -name  "*.whl.$PLATFORM_OS" -print0 -exec bash -c 'mv "${0}" "${0//.$PLATFORM_OS/}"' {} \;
           python -m pip install --find-links wheelhouse/artifact pymgl
           python -m pip list
-          python -m pip list --path $PYTHON_SITE_PACKAGES
           xvfb-run -a --server-args="-screen 0 1024x768x24 -ac +render -noreset" \
             python -m pytest --pyargs pymgl -v
 
