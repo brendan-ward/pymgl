@@ -44,10 +44,18 @@ Ubuntu 22.04 and 20.04.
 
 Wheels are available on the release page in Github. Download and install from there.
 
-Something like:
+Unfortunately, Python wheel names are very restrictive, so we have added
+`.ubuntu-22.04` and `.ubuntu-20.04` suffixes to the wheel names, which have to
+be stripped off before you can install them.
+
+Something like this for Ubuntu 22.04:
 
 ```bash
-pip install https://github.com/brendan-ward/pymgl/releases/download/<release>/pymgl-<release>-<Python version>-<Python version>-ubuntu<Ubuntu version>_x86_64.whl
+
+wget https://github.com/brendan-ward/pymgl/releases/download/<release>/pymgl-<release>-<Python version>-<Python version>-linux_x86_64.whl.ubuntu-22.04
+# rename file to remove .ubuntu-22.04 suffix
+find . -type f -name  "*.whl.ubuntu-22.04" -print0 -exec bash -c 'mv "${0}" "${0//.ubuntu-22.04/}"' {} \;
+python3 -m pip install --find-links . pymgl
 ```
 
 You also need to install the following runtime dependencies:
