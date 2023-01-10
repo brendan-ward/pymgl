@@ -265,4 +265,4 @@ jobs:
           draft: false
           prerelease: false
           files: |
-            ./wheels/*.whl
+            ./wheels/*
