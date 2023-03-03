@@ -77,7 +77,7 @@ add_subdirectory(vendor/nanobind)
 
 nanobind_add_module(
     _pymgl
-    NB_SHARED LTO
+    NB_STATIC LTO
     ${PROJECT_SOURCE_DIR}/src/_pymgl.cpp
 )
 
