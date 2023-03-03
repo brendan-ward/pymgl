@@ -4,7 +4,10 @@ cmake_policy(SET CMP0048 NEW)
 project("_pymgl" VERSION "")
 
 cmake_minimum_required(VERSION 3.18...3.22)
-find_package(Python 3.10 COMPONENTS Interpreter Development.Module REQUIRED)
+
+# find Python (note: this looks for at least Python 3.8)
+set(Python_FIND_FRAMEWORK LAST) # Prefer Brew/Conda to Apple framework python
+find_package(Python 3.8 COMPONENTS Interpreter Development.Module REQUIRED)
 
 if(NOT CMAKE_BUILD_TYPE)
     set(CMAKE_BUILD_TYPE Release)

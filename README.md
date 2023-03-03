@@ -487,7 +487,7 @@ This package is composed of 2 main parts:
 
 -   wrapper around Maplibre GL native classes to make constructing and managing
     properties of the map easier
--   Python bindings created using pybind11 against that wrapper
+-   Python bindings created using nanobind against that wrapper
 
 The wrapper is located in `src/map.cpp`.
 
