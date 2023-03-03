@@ -424,6 +424,8 @@ It is included here as a git submodule, per the
 
 ```bash
 git submodule add https://github.com/wjakob/nanobind vendor/nanobind
+cd vendor/nanobind
+git submodule update --init --recursive
 ```
 
 Temporary fix: update `vendor/nanobind/nanobind-config.cmake` to comment out
