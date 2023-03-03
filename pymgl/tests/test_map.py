@@ -59,13 +59,13 @@ def test_invalid_size(empty_style):
     with pytest.raises(ValueError, match="width must be greater than 0"):
         Map(empty_style, width=0)
 
-    with pytest.raises(TypeError, match="incompatible constructor arguments"):
-        Map(empty_style, width=-1)
-
     with pytest.raises(ValueError, match="height must be greater than 0"):
         Map(empty_style, height=0)
 
-    with pytest.raises(TypeError, match="incompatible constructor arguments"):
+    with pytest.raises(TypeError, match="incompatible function arguments"):
+        Map(empty_style, width=-1)
+
+    with pytest.raises(TypeError, match="incompatible function arguments"):
         Map(empty_style, height=-1)
 
 

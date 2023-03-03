@@ -1,20 +1,22 @@
 #include <iostream>
-#include <pybind11/numpy.h>
-#include <pybind11/pybind11.h>
-#include <pybind11/stl.h>
+#include <nanobind/nanobind.h>
+#include <nanobind/ndarray.h>
+#include <nanobind/stl/optional.h>
+#include <nanobind/stl/pair.h>
+#include <nanobind/stl/string.h>
 #include <sstream>
 
 #include "map.h"
 
-namespace py = pybind11;
-using namespace pybind11::literals;
+namespace nb = nanobind;
+using namespace nanobind::literals;
 using namespace mgl_wrapper;
 
-PYBIND11_MODULE(_pymgl, m) {
+NB_MODULE(_pymgl, m) {
     m.doc() = "MapLibre GL native static renderer";
 
-    py::class_<Map>(m, "Map")
-        .def(py::init<const std::string &,
+    nb::class_<Map>(m, "Map")
+        .def(nb::init<const std::string &,
                       const std::optional<uint32_t> &,
                       const std::optional<uint32_t> &,
                       const std::optional<float> &,
@@ -47,15 +49,15 @@ PYBIND11_MODULE(_pymgl, m) {
             provider : str, one of {'mapbox', 'maptiler', 'maplibre', None}
                 Map resource provider, if required for sources listed in the style.
         )pbdoc",
-             py::arg("style"),
-             py::arg("width")     = 256,
-             py::arg("height")    = 256,
-             py::arg("ratio")     = 1,
-             py::arg("longitude") = 0,
-             py::arg("latitude")  = 0,
-             py::arg("zoom")      = 0,
-             py::arg("token")     = py::none(),
-             py::arg("provider")  = py::none())
+             nb::arg("style"),
+             nb::arg("width")     = 256,
+             nb::arg("height")    = 256,
+             nb::arg("ratio")     = 1,
+             nb::arg("longitude") = 0,
+             nb::arg("latitude")  = 0,
+             nb::arg("zoom")      = 0,
+             nb::arg("token")     = nb::none(),
+             nb::arg("provider")  = nb::none())
         .def("__str__",
              [](Map &self) {
                  std::ostringstream os;
@@ -69,11 +71,29 @@ PYBIND11_MODULE(_pymgl, m) {
                  return os.str();
              })
         .def("__enter__", [&](Map &self) { return &self; })
-        .def("__exit__",
-             [&](Map &self, void *exc_type, void *exc_value, void *traceback) { self.release(); })
-        .def("addImage",
-             &Map::addImage,
-             R"pbdoc(
+        .def(
+            "__exit__",
+            [&](Map &self,
+                nb::object exc_type  = nb::none(),
+                nb::object exc_value = nb::none(),
+                nb::object traceback = nb::none()) { self.release(); },
+            nb::arg("exc_type").none(),
+            nb::arg("exc_value").none(),
+            nb::arg("traceback").none())
+        .def(
+            "addImage",
+            [](Map &self,
+               const std::string &name,
+               nb::bytes &image,
+               uint32_t width,
+               uint32_t height,
+               float ratio   = 1,
+               bool make_sdf = false) {
+                // convert bytes to std::string
+                const std::string imageStr(image.c_str(), image.size());
+                self.addImage(name, imageStr, width, height, ratio, make_sdf);
+            },
+            R"pbdoc(
             Add an image to the map to be used as an icon or pattern.
 
             Parameters
@@ -94,54 +114,43 @@ PYBIND11_MODULE(_pymgl, m) {
                 If True, image will be converted to an SDF format.  See
                 the Mapbox Style Specification for more information about
                 SDF images.
-        )pbdoc",
-             py::arg("name"),
-             py::arg("image"),
-             py::arg("width"),
-             py::arg("height"),
-             py::arg("ratio"),
-             py::arg("make_sdf"))
-        .def_property_readonly("bearing", &Map::getBearing)
-        .def_property_readonly("center", &Map::getCenter)
-        .def_property_readonly("pitch", &Map::getPitch)
-        .def_property_readonly("size", &Map::getSize)
-        .def_property_readonly("zoom", &Map::getZoom)
+        )pbdoc")
+
+        .def_prop_ro("bearing", &Map::getBearing)
+        .def_prop_ro("center", &Map::getCenter)
+        .def_prop_ro("pitch", &Map::getPitch)
+        .def_prop_ro("size", &Map::getSize)
+        .def_prop_ro("zoom", &Map::getZoom)
         .def(
             "renderPNG",
-            [](Map &self) -> py::bytes { return py::bytes(self.renderPNG()); },
-            py::call_guard<py::gil_scoped_release>(),
+            [](Map &self) -> nb::bytes {
+                const std::string png = self.renderPNG();
+                return nb::bytes(png.c_str(), png.size());
+            },
+            nb::call_guard<nb::gil_scoped_release>(),
             R"pbdoc(
                 Render the map to PNG bytes.
             )pbdoc")
         .def(
             "renderBuffer",
-            [](Map &self) -> py::array_t<uint8_t> {
-                std::pair<uint32_t, uint32_t> size = self.getSize();
-
+            [](Map &self) {
                 // always returns width * height * 4 (RGBA)
-                size_t bytes = size.first * size.second * 4;
+                std::pair<uint32_t, uint32_t> size = self.getSize();
+                size_t shape[1]                    = {size.first * size.second * 4};
 
                 // have to hold a reference until we are done
                 auto img = self.renderBuffer();
                 auto buf = img.get();
 
-                // Alternative copy version
-                // allocate array to receive the data, then copy in memory
-                //  auto result                = py::array_t<uint8_t>(bytes);
-                //  py::buffer_info result_buf = result.request();
-                //  auto ptr                   = static_cast<uint8_t *>(result_buf.ptr);
-                //  std::memcpy(ptr, buf, bytes);
-                //  return result;
-
-                // return a view of the data instead, using capsule to handle delete of underlying
-                // memory
-                // ref: https://github.com/pybind/pybind11/issues/323#issuecomment-575717041
-                auto capsule = py::capsule(buf, [](void *p) {
+                // return a view of the data instead, using capsule to handle
+                // delete of underlying memory
+                // (see: https://nanobind.readthedocs.io/en/latest/ndarray.html)
+                nb::capsule owner(buf, [](void *p) noexcept {
                     std::unique_ptr<uint8_t>(reinterpret_cast<uint8_t *>(p));
                 });
                 img.release();
-                auto arr = py::array(size.first * size.second * 4, buf, capsule);
-                return arr;
+
+                return nb::ndarray<nb::numpy, uint8_t, nb::shape<1>>(buf, 1, shape, owner);
             },
             R"pbdoc(
                 Render the map to a numpy array of uint8 pixel values.
@@ -156,7 +165,7 @@ PYBIND11_MODULE(_pymgl, m) {
                 bearing : float
                     Map bearing in degrees, between 0 and 360.
             )pbdoc",
-             py::arg("bearing"))
+             nb::arg("bearing"))
         .def("setBounds",
              &Map::setBounds,
              R"pbdoc(
@@ -170,11 +179,11 @@ PYBIND11_MODULE(_pymgl, m) {
                 ymax : float
                 padding : int, optional (default: 0)
             )pbdoc",
-             py::arg("xmin"),
-             py::arg("ymin"),
-             py::arg("xmax"),
-             py::arg("ymax"),
-             py::arg("padding") = 0)
+             nb::arg("xmin"),
+             nb::arg("ymin"),
+             nb::arg("xmax"),
+             nb::arg("ymax"),
+             nb::arg("padding") = 0)
         .def("setCenter",
              &Map::setCenter,
              R"pbdoc(
@@ -185,8 +194,8 @@ PYBIND11_MODULE(_pymgl, m) {
                 longitude : float
                 latitude : float
             )pbdoc",
-             py::arg("longitude"),
-             py::arg("latitude"))
+             nb::arg("longitude"),
+             nb::arg("latitude"))
         .def("setPitch",
              &Map::setPitch,
              R"pbdoc(
@@ -197,7 +206,7 @@ PYBIND11_MODULE(_pymgl, m) {
                 pitch : float
                     Map pitch in degrees, between 0 and 85.
             )pbdoc",
-             py::arg("pitch"))
+             nb::arg("pitch"))
         .def("setZoom",
              &Map::setZoom,
              R"pbdoc(
@@ -208,7 +217,7 @@ PYBIND11_MODULE(_pymgl, m) {
                 zoom : float
                     Map zoom between 0 and 24
             )pbdoc",
-             py::arg("zoom"))
+             nb::arg("zoom"))
         .def("setSize",
              &Map::setSize,
              R"pbdoc(
@@ -219,6 +228,6 @@ PYBIND11_MODULE(_pymgl, m) {
                 width : int
                 height : int
             )pbdoc",
-             py::arg("width"),
-             py::arg("height"));
+             nb::arg("width"),
+             nb::arg("height"));
 }

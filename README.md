@@ -414,16 +414,21 @@ apt install --no-install-recommends -y \
     libopengl0
 ```
 
-### PyBind11
+### nanobind
 
-PyBind11 is used to provide bindings for Python against a C++ class that wraps
+`nanonbind` is used to provide bindings for Python against a C++ class that wraps
 `maplibre-gl-native` for easier rendering operations.
 
-It is included here as a git submodule, per the [installation instructions](https://pybind11.readthedocs.io/en/stable/installing.html).
+It is included here as a git submodule, per the
+[installation instructions]().
 
 ```bash
-git submodule add -b stable https://github.com/pybind/pybind11.git vendor/pybind11
+git submodule add https://github.com/wjakob/nanobind vendor/nanobind
 ```
+
+Temporary fix: update `vendor/nanobind/nanobind-config.cmake` to comment out
+`COMMAND xcodebuild -version` and
+`COMMAND pkgutil --pkg-info=com.apple.pkg.CLTools_Executables | awk '/version:/ {print $2}'`
 
 ### Maplibre-gl-native
 
