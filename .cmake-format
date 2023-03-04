@@ -1,15 +1,4 @@
-# from: https://github.com/pybind/pybind11/blob/master/.cmake-format.yaml
-
-parse:
-  additional_commands:
-    pybind11_add_module:
-      flags:
-        - THIN_LTO
-        - MODULE
-        - SHARED
-        - NO_EXTRAS
-        - EXCLUDE_FROM_ALL
-        - SYSTEM
+# adapted from: https://github.com/pybind/pybind11/blob/master/.cmake-format.yaml
 
 format:
   line_width: 99
@@ -57,7 +46,7 @@ format:
 
   # Format keywords consistently as 'lower' or 'upper' case
   # unchanged is valid too
-  keyword_case: 'upper'
+  keyword_case: "upper"
 
   # A list of command names which should always be wrapped
   always_wrap: []

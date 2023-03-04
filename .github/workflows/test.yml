@@ -46,6 +46,8 @@ jobs:
               vendor/vector-tile \
               vendor/wagyu \
               vendor/zip-archive
+          cd ../nanobind && \
+            git submodule update --init --recursive
 
       - name: Set up Python
         uses: actions/setup-python@v4

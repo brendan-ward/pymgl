@@ -112,8 +112,8 @@ void Map::addImage(const std::string &name,
                    const std::string &image,
                    uint32_t width,
                    uint32_t height,
-                   float ratio,
-                   bool make_sdf) {
+                   float ratio   = 1.0,
+                   bool make_sdf = false) {
 
     if (width > 1024 || height > 1024) {
         throw std::invalid_argument("width and height must be less than 1024");

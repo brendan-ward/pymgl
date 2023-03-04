@@ -1,3 +1,6 @@
+import numpy as np
+import numpy.typing as npt
+
 class Map:
     def __init__(
         self,
@@ -83,7 +86,7 @@ class Map:
         """map zoom"""
     def renderPNG(self) -> bytes:
         """Render the map to PNG bytes."""
-    def renderBuffer(self):
+    def renderBuffer(self) -> np.ndarray[np.uint8]:
         """Render the map to a numpy array of uint8 pixel values."""
     def setBearing(self, bearing: float):
         """Set the bearing of the map.
