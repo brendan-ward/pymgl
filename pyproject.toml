@@ -24,7 +24,21 @@ requires = [
     "poetry-core>=1.0.0",
     "setuptools>=42",
     "wheel",
+    "versioneer[toml]==0.28",
+    # tomli is used by versioneer
+    "tomli; python_version < '3.11'",
     "ninja; sys_platform != 'win32'",
     "cmake>=3.12",
 ]
 build-backend = "poetry.core.masonry.api"
+
+[tool.versioneer]
+VCS = "git"
+style = "pep440"
+versionfile_source = "pymgl/_version.py"
+versionfile_build = "pymgl/_version.py"
+parentdir_prefix = "pymgl-"
+tag_prefix = "v"
+
+[tool.pytest.ini_options]
+testpaths = ["pymgl/tests"]
