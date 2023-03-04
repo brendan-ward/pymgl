@@ -5,6 +5,7 @@
 ### Improvements
 
 -   migrated bindings from `pybind11` to `nanobind` for smaller, faster bindings (#11)
+-   upgraded `maplibre-gl-native` to `02c196a`
 
 ## 0.3.1 (1/10/2023)
 
