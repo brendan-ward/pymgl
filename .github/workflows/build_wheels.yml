@@ -133,7 +133,7 @@ jobs:
         run: |
           sudo mkdir -p $BUILD_TEMP_DIR
           sudo chown -R $(id -u):$(id -g) $BUILD_TEMP_DIR
-          pip install -e .
+          pip install versioneer[toml]==0.28 tomli setuptools wheel
           python setup.py bdist_wheel
           echo "List wheels"
           ls ./dist
@@ -148,7 +148,7 @@ jobs:
         run: |
           sudo mkdir -p $BUILD_TEMP_DIR
           sudo chown -R $(id -u):$(id -g) $BUILD_TEMP_DIR
-          pip install -e .
+          pip install versioneer[toml]==0.28 tomli setuptools wheel
           python setup.py bdist_wheel
 
       - name: "Upload artifacts"

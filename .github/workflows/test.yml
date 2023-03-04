@@ -113,7 +113,8 @@ jobs:
         run: |
           sudo mkdir -p $BUILD_TEMP_DIR
           sudo chown -R $(id -u):$(id -g) $BUILD_TEMP_DIR
-          pip install -e .
+          pip install versioneer[toml]==0.28 tomli setuptools
+          python setup.py develop
 
       - name: Install test deps
         run: python -m pip install pytest Pillow numpy pixelmatch python-dotenv
