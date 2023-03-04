@@ -113,7 +113,7 @@ jobs:
         run: |
           sudo mkdir -p $BUILD_TEMP_DIR
           sudo chown -R $(id -u):$(id -g) $BUILD_TEMP_DIR
-          python setup.py develop
+          pip install -e .
 
       - name: Install test deps
         run: python -m pip install pytest Pillow numpy pixelmatch python-dotenv
