@@ -115,12 +115,26 @@ NB_MODULE(_pymgl, m) {
                 the Mapbox Style Specification for more information about
                 SDF images.
         )pbdoc")
-
         .def_prop_ro("bearing", &Map::getBearing)
         .def_prop_ro("center", &Map::getCenter)
         .def_prop_ro("pitch", &Map::getPitch)
         .def_prop_ro("size", &Map::getSize)
         .def_prop_ro("zoom", &Map::getZoom)
+        .def("getLayerVisibility",
+             &Map::getLayerVisibility,
+             R"pbdoc(
+                Get the visibility of a layer in the map
+
+                Parameters
+                ----------
+                id : str
+                    id of layer in map
+
+                Returns
+                -------
+                bool
+            )pbdoc",
+             nb::arg("id"))
         .def(
             "renderPNG",
             [](Map &self) -> nb::bytes {
@@ -196,6 +210,20 @@ NB_MODULE(_pymgl, m) {
             )pbdoc",
              nb::arg("longitude"),
              nb::arg("latitude"))
+        .def("setLayerVisibility",
+             &Map::setLayerVisibility,
+             R"pbdoc(
+                Set the visibility of a layer in the map
+
+                Parameters
+                ----------
+                id : str
+                    id of layer in map
+                visible : bool
+                    set to True to make layer visible
+            )pbdoc",
+             nb::arg("id"),
+             nb::arg("visible"))
         .def("setPitch",
              &Map::setPitch,
              R"pbdoc(

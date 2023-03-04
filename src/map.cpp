@@ -139,6 +139,14 @@ const std::pair<double, double> Map::getCenter() {
     return std::pair<double, double>(center.longitude(), center.latitude());
 }
 
+const bool Map::getLayerVisibility(const std::string &id) {
+    auto layer = map->getStyle().getLayer(id);
+    if (layer == nullptr) {
+        throw std::runtime_error(id + " is not a valid layer id in map");
+    }
+    return layer->getVisibility() == mbgl::style::VisibilityType::Visible;
+}
+
 const double Map::getPitch() { return map->getCameraOptions().pitch.value_or(0); }
 
 const std::pair<uint32_t, uint32_t> Map::getSize() {
@@ -166,6 +174,15 @@ void Map::setBounds(const double &xmin,
         {padding, padding, padding, padding},
         {},
         {}));
+}
+
+void Map::setLayerVisibility(const std::string &id, bool visible) {
+    auto layer = map->getStyle().getLayer(id);
+    if (layer == nullptr) {
+        throw std::runtime_error(id + " is not a valid layer id in map");
+    }
+    layer->setVisibility(visible ? mbgl::style::VisibilityType::Visible
+                                 : mbgl::style::VisibilityType::None);
 }
 
 void Map::setPitch(const double &pitch) {

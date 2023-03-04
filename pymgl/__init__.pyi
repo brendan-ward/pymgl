@@ -84,6 +84,18 @@ class Map:
     @property
     def zoom(self) -> float:
         """map zoom"""
+    def getLayerVisibility(self, id: str) -> bool:
+        """Get the visibility of a layer in the map
+
+        Parameters
+        ----------
+        id : str
+            id of layer in map
+
+        Returns
+        -------
+        bool
+        """
     def renderPNG(self) -> bytes:
         """Render the map to PNG bytes."""
     def renderBuffer(self) -> np.ndarray[np.uint8]:
@@ -108,6 +120,16 @@ class Map:
         xmax : float
         ymax : float
         padding : int, optional (default: 0)
+        """
+    def setLayerVisibility(self, id: str, visible: bool):
+        """Set the visibility of a layer in the map
+
+        Parameters
+        ----------
+        id : str
+            id of layer in map
+        visible : bool
+            set to True to make layer visible
         """
     def setPitch(self, pitch: float):
         """Set the pitch of the map.

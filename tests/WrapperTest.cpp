@@ -121,6 +121,21 @@ TEST(Wrapper, SetBounds) {
     EXPECT_NEAR(map.getZoom(), 8.492, 1e-2);
 }
 
+TEST(Wrapper, LayerVisibility) {
+    Map map = Map(read_style("example-style-geojson.json"), 10, 10);
+    map.setLayerVisibility("box", true);
+    EXPECT_EQ(map.getLayerVisibility("box"), true);
+
+    map.setLayerVisibility("box", false);
+    EXPECT_EQ(map.getLayerVisibility("box"), false);
+
+    // empty style has no layers to set; should throw errors
+    Map map2 = Map(read_style("example-style-empty.json"), 10, 10);
+    EXPECT_THROW(map2.setLayerVisibility("any_layer", true), std::runtime_error);
+    EXPECT_THROW(map2.setLayerVisibility("any_layer", false), std::runtime_error);
+    EXPECT_THROW(map2.getLayerVisibility("any_layer"), std::runtime_error);
+}
+
 TEST(Wrapper, SetPitch) {
     const string style = read_style("example-style-empty.json");
 

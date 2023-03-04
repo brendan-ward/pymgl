@@ -128,3 +128,12 @@ def test_set_pitch_invalid(empty_style):
 def test_invalid_provider(empty_style):
     with pytest.raises(ValueError, match="invalid provider: foo"):
         Map(empty_style, provider="foo")
+
+
+@pytest.mark.parametrize("visibility", [True, False])
+def test_layer_visibility_no_layers(empty_style, visibility):
+    with pytest.raises(RuntimeError, match="any_layer is not a valid layer id in map"):
+        Map(empty_style).getLayerVisibility("any_layer")
+
+    with pytest.raises(RuntimeError, match="any_layer is not a valid layer id in map"):
+        Map(empty_style).setLayerVisibility("any_layer", visibility)

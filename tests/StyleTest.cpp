@@ -291,3 +291,28 @@ TEST(Style, BadGlyphs) {
 
     EXPECT_ANY_THROW(map.renderPNG());
 }
+
+TEST(Style, LayerVisibility) {
+    const string test  = "example-style-geojson-hidden-box";
+    const string style = read_style(test + ".json");
+
+    Map map = Map(style, 100, 100, 1);
+    map.setBounds(-125, 37.5, -115, 42.5);
+    // toggle visible box hidden
+    map.setLayerVisibility("box", false);
+    EXPECT_EQ(map.getLayerVisibility("box"), false);
+
+    // toggle hidden box visible
+    map.setLayerVisibility("box2", true);
+    EXPECT_EQ(map.getLayerVisibility("box2"), true);
+
+    auto img = map.renderPNG();
+
+    const string img_filename = test + ".png";
+
+    // to write out expected image, uncomment
+    // write_test_image(img, img_filename, true);
+
+    write_test_image(img, img_filename, false);
+    EXPECT_TRUE(image_matches(img_filename, 10));
+}
