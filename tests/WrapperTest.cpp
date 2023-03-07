@@ -3,6 +3,7 @@
 #include <string>
 
 #include <gtest/gtest.h>
+#include <mbgl/util/rapidjson.hpp>
 
 #include "map.h"
 #include "util.h"
@@ -148,9 +149,9 @@ TEST(Wrapper, LayerFilter) {
 TEST(Wrapper, LayerJSON) {
     Map map = Map(read_style("example-style-geojson.json"), 10, 10);
 
-    auto actual = map.getLayerJSON("box").value();
+    auto actualJSON = map.getLayerJSON("box").value();
 
-    std::string expected = R"""({
+    const std::string expectedJSON = R"""({
   "source": "geojson",
   "type": "fill",
   "paint": {
@@ -160,18 +161,19 @@ TEST(Wrapper, LayerJSON) {
   "id": "box"
 })""";
 
-    // strip spaces / newlines before compare
-    actual.erase(std::remove_if(actual.begin(),
-                                actual.end(),
-                                [](unsigned char x) { return std::isspace(x); }),
-                 actual.end());
+    // WARNING: order of keys varies between platforms, so we have to parse the
+    // JSON here and compare individual fields
+    mbgl::JSDocument actual;
+    actual.Parse(actualJSON.c_str());
 
-    expected.erase(std::remove_if(expected.begin(),
-                                  expected.end(),
-                                  [](unsigned char x) { return std::isspace(x); }),
-                   expected.end());
+    mbgl::JSDocument expected;
+    expected.Parse(expectedJSON.c_str());
 
-    EXPECT_EQ(actual, expected);
+    EXPECT_EQ(actual["id"], expected["id"]);
+    EXPECT_EQ(actual["source"], expected["source"]);
+    EXPECT_EQ(actual["type"], expected["type"]);
+    EXPECT_EQ(actual["paint"]["fill-color"], expected["paint"]["fill-color"]);
+    EXPECT_EQ(actual["paint"]["fill-opacity"], expected["paint"]["fill-opacity"]);
 
     // empty style has no layers; should throw errors
     Map map2 = Map(read_style("example-style-empty.json"), 10, 10);

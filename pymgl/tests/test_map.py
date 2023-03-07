@@ -1,3 +1,5 @@
+import json
+
 import pytest
 import numpy as np
 
@@ -155,56 +157,30 @@ def test_layer_json_no_layers(empty_style):
 
 def test_layer_json():
     map = Map(read_style("example-style-geojson.json"))
+    actual = json.loads(map.getLayerJSON("box"))
 
-    assert (
-        map.getLayerJSON("box")
-        == """{
-  "source": "geojson",
-  "type": "fill",
-  "paint": {
-    "fill-opacity": 0.5,
-    "fill-color": ["rgba", 255, 0, 0, 1]
-  },
-  "id": "box"
-}"""
-    )
+    expected = {
+        "source": "geojson",
+        "type": "fill",
+        "paint": {"fill-opacity": 0.5, "fill-color": ["rgba", 255, 0, 0, 1]},
+        "id": "box",
+    }
+
+    assert actual["id"] == expected["id"]
+    assert actual["source"] == expected["source"]
+    assert actual["type"] == expected["type"]
+    assert actual["paint"]["fill-color"] == expected["paint"]["fill-color"]
+    assert actual["paint"]["fill-opacity"] == expected["paint"]["fill-opacity"]
 
     map.setLayerVisibility("box", False)
+    actual = json.loads(map.getLayerJSON("box"))
 
-    assert (
-        map.getLayerJSON("box")
-        == """{
-  "layout": {
-    "visibility": "none"
-  },
-  "source": "geojson",
-  "type": "fill",
-  "paint": {
-    "fill-opacity": 0.5,
-    "fill-color": ["rgba", 255, 0, 0, 1]
-  },
-  "id": "box"
-}"""
-    )
+    assert actual["layout"] == {"visibility": "none"}
 
     map.setLayerFilter("box", """["==", "id", 2]""")
+    actual = json.loads(map.getLayerJSON("box"))
 
-    assert (
-        map.getLayerJSON("box")
-        == """{
-  "paint": {
-    "fill-opacity": 0.5,
-    "fill-color": ["rgba", 255, 0, 0, 1]
-  },
-  "filter": ["==", "id", 2],
-  "id": "box",
-  "layout": {
-    "visibility": "none"
-  },
-  "source": "geojson",
-  "type": "fill"
-}"""
-    )
+    assert actual["filter"] == ["==", "id", 2]
 
 
 def test_list_layers():
