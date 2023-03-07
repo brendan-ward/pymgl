@@ -1,4 +1,6 @@
+#include <algorithm>
 #include <iostream>
+#include <string>
 
 #include <gtest/gtest.h>
 
@@ -146,7 +148,9 @@ TEST(Wrapper, LayerFilter) {
 TEST(Wrapper, LayerJSON) {
     Map map = Map(read_style("example-style-geojson.json"), 10, 10);
 
-    auto expected = R"""({
+    auto actual = map.getLayerJSON("box").value();
+
+    std::string expected = R"""({
   "source": "geojson",
   "type": "fill",
   "paint": {
@@ -155,7 +159,19 @@ TEST(Wrapper, LayerJSON) {
   },
   "id": "box"
 })""";
-    EXPECT_EQ(map.getLayerJSON("box"), expected);
+
+    // strip spaces / newlines before compare
+    actual.erase(std::remove_if(actual.begin(),
+                                actual.end(),
+                                [](unsigned char x) { return std::isspace(x); }),
+                 actual.end());
+
+    expected.erase(std::remove_if(expected.begin(),
+                                  expected.end(),
+                                  [](unsigned char x) { return std::isspace(x); }),
+                   expected.end());
+
+    EXPECT_EQ(actual, expected);
 
     // empty style has no layers; should throw errors
     Map map2 = Map(read_style("example-style-empty.json"), 10, 10);

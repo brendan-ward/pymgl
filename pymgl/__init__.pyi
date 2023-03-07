@@ -120,6 +120,20 @@ class Map:
         -------
         bool
         """
+    def listLayers(self) -> list:
+        """List layer ids in the map's style
+
+        Returns
+        -------
+        list
+        """
+    def listSources(self) -> list:
+        """List source ids in the map's style
+
+        Returns
+        -------
+        list
+        """
     def renderPNG(self) -> bytes:
         """Render the map to PNG bytes."""
     def renderBuffer(self) -> np.ndarray[np.uint8]:
