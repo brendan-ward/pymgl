@@ -250,3 +250,24 @@ TEST(Wrapper, MultipleMapRenders) {
         Map(style, 255, 255).renderPNG();
     }
 }
+
+TEST(Wrapper, ListLayers) {
+    auto layers = Map(read_style("example-style-geojson.json"), 10, 10).listLayers();
+    EXPECT_EQ(layers.size(), 2);
+    EXPECT_EQ(layers[0], "box");
+    EXPECT_EQ(layers[1], "box-outline");
+
+    EXPECT_EQ(Map(read_style("example-style-empty.json"), 10, 10).listLayers().size(), 0);
+}
+
+TEST(Wrapper, ListSources) {
+    auto sources = Map(read_style("example-style-geojson.json"), 10, 10).listSources();
+    EXPECT_EQ(sources.size(), 1);
+    EXPECT_EQ(sources[0], "geojson");
+
+    EXPECT_EQ(Map(read_style("example-style-empty.json"), 10, 10).listSources().size(), 0);
+
+    sources = Map(read_style("example-style-mbtiles-vector-source.json"), 10, 10).listSources();
+    EXPECT_EQ(sources.size(), 1);
+    EXPECT_EQ(sources[0], "land");
+}

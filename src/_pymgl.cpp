@@ -4,6 +4,7 @@
 #include <nanobind/stl/optional.h>
 #include <nanobind/stl/pair.h>
 #include <nanobind/stl/string.h>
+#include <nanobind/stl/vector.h>
 #include <sstream>
 
 #include "map.h"
@@ -165,6 +166,8 @@ NB_MODULE(_pymgl, m) {
                 bool
             )pbdoc",
              nb::arg("id"))
+        .def("listLayers", &Map::listLayers)
+        .def("listSources", &Map::listSources)
         .def(
             "renderPNG",
             [](Map &self) -> nb::bytes {

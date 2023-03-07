@@ -205,3 +205,22 @@ def test_layer_json():
   "type": "fill"
 }"""
     )
+
+
+def test_list_layers():
+    map = Map(read_style("example-style-geojson.json"))
+    assert map.listLayers() == ["box", "box-outline"]
+
+    map = Map(read_style("example-style-empty.json"))
+    assert map.listLayers() == []
+
+
+def test_list_sources():
+    map = Map(read_style("example-style-geojson.json"))
+    assert map.listSources() == ["geojson"]
+
+    map = Map(read_style("example-style-empty.json"))
+    assert map.listSources() == []
+
+    map = Map(read_style("example-style-mbtiles-vector-source.json"))
+    assert map.listSources() == ["land"]

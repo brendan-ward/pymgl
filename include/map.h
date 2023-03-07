@@ -38,6 +38,9 @@ public:
     const std::pair<uint32_t, uint32_t> getSize();
     const double getZoom();
 
+    const std::vector<std::string> listLayers();
+    const std::vector<std::string> listSources();
+
     void addImage(const std::string &name,
                   const std::string &image,
                   uint32_t width,

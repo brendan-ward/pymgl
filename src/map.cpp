@@ -236,6 +236,44 @@ void Map::setBearing(const double &bearing) {
     map->jumpTo(mbgl::CameraOptions().withBearing(bearing));
 }
 
+const std::vector<std::string> Map::listLayers() {
+    auto layers = map->getStyle().getLayers();
+
+    std::vector<std::string> layerIds;
+    layerIds.reserve(layers.size());
+
+    for (auto &layer : layers) {
+        auto layerId = layer->getID();
+
+        // ignore builtin layer
+        if (layerId == "com.mapbox.annotations.points") {
+            continue;
+        }
+
+        layerIds.push_back(layerId);
+    }
+    return layerIds;
+}
+
+const std::vector<std::string> Map::listSources() {
+    auto sources = map->getStyle().getSources();
+
+    std::vector<std::string> sourceIds;
+    sourceIds.reserve(sources.size());
+
+    for (auto &source : sources) {
+        auto sourceId = source->getID();
+
+        // ignore builtin source
+        if (sourceId == "com.mapbox.annotations") {
+            continue;
+        }
+
+        sourceIds.push_back(sourceId);
+    }
+    return sourceIds;
+}
+
 void Map::setCenter(const double &longitude, const double &latitude) {
     map->jumpTo(mbgl::CameraOptions().withCenter(mbgl::LatLng{latitude, longitude}));
 }

@@ -6,6 +6,10 @@
 
 -   migrated bindings from `pybind11` to `nanobind` for smaller, faster bindings (#11)
 -   upgraded `maplibre-gl-native` to `02c196a`
+-   added `getLayerFilter` to retrieve a layer's filter and and `setLayerFilter` to set it
+-   added `getLayerVisibility` to retrieve a layer's visibility and `setLayerVisibility` to set it
+-   added `getLayerJSON` to serialize a layer's properties to JSON
+-   added `listLayers` to list layers in the map's style, and `listSources` to list sources
 
 ## 0.3.1 (1/10/2023)
 
