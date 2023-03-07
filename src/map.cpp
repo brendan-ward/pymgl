@@ -199,6 +199,22 @@ const std::optional<std::string> Map::getLayerFilter(const std::string &id) {
     return buffer.GetString();
 }
 
+const std::optional<std::string> Map::getLayerJSON(const std::string &id) {
+    auto layer = map->getStyle().getLayer(id);
+    if (layer == nullptr) {
+        throw std::runtime_error(id + " is not a valid layer id in map");
+    }
+
+    // adapted from expression_test_parser.cpp
+    rapidjson::StringBuffer buffer;
+    rapidjson::PrettyWriter<rapidjson::StringBuffer> writer(buffer);
+    writer.SetFormatOptions(rapidjson::kFormatSingleLineArray);
+    writer.SetIndent(' ', 2);
+    writeJSON(writer, layer->serialize());
+
+    return buffer.GetString();
+}
+
 const bool Map::getLayerVisibility(const std::string &id) {
     auto layer = map->getStyle().getLayer(id);
     if (layer == nullptr) {

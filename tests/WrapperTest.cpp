@@ -143,6 +143,25 @@ TEST(Wrapper, LayerFilter) {
                  std::runtime_error);
 }
 
+TEST(Wrapper, LayerJSON) {
+    Map map = Map(read_style("example-style-geojson.json"), 10, 10);
+
+    auto expected = R"""({
+  "source": "geojson",
+  "type": "fill",
+  "paint": {
+    "fill-opacity": 0.5,
+    "fill-color": ["rgba", 255, 0, 0, 1]
+  },
+  "id": "box"
+})""";
+    EXPECT_EQ(map.getLayerJSON("box"), expected);
+
+    // empty style has no layers; should throw errors
+    Map map2 = Map(read_style("example-style-empty.json"), 10, 10);
+    EXPECT_THROW(map2.getLayerJSON("any_layer"), std::runtime_error);
+}
+
 TEST(Wrapper, LayerVisibility) {
     Map map = Map(read_style("example-style-geojson.json"), 10, 10);
     map.setLayerVisibility("box", true);

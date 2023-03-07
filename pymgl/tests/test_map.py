@@ -3,7 +3,7 @@ import numpy as np
 
 from pymgl import Map
 
-from .common import MAPBOX_TOKEN
+from .common import MAPBOX_TOKEN, read_style
 
 
 def test_default_map(empty_style):
@@ -146,3 +146,62 @@ def test_layer_filter_no_layers(empty_style, filter):
 
     with pytest.raises(RuntimeError, match="any_layer is not a valid layer id in map"):
         Map(empty_style).setLayerFilter("any_layer", filter)
+
+
+def test_layer_json_no_layers(empty_style):
+    with pytest.raises(RuntimeError, match="any_layer is not a valid layer id in map"):
+        Map(empty_style).getLayerJSON("any_layer")
+
+
+def test_layer_json():
+    map = Map(read_style("example-style-geojson.json"))
+
+    assert (
+        map.getLayerJSON("box")
+        == """{
+  "source": "geojson",
+  "type": "fill",
+  "paint": {
+    "fill-opacity": 0.5,
+    "fill-color": ["rgba", 255, 0, 0, 1]
+  },
+  "id": "box"
+}"""
+    )
+
+    map.setLayerVisibility("box", False)
+
+    assert (
+        map.getLayerJSON("box")
+        == """{
+  "layout": {
+    "visibility": "none"
+  },
+  "source": "geojson",
+  "type": "fill",
+  "paint": {
+    "fill-opacity": 0.5,
+    "fill-color": ["rgba", 255, 0, 0, 1]
+  },
+  "id": "box"
+}"""
+    )
+
+    map.setLayerFilter("box", """["==", "id", 2]""")
+
+    assert (
+        map.getLayerJSON("box")
+        == """{
+  "paint": {
+    "fill-opacity": 0.5,
+    "fill-color": ["rgba", 255, 0, 0, 1]
+  },
+  "filter": ["==", "id", 2],
+  "id": "box",
+  "layout": {
+    "visibility": "none"
+  },
+  "source": "geojson",
+  "type": "fill"
+}"""
+    )

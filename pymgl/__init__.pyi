@@ -96,6 +96,18 @@ class Map:
         -------
         str or None
         """
+    def getLayerJSON(self, id: str) -> str:
+        """Get JSON that describes a layer
+
+        Parameters
+        ----------
+        id : str
+            id of layer in map
+
+        Returns
+        -------
+        str
+        """
     def getLayerVisibility(self, id: str) -> bool:
         """Get the visibility of a layer in the map
 

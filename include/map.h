@@ -32,6 +32,7 @@ public:
     const double getBearing();
     const std::pair<double, double> getCenter();
     const std::optional<std::string> getLayerFilter(const std::string &id);
+    const std::optional<std::string> getLayerJSON(const std::string &id);
     const bool getLayerVisibility(const std::string &id);
     const double getPitch();
     const std::pair<uint32_t, uint32_t> getSize();

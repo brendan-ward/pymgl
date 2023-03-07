@@ -135,6 +135,21 @@ NB_MODULE(_pymgl, m) {
                 str or None
             )pbdoc",
              nb::arg("id"))
+        .def("getLayerJSON",
+             &Map::getLayerJSON,
+             R"pbdoc(
+                Get JSON that describes a layer
+
+                Parameters
+                ----------
+                id : str
+                    id of layer in map
+
+                Returns
+                -------
+                str
+            )pbdoc",
+             nb::arg("id"))
         .def("getLayerVisibility",
              &Map::getLayerVisibility,
              R"pbdoc(
