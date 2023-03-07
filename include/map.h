@@ -31,9 +31,15 @@ public:
 
     const double getBearing();
     const std::pair<double, double> getCenter();
+    const std::optional<std::string> getLayerFilter(const std::string &id);
+    const std::optional<std::string> getLayerJSON(const std::string &id);
+    const bool getLayerVisibility(const std::string &id);
     const double getPitch();
     const std::pair<uint32_t, uint32_t> getSize();
     const double getZoom();
+
+    const std::vector<std::string> listLayers();
+    const std::vector<std::string> listSources();
 
     void addImage(const std::string &name,
                   const std::string &image,
@@ -49,6 +55,8 @@ public:
                    const double &xmax,
                    const double &ymax,
                    const double &padding = 0);
+    void setLayerFilter(const std::string &id, const std::optional<std::string> &expression);
+    void setLayerVisibility(const std::string &id, bool visible);
     void setPitch(const double &pitch);
     void setZoom(const double &zoom);
     void setSize(const uint32_t &width, const uint32_t &height);

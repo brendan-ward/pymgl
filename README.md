@@ -161,6 +161,10 @@ map.setSize(width, height)
 map.setBearing(bearing)  # map bearing in degrees
 
 map.setPitch(pitch)  # map pitch in degrees
+
+map.setLayerFilter(layerId, filterJSON or None)
+
+map.setLayerVisibility(layerId, True / False)
 ```
 
 You can retrieve these values using attributes, if needed:
@@ -175,6 +179,16 @@ map.zoom
 map.bearing
 
 map.pitch
+```
+
+You can also retrive information about the map's style or a specific layer:
+
+```Python
+map.listLayers()  # [<layerId1>, ...]
+
+map.listSources()  # [<sourceId1>, ...]
+
+map.getLayerJSON()  # returns JSON describing layer
 ```
 
 You can auto-fit the map to bounds instead of using center longitude / lantitude

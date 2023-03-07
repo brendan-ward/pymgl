@@ -1,9 +1,11 @@
+import json
+
 import pytest
 import numpy as np
 
 from pymgl import Map
 
-from .common import MAPBOX_TOKEN
+from .common import MAPBOX_TOKEN, read_style
 
 
 def test_default_map(empty_style):
@@ -128,3 +130,73 @@ def test_set_pitch_invalid(empty_style):
 def test_invalid_provider(empty_style):
     with pytest.raises(ValueError, match="invalid provider: foo"):
         Map(empty_style, provider="foo")
+
+
+@pytest.mark.parametrize("visibility", [True, False])
+def test_layer_visibility_no_layers(empty_style, visibility):
+    with pytest.raises(RuntimeError, match="any_layer is not a valid layer id in map"):
+        Map(empty_style).getLayerVisibility("any_layer")
+
+    with pytest.raises(RuntimeError, match="any_layer is not a valid layer id in map"):
+        Map(empty_style).setLayerVisibility("any_layer", visibility)
+
+
+@pytest.mark.parametrize("filter", ["""["==", "foo", "bar"]""", "", None])
+def test_layer_filter_no_layers(empty_style, filter):
+    with pytest.raises(RuntimeError, match="any_layer is not a valid layer id in map"):
+        Map(empty_style).getLayerFilter("any_layer")
+
+    with pytest.raises(RuntimeError, match="any_layer is not a valid layer id in map"):
+        Map(empty_style).setLayerFilter("any_layer", filter)
+
+
+def test_layer_json_no_layers(empty_style):
+    with pytest.raises(RuntimeError, match="any_layer is not a valid layer id in map"):
+        Map(empty_style).getLayerJSON("any_layer")
+
+
+def test_layer_json():
+    map = Map(read_style("example-style-geojson.json"))
+    actual = json.loads(map.getLayerJSON("box"))
+
+    expected = {
+        "source": "geojson",
+        "type": "fill",
+        "paint": {"fill-opacity": 0.5, "fill-color": ["rgba", 255, 0, 0, 1]},
+        "id": "box",
+    }
+
+    assert actual["id"] == expected["id"]
+    assert actual["source"] == expected["source"]
+    assert actual["type"] == expected["type"]
+    assert actual["paint"]["fill-color"] == expected["paint"]["fill-color"]
+    assert actual["paint"]["fill-opacity"] == expected["paint"]["fill-opacity"]
+
+    map.setLayerVisibility("box", False)
+    actual = json.loads(map.getLayerJSON("box"))
+
+    assert actual["layout"] == {"visibility": "none"}
+
+    map.setLayerFilter("box", """["==", "id", 2]""")
+    actual = json.loads(map.getLayerJSON("box"))
+
+    assert actual["filter"] == ["==", "id", 2]
+
+
+def test_list_layers():
+    map = Map(read_style("example-style-geojson.json"))
+    assert map.listLayers() == ["box", "box-outline"]
+
+    map = Map(read_style("example-style-empty.json"))
+    assert map.listLayers() == []
+
+
+def test_list_sources():
+    map = Map(read_style("example-style-geojson.json"))
+    assert map.listSources() == ["geojson"]
+
+    map = Map(read_style("example-style-empty.json"))
+    assert map.listSources() == []
+
+    map = Map(read_style("example-style-mbtiles-vector-source.json"))
+    assert map.listSources() == ["land"]

@@ -1,4 +1,4 @@
-### C++ unit tests
+# ## C++ unit tests
 
 # Add GoogleTest
 include_directories(
@@ -29,14 +29,16 @@ target_link_libraries(
     pymgl_test PRIVATE
     gtest_main
     Mapbox::Base::pixelmatch-cpp
+    Mapbox::Base::Extras::rapidjson
     mgl_wrapper
 )
 
 file(GLOB_RECURSE _testfiles ${PROJECT_SOURCE_DIR}/tests/*Test.cpp CONFIGURE_DEPEND)
+
 foreach(_testfile ${_testfiles})
     string(REPLACE ${PROJECT_SOURCE_DIR}/ "" _testname ${_testfile})
     string(REPLACE "Test.cpp" "" _testname ${_testname})
-    string(REPLACE "/" "-" _cmake_testname  ${_testname})
+    string(REPLACE "/" "-" _cmake_testname ${_testname})
     string(REPLACE "/" "::" _testname ${_testname})
     add_test(NAME unit-${_cmake_testname} COMMAND pymgl_test ${_testname})
 endforeach()

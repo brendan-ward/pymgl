@@ -1,6 +1,9 @@
+#include <algorithm>
 #include <iostream>
+#include <string>
 
 #include <gtest/gtest.h>
+#include <mbgl/util/rapidjson.hpp>
 
 #include "map.h"
 #include "util.h"
@@ -121,6 +124,77 @@ TEST(Wrapper, SetBounds) {
     EXPECT_NEAR(map.getZoom(), 8.492, 1e-2);
 }
 
+TEST(Wrapper, LayerFilter) {
+    Map map = Map(read_style("example-style-geojson.json"), 10, 10);
+    map.setLayerFilter("box", R"(["==", "foo", "bar"])");
+
+    EXPECT_TRUE(map.getLayerFilter("box").has_value());
+    EXPECT_EQ(map.getLayerFilter("box").value(), R"(["==", "foo", "bar"])");
+
+    map.setLayerFilter("box", "");
+    EXPECT_FALSE(map.getLayerFilter("box").has_value());
+
+    map.setLayerFilter("box", std::optional<std::string>());
+    EXPECT_FALSE(map.getLayerFilter("box").has_value());
+
+    // empty style has no layers to set; should throw errors
+    Map map2 = Map(read_style("example-style-empty.json"), 10, 10);
+    EXPECT_THROW(map2.getLayerFilter("any_layer"), std::runtime_error);
+    EXPECT_THROW(map2.setLayerFilter("any_layer", R"(["==", "foo", "bar"])"), std::runtime_error);
+    EXPECT_THROW(map2.setLayerFilter("any_layer", ""), std::runtime_error);
+    EXPECT_THROW(map2.setLayerFilter("any_layer", std::optional<std::string>()),
+                 std::runtime_error);
+}
+
+TEST(Wrapper, LayerJSON) {
+    Map map = Map(read_style("example-style-geojson.json"), 10, 10);
+
+    auto actualJSON = map.getLayerJSON("box").value();
+
+    const std::string expectedJSON = R"""({
+  "source": "geojson",
+  "type": "fill",
+  "paint": {
+    "fill-opacity": 0.5,
+    "fill-color": ["rgba", 255, 0, 0, 1]
+  },
+  "id": "box"
+})""";
+
+    // WARNING: order of keys varies between platforms, so we have to parse the
+    // JSON here and compare individual fields
+    mbgl::JSDocument actual;
+    actual.Parse(actualJSON.c_str());
+
+    mbgl::JSDocument expected;
+    expected.Parse(expectedJSON.c_str());
+
+    EXPECT_EQ(actual["id"], expected["id"]);
+    EXPECT_EQ(actual["source"], expected["source"]);
+    EXPECT_EQ(actual["type"], expected["type"]);
+    EXPECT_EQ(actual["paint"]["fill-color"], expected["paint"]["fill-color"]);
+    EXPECT_EQ(actual["paint"]["fill-opacity"], expected["paint"]["fill-opacity"]);
+
+    // empty style has no layers; should throw errors
+    Map map2 = Map(read_style("example-style-empty.json"), 10, 10);
+    EXPECT_THROW(map2.getLayerJSON("any_layer"), std::runtime_error);
+}
+
+TEST(Wrapper, LayerVisibility) {
+    Map map = Map(read_style("example-style-geojson.json"), 10, 10);
+    map.setLayerVisibility("box", true);
+    EXPECT_EQ(map.getLayerVisibility("box"), true);
+
+    map.setLayerVisibility("box", false);
+    EXPECT_EQ(map.getLayerVisibility("box"), false);
+
+    // empty style has no layers to set; should throw errors
+    Map map2 = Map(read_style("example-style-empty.json"), 10, 10);
+    EXPECT_THROW(map2.setLayerVisibility("any_layer", true), std::runtime_error);
+    EXPECT_THROW(map2.setLayerVisibility("any_layer", false), std::runtime_error);
+    EXPECT_THROW(map2.getLayerVisibility("any_layer"), std::runtime_error);
+}
+
 TEST(Wrapper, SetPitch) {
     const string style = read_style("example-style-empty.json");
 
@@ -193,4 +267,25 @@ TEST(Wrapper, MultipleMapRenders) {
     for (int i = 0; i < 5; i++) {
         Map(style, 255, 255).renderPNG();
     }
+}
+
+TEST(Wrapper, ListLayers) {
+    auto layers = Map(read_style("example-style-geojson.json"), 10, 10).listLayers();
+    EXPECT_EQ(layers.size(), 2);
+    EXPECT_EQ(layers[0], "box");
+    EXPECT_EQ(layers[1], "box-outline");
+
+    EXPECT_EQ(Map(read_style("example-style-empty.json"), 10, 10).listLayers().size(), 0);
+}
+
+TEST(Wrapper, ListSources) {
+    auto sources = Map(read_style("example-style-geojson.json"), 10, 10).listSources();
+    EXPECT_EQ(sources.size(), 1);
+    EXPECT_EQ(sources[0], "geojson");
+
+    EXPECT_EQ(Map(read_style("example-style-empty.json"), 10, 10).listSources().size(), 0);
+
+    sources = Map(read_style("example-style-mbtiles-vector-source.json"), 10, 10).listSources();
+    EXPECT_EQ(sources.size(), 1);
+    EXPECT_EQ(sources[0], "land");
 }

@@ -204,3 +204,34 @@ def test_slow_tile_server(poorconn_http_server, tmp_path, capsys):
     with pytest.raises(RuntimeError, match="request timed out"):
         Map(read_style("example-style-bad-remote.json")).renderPNG()
         # NOTE: this emits errors from poorconn
+
+
+def test_layer_visibility():
+    test = "example-style-geojson-hidden-box"
+    map = Map(read_style(f"{test}.json"), 100, 100)
+    map.setBounds(-125, 37.5, -115, 42.5)
+
+    map.setLayerVisibility("box", False)
+    assert map.getLayerVisibility("box") == False
+
+    map.setLayerVisibility("box2", True)
+    assert map.getLayerVisibility("box2") == True
+
+    img_data = map.renderPNG()
+
+    assert image_matches(img_data, f"{test}.png")
+
+
+def test_layer_filter():
+    test = "example-style-geojson-filter"
+    map = Map(read_style(f"{test}.json"), 100, 100)
+    map.setBounds(-125, 37.5, -115, 42.5)
+
+    assert map.getLayerFilter("box") is None
+
+    map.setLayerFilter("box", """["==", "id", 2]""")
+    assert map.getLayerFilter("box") == """["==", "id", 2]"""
+
+    img_data = map.renderPNG()
+
+    assert image_matches(img_data, f"{test}.png")
