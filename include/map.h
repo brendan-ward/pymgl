@@ -31,6 +31,7 @@ public:
 
     const double getBearing();
     const std::pair<double, double> getCenter();
+    const std::optional<std::string> getLayerFilter(const std::string &id);
     const bool getLayerVisibility(const std::string &id);
     const double getPitch();
     const std::pair<uint32_t, uint32_t> getSize();
@@ -50,6 +51,7 @@ public:
                    const double &xmax,
                    const double &ymax,
                    const double &padding = 0);
+    void setLayerFilter(const std::string &id, const std::optional<std::string> &expression);
     void setLayerVisibility(const std::string &id, bool visible);
     void setPitch(const double &pitch);
     void setZoom(const double &zoom);

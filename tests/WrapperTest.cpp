@@ -121,6 +121,28 @@ TEST(Wrapper, SetBounds) {
     EXPECT_NEAR(map.getZoom(), 8.492, 1e-2);
 }
 
+TEST(Wrapper, LayerFilter) {
+    Map map = Map(read_style("example-style-geojson.json"), 10, 10);
+    map.setLayerFilter("box", R"(["==", "foo", "bar"])");
+
+    EXPECT_TRUE(map.getLayerFilter("box").has_value());
+    EXPECT_EQ(map.getLayerFilter("box").value(), R"(["==", "foo", "bar"])");
+
+    map.setLayerFilter("box", "");
+    EXPECT_FALSE(map.getLayerFilter("box").has_value());
+
+    map.setLayerFilter("box", std::optional<std::string>());
+    EXPECT_FALSE(map.getLayerFilter("box").has_value());
+
+    // empty style has no layers to set; should throw errors
+    Map map2 = Map(read_style("example-style-empty.json"), 10, 10);
+    EXPECT_THROW(map2.getLayerFilter("any_layer"), std::runtime_error);
+    EXPECT_THROW(map2.setLayerFilter("any_layer", R"(["==", "foo", "bar"])"), std::runtime_error);
+    EXPECT_THROW(map2.setLayerFilter("any_layer", ""), std::runtime_error);
+    EXPECT_THROW(map2.setLayerFilter("any_layer", std::optional<std::string>()),
+                 std::runtime_error);
+}
+
 TEST(Wrapper, LayerVisibility) {
     Map map = Map(read_style("example-style-geojson.json"), 10, 10);
     map.setLayerVisibility("box", true);

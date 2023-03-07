@@ -220,3 +220,18 @@ def test_layer_visibility():
     img_data = map.renderPNG()
 
     assert image_matches(img_data, f"{test}.png")
+
+
+def test_layer_filter():
+    test = "example-style-geojson-filter"
+    map = Map(read_style(f"{test}.json"), 100, 100)
+    map.setBounds(-125, 37.5, -115, 42.5)
+
+    assert map.getLayerFilter("box") is None
+
+    map.setLayerFilter("box", """["==", "id", 2]""")
+    assert map.getLayerFilter("box") == """["==", "id", 2]"""
+
+    img_data = map.renderPNG()
+
+    assert image_matches(img_data, f"{test}.png")

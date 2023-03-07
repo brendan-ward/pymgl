@@ -137,3 +137,12 @@ def test_layer_visibility_no_layers(empty_style, visibility):
 
     with pytest.raises(RuntimeError, match="any_layer is not a valid layer id in map"):
         Map(empty_style).setLayerVisibility("any_layer", visibility)
+
+
+@pytest.mark.parametrize("filter", ["""["==", "foo", "bar"]""", "", None])
+def test_layer_filter_no_layers(empty_style, filter):
+    with pytest.raises(RuntimeError, match="any_layer is not a valid layer id in map"):
+        Map(empty_style).getLayerFilter("any_layer")
+
+    with pytest.raises(RuntimeError, match="any_layer is not a valid layer id in map"):
+        Map(empty_style).setLayerFilter("any_layer", filter)

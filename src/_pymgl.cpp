@@ -120,6 +120,21 @@ NB_MODULE(_pymgl, m) {
         .def_prop_ro("pitch", &Map::getPitch)
         .def_prop_ro("size", &Map::getSize)
         .def_prop_ro("zoom", &Map::getZoom)
+        .def("getLayerFilter",
+             &Map::getLayerFilter,
+             R"pbdoc(
+                Get the filter of a layer in the map
+
+                Parameters
+                ----------
+                id : str
+                    id of layer in map
+
+                Returns
+                -------
+                str or None
+            )pbdoc",
+             nb::arg("id"))
         .def("getLayerVisibility",
              &Map::getLayerVisibility,
              R"pbdoc(
@@ -210,6 +225,20 @@ NB_MODULE(_pymgl, m) {
             )pbdoc",
              nb::arg("longitude"),
              nb::arg("latitude"))
+        .def("setLayerFilter",
+             &Map::setLayerFilter,
+             R"pbdoc(
+                Set the filter of a layer in the map
+
+                Parameters
+                ----------
+                id : str
+                    id of layer in map
+                visible : str, optional (default None)
+                    JSON string or None / empty string to clear filter
+            )pbdoc",
+             nb::arg("id"),
+             nb::arg("filter") = nb::none())
         .def("setLayerVisibility",
              &Map::setLayerVisibility,
              R"pbdoc(

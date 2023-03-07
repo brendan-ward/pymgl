@@ -8,16 +8,57 @@
 
 #include <mbgl/map/map_observer.hpp>
 #include <mbgl/map/map_options.hpp>
+#include <mbgl/style/conversion/filter.hpp>
+#include <mbgl/style/conversion/json.hpp>
 #include <mbgl/style/style.hpp>
 #include <mbgl/util/image.hpp>
 #include <mbgl/util/logging.hpp>
 #include <mbgl/util/mapbox.hpp>
 #include <mbgl/util/premultiply.hpp>
 
+#include <rapidjson/prettywriter.h>
+#include <rapidjson/stringbuffer.h>
+#include <rapidjson/writer.h>
+
 #include "map.h"
 #include "spng.h"
 
 namespace mgl_wrapper {
+
+// helper function to parse filter expr from JSON string to Expression
+mbgl::style::Filter parseFilter(const std::string &expression) {
+    mbgl::style::conversion::Error error;
+    return *mbgl::style::conversion::convertJSON<mbgl::style::Filter>(expression, error);
+}
+
+// helper function to write JSON from mbgl::Value
+// adapted from mbgl-native-gl::/expression-test/expression_test_parser.cpp
+void writeJSON(rapidjson::PrettyWriter<rapidjson::StringBuffer> &writer,
+               const mbgl::Value &value) {
+    value.match([&](const mbgl::NullValue &) { writer.Null(); },
+                [&](bool b) { writer.Bool(b); },
+                [&](uint64_t u) { writer.Uint64(u); },
+                [&](int64_t i) { writer.Int64(i); },
+                [&](double d) {
+                    d == std::floor(d) ? writer.Int64(static_cast<int64_t>(d)) : writer.Double(d);
+                },
+                [&](const std::string &s) { writer.String(s); },
+                [&](const std::vector<mbgl::Value> &arr) {
+                    writer.StartArray();
+                    for (const auto &item : arr) {
+                        writeJSON(writer, item);
+                    }
+                    writer.EndArray();
+                },
+                [&](const std::unordered_map<std::string, mbgl::Value> &obj) {
+                    writer.StartObject();
+                    for (const auto &entry : obj) {
+                        writer.Key(entry.first.c_str());
+                        writeJSON(writer, entry.second);
+                    }
+                    writer.EndObject();
+                });
+}
 
 Map::Map(const std::string &style,
          const std::optional<uint32_t> &width,
@@ -139,6 +180,25 @@ const std::pair<double, double> Map::getCenter() {
     return std::pair<double, double>(center.longitude(), center.latitude());
 }
 
+const std::optional<std::string> Map::getLayerFilter(const std::string &id) {
+    auto layer = map->getStyle().getLayer(id);
+    if (layer == nullptr) {
+        throw std::runtime_error(id + " is not a valid layer id in map");
+    }
+    auto filter = layer->getFilter();
+    if (!filter) {
+        return std::optional<std::string>();
+    }
+
+    // adapted from expression_test_parser.cpp
+    rapidjson::StringBuffer buffer;
+    rapidjson::PrettyWriter<rapidjson::StringBuffer> writer(buffer);
+    writer.SetFormatOptions(rapidjson::kFormatSingleLineArray);
+    writeJSON(writer, filter.serialize());
+
+    return buffer.GetString();
+}
+
 const bool Map::getLayerVisibility(const std::string &id) {
     auto layer = map->getStyle().getLayer(id);
     if (layer == nullptr) {
@@ -174,6 +234,20 @@ void Map::setBounds(const double &xmin,
         {padding, padding, padding, padding},
         {},
         {}));
+}
+
+void Map::setLayerFilter(const std::string &id, const std::optional<std::string> &expression) {
+    auto layer = map->getStyle().getLayer(id);
+    if (layer == nullptr) {
+        throw std::runtime_error(id + " is not a valid layer id in map");
+    }
+
+    if (!expression.has_value() || expression.value().empty()) {
+        layer->setFilter(mbgl::style::Filter());
+    } else {
+        auto filter = parseFilter(expression.value());
+        layer->setFilter(filter);
+    }
 }
 
 void Map::setLayerVisibility(const std::string &id, bool visible) {

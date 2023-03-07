@@ -84,6 +84,18 @@ class Map:
     @property
     def zoom(self) -> float:
         """map zoom"""
+    def getLayerFilter(self, id: str) -> str:
+        """Get the filter of a layer in the map
+
+        Parameters
+        ----------
+        id : str
+            id of layer in map
+
+        Returns
+        -------
+        str or None
+        """
     def getLayerVisibility(self, id: str) -> bool:
         """Get the visibility of a layer in the map
 
@@ -100,7 +112,7 @@ class Map:
         """Render the map to PNG bytes."""
     def renderBuffer(self) -> np.ndarray[np.uint8]:
         """Render the map to a numpy array of uint8 pixel values."""
-    def setBearing(self, bearing: float):
+    def setBearing(self, bearing: float) -> None:
         """Set the bearing of the map.
 
         Parameters
@@ -110,7 +122,7 @@ class Map:
         """
     def setBounds(
         self, xmin: float, ymin: float, xmax: float, ymax: float, padding: int = 0
-    ):
+    ) -> None:
         """Fit the map to the bounds, given an optional inset padding in pixels.
 
         Parameters
@@ -121,7 +133,17 @@ class Map:
         ymax : float
         padding : int, optional (default: 0)
         """
-    def setLayerVisibility(self, id: str, visible: bool):
+    def setLayerFilter(self, id: str, filter: str = None) -> None:
+        """Set the filter of a layer in the map
+
+        Parameters
+        ----------
+        id : str
+            id of layer in map
+        visible : str, optional (default None)
+            JSON string or None / empty string to clear filter
+        """
+    def setLayerVisibility(self, id: str, visible: bool) -> None:
         """Set the visibility of a layer in the map
 
         Parameters
@@ -131,7 +153,7 @@ class Map:
         visible : bool
             set to True to make layer visible
         """
-    def setPitch(self, pitch: float):
+    def setPitch(self, pitch: float) -> None:
         """Set the pitch of the map.
 
         Parameters
@@ -139,7 +161,7 @@ class Map:
         pitch : float
             Map pitch in degrees, between 0 and 85.
         """
-    def setZoom(self, zoom: float):
+    def setZoom(self, zoom: float) -> None:
         """Set the zoom level of the map.
 
         Parameters
@@ -147,7 +169,7 @@ class Map:
         zoom : float
             Map zoom between 0 and 24
         """
-    def setSize(self, width: int, height: int):
+    def setSize(self, width: int, height: int) -> None:
         """Set the width and height of the map.
 
         Parameters
