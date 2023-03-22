@@ -140,7 +140,7 @@ TEST(Style, MapboxStyle) {
 }
 
 TEST(Style, BadRemoteStyleURL) {
-    EXPECT_THROW(Map("http://localhost:8111/bogus_style", 10, 10), std::runtime_error);
+    EXPECT_THROW(Map("https://google.com/bogus_style", 10, 10), std::runtime_error);
 }
 
 TEST(Style, Labels) {

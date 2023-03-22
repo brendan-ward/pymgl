@@ -90,10 +90,8 @@ def test_mapbox_style_missing_token():
 
 
 def test_bad_remote_style_url():
-    with pytest.raises(
-        RuntimeError, match="loading style failed: Could not connect to the server"
-    ):
-        Map("http://localhost:8111/bogus_style")
+    with pytest.raises(RuntimeError, match="loading style failed"):
+        Map("https://google.com/bogus_style")
 
 
 @pytest.mark.skipif(not has_poorconn, reason="poorconn test lib not available")
