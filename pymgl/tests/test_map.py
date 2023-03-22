@@ -191,6 +191,19 @@ def test_list_layers():
     assert map.listLayers() == []
 
 
+@pytest.mark.skipif(not MAPBOX_TOKEN, reason="MAPBOX_TOKEN not available")
+def test_list_layers_remote_style():
+    map = Map(
+        "mapbox://styles/mapbox/streets-v11",
+        10,
+        10,
+        token=MAPBOX_TOKEN,
+        provider="mapbox",
+    )
+
+    assert len(map.listLayers()) == 111
+
+
 def test_list_sources():
     map = Map(read_style("example-style-geojson.json"))
     assert map.listSources() == ["geojson"]
@@ -200,3 +213,16 @@ def test_list_sources():
 
     map = Map(read_style("example-style-mbtiles-vector-source.json"))
     assert map.listSources() == ["land"]
+
+
+@pytest.mark.skipif(not MAPBOX_TOKEN, reason="MAPBOX_TOKEN not available")
+def test_list_sources_remote_style():
+    map = Map(
+        "mapbox://styles/mapbox/streets-v11",
+        10,
+        10,
+        token=MAPBOX_TOKEN,
+        provider="mapbox",
+    )
+
+    assert map.listSources() == ["composite"]

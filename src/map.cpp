@@ -12,7 +12,6 @@
 #include <mbgl/style/conversion/json.hpp>
 #include <mbgl/style/style.hpp>
 #include <mbgl/util/image.hpp>
-#include <mbgl/util/logging.hpp>
 #include <mbgl/util/mapbox.hpp>
 #include <mbgl/util/premultiply.hpp>
 
@@ -74,9 +73,7 @@ Map::Map(const std::string &style,
     loop     = std::make_unique<mbgl::util::RunLoop>();
     frontend = std::make_unique<mbgl::HeadlessFrontend>(
         mbgl::Size{width.value_or(256), height.value_or(256)}, ratio.value_or(1));
-
-    // Turn off logging
-    mbgl::Log::setObserver(std::make_unique<mbgl::Log::NullObserver>());
+    observer = std::make_unique<MapObserver>();
 
     // determine tile server options from provider
     mbgl::TileServerOptions tileServerOptions = mbgl::TileServerOptions();
@@ -119,7 +116,7 @@ Map::Map(const std::string &style,
     }
 
     map = std::make_unique<mbgl::Map>(*frontend,
-                                      mbgl::MapObserver::nullObserver(),
+                                      *observer,
                                       mbgl::MapOptions()
                                           .withMapMode(mbgl::MapMode::Static)
                                           .withSize(frontend->getSize())
@@ -127,11 +124,28 @@ Map::Map(const std::string &style,
                                       resourceOptions.withTileServerOptions(tileServerOptions));
 
     if (style.find("{") == 0) {
+        observer->didFailLoadingMapCallback
+            = [&](mbgl::MapLoadError type, const std::string &description) {
+                  throw std::runtime_error(description);
+              };
+
         // assume content is json
         map->getStyle().loadJSON(style);
     } else if (style.find("://") != -1) {
         // otherwise must be URL-like reference, like "mapbox://styles/mapbox/streets-v11"
+
         map->getStyle().loadURL(style);
+
+        // run the looop until the style is loaded
+        observer->didFinishLoadingStyleCallback = [&]() { loop->stop(); };
+
+        observer->didFailLoadingMapCallback
+            = [&](mbgl::MapLoadError type, const std::string &description) {
+                  loop->stop();
+                  throw std::runtime_error(description);
+              };
+
+        loop->run();
     } else {
         throw std::invalid_argument("style is not valid");
     }

@@ -7,6 +7,7 @@
 #include <nanobind/stl/vector.h>
 #include <sstream>
 
+#include "log_observer.h"
 #include "map.h"
 
 namespace nb = nanobind;
@@ -14,6 +15,10 @@ using namespace nanobind::literals;
 using namespace mgl_wrapper;
 
 NB_MODULE(_pymgl, m) {
+    // Setup logging when module is imported
+    // TODO: pass errors / warnings back to Python
+    mbgl::Log::setObserver(std::make_unique<LogObserver>());
+
     m.doc() = "MapLibre GL native static renderer";
 
     nb::class_<Map>(m, "Map")

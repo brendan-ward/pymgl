@@ -278,6 +278,16 @@ TEST(Wrapper, ListLayers) {
     EXPECT_EQ(Map(read_style("example-style-empty.json"), 10, 10).listLayers().size(), 0);
 }
 
+TEST(Wrapper, ListLayersRemoteStyle) {
+    const string token = get_token(false);
+    if (token == "") {
+        GTEST_SKIP_("Missing Mapbox Token");
+    }
+
+    Map map = Map("mapbox://styles/mapbox/streets-v11", 10, 10, 1, 0, 0, 0, token, "mapbox");
+    EXPECT_EQ(map.listLayers().size(), 111);
+}
+
 TEST(Wrapper, ListSources) {
     auto sources = Map(read_style("example-style-geojson.json"), 10, 10).listSources();
     EXPECT_EQ(sources.size(), 1);
@@ -288,4 +298,16 @@ TEST(Wrapper, ListSources) {
     sources = Map(read_style("example-style-mbtiles-vector-source.json"), 10, 10).listSources();
     EXPECT_EQ(sources.size(), 1);
     EXPECT_EQ(sources[0], "land");
+}
+
+TEST(Wrapper, ListSourcesRemoteStyle) {
+    const string token = get_token(false);
+    if (token == "") {
+        GTEST_SKIP_("Missing Mapbox Token");
+    }
+
+    Map map      = Map("mapbox://styles/mapbox/streets-v11", 10, 10, 1, 0, 0, 0, token, "mapbox");
+    auto sources = map.listSources();
+    EXPECT_EQ(sources.size(), 1);
+    EXPECT_EQ(sources[0], "composite");
 }
