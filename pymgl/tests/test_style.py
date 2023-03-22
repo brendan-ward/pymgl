@@ -89,6 +89,21 @@ def test_mapbox_style_missing_token():
         Map("mapbox://styles/mapbox/streets-v11", provider="mapbox")
 
 
+def test_bad_remote_style_url():
+    with pytest.raises(RuntimeError, match="loading style failed"):
+        Map("https://google.com/bogus_style")
+
+
+@pytest.mark.skipif(not has_poorconn, reason="poorconn test lib not available")
+@pytest.mark.poorconn_http_server_config(port=8111, t=1, length=10)
+def test_slow_remote_style_url(poorconn_http_server, tmp_path):
+    with pytest.raises(RuntimeError, match="request timed out"):
+        Map(
+            "http://localhost:8111/bogus_style",
+        )
+        # NOTE: this emits errors from poorconn
+
+
 def test_labels():
     test = "example-style-geojson-labels"
 
@@ -184,13 +199,32 @@ def test_missing_style():
         Map("")
 
 
-def test_invalid_style():
-    with pytest.raises(ValueError, match="style is not valid"):
-        Map("foo")
+@pytest.mark.parametrize(
+    "style,error_type,match",
+    [
+        ("invalid style", ValueError, "style is not valid"),
+        ("{invalid style", RuntimeError, "Failed to parse style"),
+        ("{invalid style}", RuntimeError, "Failed to parse style"),
+        ("{[]}", RuntimeError, "Failed to parse style"),
+        # also for short style IDs
+        ("streets-v11", ValueError, "style is not valid"),
+    ],
+)
+def test_invalid_style(style, error_type, match):
+    with pytest.raises(error_type, match=match):
+        Map(style)
 
-    # also for short mapbox style IDs
-    with pytest.raises(ValueError, match="style is not valid"):
-        Map("streets-v11")
+
+# NOTE: these will emit warnings to stderr but are not capturable from python
+@pytest.mark.parametrize(
+    "style",
+    [
+        """{"version":0}""",
+        """{"sources": []}""",
+    ],
+)
+def test_style_parse_warnings(capsys, style):
+    Map(style)
 
 
 @pytest.mark.skipif(not has_poorconn, reason="poorconn test lib not available")

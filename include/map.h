@@ -10,6 +10,26 @@
 
 namespace mgl_wrapper {
 
+// adapted from mbgl/test/stub_map_observer.hpp to implement only those callbacks
+// that are used below
+class MapObserver : public mbgl::MapObserver {
+public:
+    void onDidFinishLoadingStyle() final {
+        if (didFinishLoadingStyleCallback) {
+            didFinishLoadingStyleCallback();
+        }
+    }
+
+    void onDidFailLoadingMap(mbgl::MapLoadError type, const std::string &description) final {
+        if (didFailLoadingMapCallback) {
+            didFailLoadingMapCallback(type, description);
+        }
+    }
+
+    std::function<void()> didFinishLoadingStyleCallback;
+    std::function<void(mbgl::MapLoadError, const std::string &)> didFailLoadingMapCallback;
+};
+
 class Map {
 public:
     Map(const std::string &style,
@@ -68,6 +88,9 @@ public:
 private:
     std::unique_ptr<mbgl::HeadlessFrontend> frontend;
     std::unique_ptr<mbgl::Map> map;
+
+    // std::unique_ptr<LogObserver> logObserver;
+    std::unique_ptr<MapObserver> observer;
 
     // loop must be defined on the instance or we get segfaults, but we don't
     // need to stop it (stopping works fine on MacOS, but causes things to hang

@@ -139,6 +139,10 @@ TEST(Style, MapboxStyle) {
     EXPECT_TRUE(image_matches(img_filename, 100));
 }
 
+TEST(Style, BadRemoteStyleURL) {
+    EXPECT_THROW(Map("https://google.com/bogus_style", 10, 10), std::runtime_error);
+}
+
 TEST(Style, Labels) {
     // should render text labels
     const string test  = "example-style-geojson-labels";
