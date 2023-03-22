@@ -14,6 +14,7 @@
     -   added `getLayerJSON` to serialize a layer's properties to JSON
     -   added `listLayers` to list layers in the map's style, and `listSources`
         to list sources
+-   load remote styles during map creation instead of on first rendering pass (#13)
 
 ## 0.3.1 (1/10/2023)
 
