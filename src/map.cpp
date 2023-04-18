@@ -193,20 +193,24 @@ void Map::addImage(const std::string &name,
 }
 
 void Map::addGeoJSONSource(const std::string &id,
-                           const std::string &geoJSON,
+                           const std::optional<std::string> &geoJSON,
                            const std::optional<uint8_t> minzoom,
                            const std::optional<uint8_t> maxzoom,
                            const std::optional<uint16_t> tileSize) {
 
-    mbgl::Mutable<mbgl::style::GeoJSONOptions> options
-        = mbgl::makeMutable<mbgl::style::GeoJSONOptions>();
-    options->minzoom  = minzoom.value_or(0);
-    options->maxzoom  = maxzoom.value_or(18); // default in geojson_source.hpp
-    options->tileSize = tileSize.value_or(mbgl::util::tileSize_I);
-    auto source       = std::make_unique<mbgl::style::GeoJSONSource>(id, std::move(options));
+    using namespace mbgl;
+    using namespace mbgl::style;
 
-    auto geoJSONData = mbgl::style::GeoJSONData::create(mapbox::geojson::parse(geoJSON));
-    source->setGeoJSONData(geoJSONData);
+    Mutable<GeoJSONOptions> options = makeMutable<GeoJSONOptions>();
+    options->minzoom                = minzoom.value_or(0);
+    options->maxzoom                = maxzoom.value_or(18); // default in geojson_source.hpp
+    options->tileSize               = tileSize.value_or(mbgl::util::tileSize_I);
+    auto source                     = std::make_unique<GeoJSONSource>(id, std::move(options));
+
+    if (geoJSON.has_value()) {
+        source->setGeoJSON(mapbox::geojson::parse(geoJSON.value()));
+    }
+
     map->getStyle().addSource(std::move(source));
 }
 
@@ -354,6 +358,22 @@ void Map::setBounds(const double &xmin,
         {padding, padding, padding, padding},
         {},
         {}));
+}
+
+void Map::setGeoJSON(const std::string &sourceID, const std::string &geoJSON) {
+    using namespace mbgl::style;
+
+    GeoJSONSource *source = static_cast<GeoJSONSource *>(map->getStyle().getSource(sourceID));
+
+    if (source == nullptr) {
+        throw std::runtime_error(sourceID + " is not a valid source in map");
+    }
+
+    if (source->getType() != SourceType::GeoJSON) {
+        throw std::runtime_error(sourceID + " is not a GeoJSON source");
+    }
+
+    source->setGeoJSON(mapbox::geojson::parse(geoJSON));
 }
 
 void Map::setLayerFilter(const std::string &id, const std::optional<std::string> &expression) {

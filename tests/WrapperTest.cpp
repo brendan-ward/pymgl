@@ -124,6 +124,24 @@ TEST(Wrapper, SetBounds) {
     EXPECT_NEAR(map.getZoom(), 8.492, 1e-2);
 }
 
+TEST(Wrapper, SetGeoJSON) {
+    const string style = read_style("example-style-empty.json");
+
+    Map map = Map(style, 10, 10);
+
+    auto geoJSON = R"({"type": "Point", "coordinates": [0, 0]})";
+
+    // sourceID doesn't exist
+    EXPECT_THROW(map.setGeoJSON("geojson_source", geoJSON), std::runtime_error);
+
+    // wrong type
+    map.addVectorSourceURL("vector_source", "mbtiles://land.mbtiles");
+    EXPECT_THROW(map.setGeoJSON("vector_source", geoJSON), std::runtime_error);
+
+    map.addGeoJSONSource("geojson_source");
+    map.setGeoJSON("geojson_source", geoJSON);
+}
+
 TEST(Wrapper, LayerFilter) {
     Map map = Map(read_style("example-style-geojson.json"), 10, 10);
     map.setLayerFilter("box", R"(["==", "foo", "bar"])");
@@ -317,10 +335,12 @@ TEST(Wrapper, AddGeoJSONSource) {
 
     Map map = Map(style, 10, 10);
 
-    map.addGeoJSONSource("my_id", R"({"type": "Point", "coordinates": [0, 0]})");
+    map.addGeoJSONSource("my_id1");
+    map.addGeoJSONSource("my_id2", R"({"type": "Point", "coordinates": [0, 0]})");
     auto sources = map.listSources();
-    EXPECT_EQ(sources.size(), 1);
-    EXPECT_EQ(sources[0], "my_id");
+    EXPECT_EQ(sources.size(), 2);
+    EXPECT_EQ(sources[0], "my_id1");
+    EXPECT_EQ(sources[1], "my_id2");
 }
 
 TEST(Wrapper, AddVectorSourceURL) {
@@ -328,11 +348,11 @@ TEST(Wrapper, AddVectorSourceURL) {
 
     Map map = Map(style, 10, 10);
 
-    map.addVectorSourceURL("my_id", "mbtiles://land.mbtiles");
+    map.addVectorSourceURL("my_id1", "mbtiles://land.mbtiles");
     map.addVectorSourceURL("my_id2", "mbtiles://land.mbtiles", 2, 6);
     auto sources = map.listSources();
     EXPECT_EQ(sources.size(), 2);
-    EXPECT_EQ(sources[0], "my_id");
+    EXPECT_EQ(sources[0], "my_id1");
     EXPECT_EQ(sources[1], "my_id2");
 }
 

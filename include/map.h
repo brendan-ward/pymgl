@@ -69,10 +69,10 @@ public:
                   bool make_sdf);
 
     void addGeoJSONSource(const std::string &id,
-                          const std::string &geoJSON,
-                          const std::optional<uint8_t> minzoom   = {},
-                          const std::optional<uint8_t> maxzoom   = {},
-                          const std::optional<uint16_t> tileSize = {});
+                          const std::optional<std::string> &geoJSON = {},
+                          const std::optional<uint8_t> minzoom      = {},
+                          const std::optional<uint8_t> maxzoom      = {},
+                          const std::optional<uint16_t> tileSize    = {});
 
     void addVectorSourceURL(const std::string &id,
                             const std::string &url,
@@ -93,6 +93,7 @@ public:
                    const double &xmax,
                    const double &ymax,
                    const double &padding = 0);
+    void setGeoJSON(const std::string &sourceID, const std::string &geoJSON);
     void setLayerFilter(const std::string &id, const std::optional<std::string> &expression);
     void setLayerVisibility(const std::string &id, bool visible);
     void setPitch(const double &pitch);
