@@ -17,7 +17,8 @@ using namespace mgl_wrapper;
 NB_MODULE(_pymgl, m) {
     // Setup logging when module is imported
     // TODO: pass errors / warnings back to Python
-    mbgl::Log::setObserver(std::make_unique<LogObserver>());
+    // mbgl::Log::setObserver(std::make_unique<LogObserver>());
+    // mbgl::Log::useLogThread(false);
 
     m.doc() = "MapLibre GL native static renderer";
 

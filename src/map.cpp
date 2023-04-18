@@ -19,6 +19,7 @@
 #include <rapidjson/stringbuffer.h>
 #include <rapidjson/writer.h>
 
+#include "log_observer.h"
 #include "map.h"
 #include "spng.h"
 
@@ -149,6 +150,9 @@ Map::Map(const std::string &style,
     } else {
         throw std::invalid_argument("style is not valid");
     }
+
+    // TODO: check for style parse warnings
+    std::cout << "Log is empty? " << log.empty() << std::endl;
 
     map->jumpTo(mbgl::CameraOptions()
                     .withCenter(mbgl::LatLng{latitude.value_or(0), longitude.value_or(0)})

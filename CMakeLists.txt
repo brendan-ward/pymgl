@@ -62,6 +62,7 @@ include_directories(${PROJECT_SOURCE_DIR}/include)
 
 add_library(
     mgl_wrapper STATIC
+    ${PROJECT_SOURCE_DIR}/src/log_observer.cpp
     ${PROJECT_SOURCE_DIR}/src/map.cpp
     ${PROJECT_SOURCE_DIR}/src/spng.c
 )

@@ -8,6 +8,8 @@
 #include <mbgl/map/map.hpp>
 #include <mbgl/util/run_loop.hpp>
 
+#include "log_observer.h"
+
 namespace mgl_wrapper {
 
 // adapted from mbgl/test/stub_map_observer.hpp to implement only those callbacks
@@ -91,6 +93,7 @@ private:
 
     // std::unique_ptr<LogObserver> logObserver;
     std::unique_ptr<MapObserver> observer;
+    Log log;
 
     // loop must be defined on the instance or we get segfaults, but we don't
     // need to stop it (stopping works fine on MacOS, but causes things to hang
