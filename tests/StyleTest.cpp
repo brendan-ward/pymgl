@@ -339,3 +339,20 @@ TEST(Style, LayerFilter) {
     write_test_image(img, img_filename, false);
     EXPECT_TRUE(image_matches(img_filename, 10));
 }
+
+TEST(Style, AddBackgroundLayer) {
+    const string test = "add-background";
+
+    Map map = Map("", 100, 100, 1);
+    map.addBackgroundLayer("background", "#0000FF");
+
+    auto img = map.renderPNG();
+
+    const string img_filename = test + ".png";
+
+    // to write out expected image, uncomment
+    // write_test_image(img, img_filename, true);
+
+    write_test_image(img, img_filename, false);
+    EXPECT_TRUE(image_matches(img_filename, 10));
+}

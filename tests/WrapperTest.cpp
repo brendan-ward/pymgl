@@ -333,7 +333,7 @@ TEST(Wrapper, ListSourcesRemoteStyle) {
 TEST(Wrapper, AddGeoJSONSource) {
     const string style = read_style("example-style-empty.json");
 
-    Map map = Map(style, 10, 10);
+    Map map = Map("", 10, 10);
 
     map.addGeoJSONSource("my_id1");
     map.addGeoJSONSource("my_id2", R"({"type": "Point", "coordinates": [0, 0]})");
@@ -344,9 +344,7 @@ TEST(Wrapper, AddGeoJSONSource) {
 }
 
 TEST(Wrapper, AddVectorSourceURL) {
-    const string style = read_style("example-style-empty.json");
-
-    Map map = Map(style, 10, 10);
+    Map map = Map("", 10, 10);
 
     map.addVectorSourceURL("my_id1", "mbtiles://land.mbtiles");
     map.addVectorSourceURL("my_id2", "mbtiles://land.mbtiles", 2, 6);
@@ -357,12 +355,19 @@ TEST(Wrapper, AddVectorSourceURL) {
 }
 
 TEST(Wrapper, AddVectorSourceTiles) {
-    const string style = read_style("example-style-empty.json");
-
-    Map map = Map(style, 10, 10);
+    Map map = Map("", 10, 10);
 
     map.addVectorSourceTiles("my_id", {{"http://test/{x}/{y}/{z}.pbf"}});
     auto sources = map.listSources();
     EXPECT_EQ(sources.size(), 1);
     EXPECT_EQ(sources[0], "my_id");
+}
+
+TEST(Wrapper, AddBackgroundLayer) {
+    Map map = Map("", 10, 10);
+    map.addBackgroundLayer("background", "#0000FF");
+
+    auto layers = map.listLayers();
+    EXPECT_EQ(layers.size(), 1);
+    EXPECT_EQ(layers[0], "background");
 }

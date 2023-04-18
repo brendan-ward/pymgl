@@ -11,9 +11,11 @@
 #include <mbgl/style/conversion/filter.hpp>
 #include <mbgl/style/conversion/json.hpp>
 #include <mbgl/style/conversion/tileset.hpp>
+#include <mbgl/style/layers/background_layer.hpp>
 #include <mbgl/style/sources/geojson_source.hpp>
 #include <mbgl/style/sources/vector_source.hpp>
 #include <mbgl/style/style.hpp>
+#include <mbgl/util/color.hpp>
 #include <mbgl/util/geojson.hpp>
 #include <mbgl/util/image.hpp>
 #include <mbgl/util/mapbox.hpp>
@@ -151,6 +153,14 @@ Map::Map(const std::string &style,
               };
 
         loop->run();
+    } else if (style.empty()) {
+        // construct blank JSON
+        map->getStyle().loadJSON(R"({
+            "version": 8,
+            "name": "test style",
+            "sources": {},
+            "layers": []
+        })");
     } else {
         throw std::invalid_argument("style is not valid");
     }
@@ -195,8 +205,7 @@ void Map::addImage(const std::string &name,
 void Map::addGeoJSONSource(const std::string &id,
                            const std::optional<std::string> &geoJSON,
                            const std::optional<uint8_t> minzoom,
-                           const std::optional<uint8_t> maxzoom,
-                           const std::optional<uint16_t> tileSize) {
+                           const std::optional<uint8_t> maxzoom) {
 
     using namespace mbgl;
     using namespace mbgl::style;
@@ -204,7 +213,6 @@ void Map::addGeoJSONSource(const std::string &id,
     Mutable<GeoJSONOptions> options = makeMutable<GeoJSONOptions>();
     options->minzoom                = minzoom.value_or(0);
     options->maxzoom                = maxzoom.value_or(18); // default in geojson_source.hpp
-    options->tileSize               = tileSize.value_or(mbgl::util::tileSize_I);
     auto source                     = std::make_unique<GeoJSONSource>(id, std::move(options));
 
     if (geoJSON.has_value()) {
@@ -233,6 +241,8 @@ void Map::addVectorSourceTiles(const std::string &id,
                                const std::optional<std::string> &attribution,
                                const std::optional<std::string> &scheme) {
 
+    using namespace mbgl::style;
+
     auto tileset = mbgl::Tileset(
         tiles,
         mbgl::Range<uint8_t>(minzoom.value_or(0), maxzoom.value_or(mbgl::util::MAX_ZOOM)),
@@ -240,7 +250,15 @@ void Map::addVectorSourceTiles(const std::string &id,
         scheme.has_value() && (scheme.value() != "xyz") ? mbgl::Tileset::Scheme::TMS
                                                         : mbgl::Tileset::Scheme::XYZ);
 
-    map->getStyle().addSource(std::make_unique<mbgl::style::VectorSource>(id, tileset));
+    map->getStyle().addSource(std::make_unique<VectorSource>(id, tileset));
+}
+
+void Map::addBackgroundLayer(const std::string &id, const std::string &color) {
+    using namespace mbgl::style;
+
+    auto layer = std::make_unique<BackgroundLayer>(id);
+    layer->setBackgroundColor(mbgl::Color::parse(color).value());
+    map->getStyle().addLayer(std::move(layer));
 }
 
 const double Map::getBearing() { return std::abs(map->getCameraOptions().bearing.value_or(0)); }

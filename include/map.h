@@ -71,8 +71,7 @@ public:
     void addGeoJSONSource(const std::string &id,
                           const std::optional<std::string> &geoJSON = {},
                           const std::optional<uint8_t> minzoom      = {},
-                          const std::optional<uint8_t> maxzoom      = {},
-                          const std::optional<uint16_t> tileSize    = {});
+                          const std::optional<uint8_t> maxzoom      = {});
 
     void addVectorSourceURL(const std::string &id,
                             const std::string &url,
@@ -85,6 +84,8 @@ public:
                               const std::optional<uint8_t> maxzoom          = {},
                               const std::optional<std::string> &attribution = {},
                               const std::optional<std::string> &scheme      = {});
+
+    void addBackgroundLayer(const std::string &id, const std::string &color);
 
     void setBearing(const double &bearing);
     void setCenter(const double &longitude, const double &latitude);
