@@ -68,6 +68,18 @@ public:
                   float ratio,
                   bool make_sdf);
 
+    void addVectorSourceURL(const std::string &id,
+                            const std::string &url,
+                            const std::optional<float> minzoom = {},
+                            const std::optional<float> maxzoom = {});
+
+    void addVectorSourceTiles(const std::string &id,
+                              const std::vector<std::string> &tiles         = {},
+                              const std::optional<uint8_t> minzoom          = {},
+                              const std::optional<uint8_t> maxzoom          = {},
+                              const std::optional<std::string> &attribution = {},
+                              const std::optional<std::string> &scheme      = {});
+
     void setBearing(const double &bearing);
     void setCenter(const double &longitude, const double &latitude);
     void setBounds(const double &xmin,

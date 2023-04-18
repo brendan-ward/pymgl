@@ -311,3 +311,27 @@ TEST(Wrapper, ListSourcesRemoteStyle) {
     EXPECT_EQ(sources.size(), 1);
     EXPECT_EQ(sources[0], "composite");
 }
+
+TEST(Wrapper, AddVectorSourceURL) {
+    const string style = read_style("example-style-empty.json");
+
+    Map map = Map(style, 10, 10);
+
+    map.addVectorSourceURL("my_id", "mbtiles://land.mbtiles");
+    map.addVectorSourceURL("my_id2", "mbtiles://land.mbtiles", 2, 6);
+    auto sources = map.listSources();
+    EXPECT_EQ(sources.size(), 2);
+    EXPECT_EQ(sources[0], "my_id");
+    EXPECT_EQ(sources[1], "my_id2");
+}
+
+TEST(Wrapper, AddVectorSourceTiles) {
+    const string style = read_style("example-style-empty.json");
+
+    Map map = Map(style, 10, 10);
+
+    map.addVectorSourceTiles("my_id", {{"http://test/{x}/{y}/{z}.pbf"}});
+    auto sources = map.listSources();
+    EXPECT_EQ(sources.size(), 1);
+    EXPECT_EQ(sources[0], "my_id");
+}

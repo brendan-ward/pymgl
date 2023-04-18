@@ -10,10 +10,13 @@
 #include <mbgl/map/map_options.hpp>
 #include <mbgl/style/conversion/filter.hpp>
 #include <mbgl/style/conversion/json.hpp>
+#include <mbgl/style/conversion/tileset.hpp>
+#include <mbgl/style/sources/vector_source.hpp>
 #include <mbgl/style/style.hpp>
 #include <mbgl/util/image.hpp>
 #include <mbgl/util/mapbox.hpp>
 #include <mbgl/util/premultiply.hpp>
+#include <mbgl/util/range.hpp>
 
 #include <rapidjson/prettywriter.h>
 #include <rapidjson/stringbuffer.h>
@@ -185,6 +188,35 @@ void Map::addImage(const std::string &name,
 
     map->getStyle().addImage(std::make_unique<mbgl::style::Image>(
         name, std::move(cPremultipliedImage), ratio, make_sdf));
+}
+
+void Map::addVectorSourceURL(const std::string &id,
+                             const std::string &url,
+                             const std::optional<float> minzoom,
+                             const std::optional<float> maxzoom) {
+
+    map->getStyle().addSource(std::make_unique<mbgl::style::VectorSource>(
+        id,
+        url,
+        maxzoom.has_value() ? mbgl::optional<float>(maxzoom.value()) : mbgl::optional<float>(),
+        minzoom.has_value() ? mbgl::optional<float>(minzoom.value()) : mbgl::optional<float>()));
+}
+
+void Map::addVectorSourceTiles(const std::string &id,
+                               const std::vector<std::string> &tiles,
+                               const std::optional<uint8_t> minzoom,
+                               const std::optional<uint8_t> maxzoom,
+                               const std::optional<std::string> &attribution,
+                               const std::optional<std::string> &scheme) {
+
+    auto tileset = mbgl::Tileset(
+        tiles,
+        mbgl::Range<uint8_t>(minzoom.value_or(0), maxzoom.value_or(mbgl::util::MAX_ZOOM)),
+        attribution.value_or(""),
+        scheme.has_value() && (scheme.value() != "xyz") ? mbgl::Tileset::Scheme::TMS
+                                                        : mbgl::Tileset::Scheme::XYZ);
+
+    map->getStyle().addSource(std::make_unique<mbgl::style::VectorSource>(id, tileset));
 }
 
 const double Map::getBearing() { return std::abs(map->getCameraOptions().bearing.value_or(0)); }
