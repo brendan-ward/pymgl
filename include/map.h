@@ -68,6 +68,12 @@ public:
                   float ratio,
                   bool make_sdf);
 
+    void addGeoJSONSource(const std::string &id,
+                          const std::string &geoJSON,
+                          const std::optional<uint8_t> minzoom   = {},
+                          const std::optional<uint8_t> maxzoom   = {},
+                          const std::optional<uint16_t> tileSize = {});
+
     void addVectorSourceURL(const std::string &id,
                             const std::string &url,
                             const std::optional<float> minzoom = {},

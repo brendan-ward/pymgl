@@ -11,8 +11,10 @@
 #include <mbgl/style/conversion/filter.hpp>
 #include <mbgl/style/conversion/json.hpp>
 #include <mbgl/style/conversion/tileset.hpp>
+#include <mbgl/style/sources/geojson_source.hpp>
 #include <mbgl/style/sources/vector_source.hpp>
 #include <mbgl/style/style.hpp>
+#include <mbgl/util/geojson.hpp>
 #include <mbgl/util/image.hpp>
 #include <mbgl/util/mapbox.hpp>
 #include <mbgl/util/premultiply.hpp>
@@ -188,6 +190,24 @@ void Map::addImage(const std::string &name,
 
     map->getStyle().addImage(std::make_unique<mbgl::style::Image>(
         name, std::move(cPremultipliedImage), ratio, make_sdf));
+}
+
+void Map::addGeoJSONSource(const std::string &id,
+                           const std::string &geoJSON,
+                           const std::optional<uint8_t> minzoom,
+                           const std::optional<uint8_t> maxzoom,
+                           const std::optional<uint16_t> tileSize) {
+
+    mbgl::Mutable<mbgl::style::GeoJSONOptions> options
+        = mbgl::makeMutable<mbgl::style::GeoJSONOptions>();
+    options->minzoom  = minzoom.value_or(0);
+    options->maxzoom  = maxzoom.value_or(18); // default in geojson_source.hpp
+    options->tileSize = tileSize.value_or(mbgl::util::tileSize_I);
+    auto source       = std::make_unique<mbgl::style::GeoJSONSource>(id, std::move(options));
+
+    auto geoJSONData = mbgl::style::GeoJSONData::create(mapbox::geojson::parse(geoJSON));
+    source->setGeoJSONData(geoJSONData);
+    map->getStyle().addSource(std::move(source));
 }
 
 void Map::addVectorSourceURL(const std::string &id,

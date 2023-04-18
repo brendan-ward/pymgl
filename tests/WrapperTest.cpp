@@ -312,6 +312,17 @@ TEST(Wrapper, ListSourcesRemoteStyle) {
     EXPECT_EQ(sources[0], "composite");
 }
 
+TEST(Wrapper, AddGeoJSONSource) {
+    const string style = read_style("example-style-empty.json");
+
+    Map map = Map(style, 10, 10);
+
+    map.addGeoJSONSource("my_id", R"({"type": "Point", "coordinates": [0, 0]})");
+    auto sources = map.listSources();
+    EXPECT_EQ(sources.size(), 1);
+    EXPECT_EQ(sources[0], "my_id");
+}
+
 TEST(Wrapper, AddVectorSourceURL) {
     const string style = read_style("example-style-empty.json");
 
