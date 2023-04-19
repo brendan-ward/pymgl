@@ -69,8 +69,7 @@ public:
                   bool make_sdf);
 
     void addSource(const std::string &id, const std::string &options);
-
-    void addBackgroundLayer(const std::string &id, const std::string &color);
+    void addLayer(const std::string &options);
 
     void setBearing(const double &bearing);
     void setCenter(const double &longitude, const double &latitude);

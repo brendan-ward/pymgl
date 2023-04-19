@@ -10,6 +10,7 @@
 #include <mbgl/map/map_options.hpp>
 #include <mbgl/style/conversion/filter.hpp>
 #include <mbgl/style/conversion/json.hpp>
+#include <mbgl/style/conversion/layer.hpp>
 #include <mbgl/style/conversion/source.hpp>
 #include <mbgl/style/conversion/tileset.hpp>
 #include <mbgl/style/layers/background_layer.hpp>
@@ -31,15 +32,6 @@
 #include "spng.h"
 
 namespace mgl_wrapper {
-
-// helper function to parse filter expr from JSON string to Expression
-mbgl::style::Filter parseFilter(const std::string &expression) {
-    using namespace mbgl::style;
-    using namespace mbgl::style::conversion;
-
-    Error error;
-    return *convertJSON<Filter>(expression, error);
-}
 
 // helper function to write JSON from mbgl::Value
 // adapted from mbgl-native-gl::/expression-test/expression_test_parser.cpp
@@ -221,12 +213,19 @@ void Map::addSource(const std::string &id, const std::string &options) {
     map->getStyle().addSource(std::move(*source));
 }
 
-void Map::addBackgroundLayer(const std::string &id, const std::string &color) {
+void Map::addLayer(const std::string &options) {
     using namespace mbgl::style;
+    using namespace mbgl::style::conversion;
 
-    auto layer = std::make_unique<BackgroundLayer>(id);
-    layer->setBackgroundColor(mbgl::Color::parse(color).value());
-    map->getStyle().addLayer(std::move(layer));
+    Error error;
+    mbgl::optional<std::unique_ptr<Layer>> layer
+        = convertJSON<std::unique_ptr<Layer>>(options, error);
+
+    if (!layer.has_value()) {
+        throw std::invalid_argument(error.message.c_str());
+    }
+
+    map->getStyle().addLayer(std::move(*layer));
 }
 
 const double Map::getBearing() { return std::abs(map->getCameraOptions().bearing.value_or(0)); }
@@ -363,6 +362,9 @@ void Map::setGeoJSON(const std::string &sourceID, const std::string &geoJSON) {
 }
 
 void Map::setLayerFilter(const std::string &id, const std::optional<std::string> &expression) {
+    using namespace mbgl::style;
+    using namespace mbgl::style::conversion;
+
     auto layer = map->getStyle().getLayer(id);
     if (layer == nullptr) {
         throw std::runtime_error(id + " is not a valid layer id in map");
@@ -371,7 +373,8 @@ void Map::setLayerFilter(const std::string &id, const std::optional<std::string>
     if (!expression.has_value() || expression.value().empty()) {
         layer->setFilter(mbgl::style::Filter());
     } else {
-        auto filter = parseFilter(expression.value());
+        Error error;
+        auto filter = *convertJSON<Filter>(expression.value(), error);
         layer->setFilter(filter);
     }
 }

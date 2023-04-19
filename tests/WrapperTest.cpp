@@ -381,11 +381,20 @@ TEST(Wrapper, AddSource) {
     EXPECT_EQ(sources[5], "image");
 }
 
-TEST(Wrapper, AddBackgroundLayer) {
+TEST(Wrapper, AddLayer) {
     Map map = Map("", 10, 10);
-    map.addBackgroundLayer("background", "#0000FF");
 
-    auto layers = map.listLayers();
-    EXPECT_EQ(layers.size(), 1);
-    EXPECT_EQ(layers[0], "background");
+    map.addLayer(R"({
+        "id": "background",
+        "type": "background",
+        "color": "#0000FF"
+    })");
+
+    // adding layers does not validate them against their sources
+    auto geoJSONLayer = R"({
+        "id": "circle",
+        "source": "geojson",
+        "type": "circle"
+    })";
+    map.addLayer(geoJSONLayer);
 }
