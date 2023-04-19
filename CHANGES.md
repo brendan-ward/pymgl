@@ -15,6 +15,10 @@
     -   added `listLayers` to list layers in the map's style, and `listSources`
         to list sources
 -   load remote styles during map creation instead of on first rendering pass (#13)
+-   added `addSource` to add a source to the map and `addLayer` to add a layer
+-   added `setGeoJSON` to set GeoJSON data for a GeoJSON source in the map
+-   allow constructing map with an empty style `Map("")` in order to allow adding
+    sources and layers after construction
 
 ## 0.3.1 (1/10/2023)
 

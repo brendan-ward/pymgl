@@ -69,6 +69,24 @@ class Map:
             the Mapbox Style Specification for more information about
             SDF images.
         """
+    def addSource(self, id: str, options: str) -> None:
+        """Add a source to the map.
+
+        Parameters
+        ---------
+        id : str
+            ID of the source.  Used when referencing this source in the style.
+        options : str
+            JSON-encoded source options.  Fields are specific to the source type.
+        """
+    def addLayer(self, options: str) -> None:
+        """Add a layer to the map.
+
+        Parameters
+        ----------
+        options : str
+            JSON-encoded layer options.  Fields are specific to the layer type.
+        """
     @property
     def bearing(self) -> float:
         """map bearing, in degrees"""
@@ -158,6 +176,16 @@ class Map:
         xmax : float
         ymax : float
         padding : int, optional (default: 0)
+        """
+    def setGeoJSON(self, sourceID: str, geoJSON: str) -> None:
+        """Set GeoJSON data on a GeoJSON source in the map.
+
+        Parameters
+        ----------
+        sourceID : str
+            ID of the source, which must already exist in the map
+        geoJSON : str
+            JSON-encoded GeoJSON data
         """
     def setLayerFilter(self, id: str, filter: str = None) -> None:
         """Set the filter of a layer in the map

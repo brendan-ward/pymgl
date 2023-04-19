@@ -132,7 +132,7 @@ TEST(Wrapper, SetGeoJSON) {
     auto geoJSON = R"({"type": "Point", "coordinates": [0, 0]})";
 
     // sourceID doesn't exist
-    EXPECT_THROW(map.setGeoJSON("geojson_source", geoJSON), std::runtime_error);
+    EXPECT_THROW(map.setGeoJSON("geojson", geoJSON), std::runtime_error);
 
     // wrong type
     map.addSource("vector_url", R"({
@@ -387,14 +387,20 @@ TEST(Wrapper, AddLayer) {
     map.addLayer(R"({
         "id": "background",
         "type": "background",
-        "color": "#0000FF"
+        "paint": {
+            "background-color": "#0000FF"
+        }
     })");
 
-    // adding layers does not validate them against their sources
-    auto geoJSONLayer = R"({
+    // NOTE: adding layers does not validate them against their sources
+    map.addLayer(R"({
         "id": "circle",
         "source": "geojson",
         "type": "circle"
-    })";
-    map.addLayer(geoJSONLayer);
+    })");
+
+    auto layers = map.listLayers();
+    EXPECT_EQ(layers.size(), 2);
+    EXPECT_EQ(layers[0], "background");
+    EXPECT_EQ(layers[1], "circle");
 }

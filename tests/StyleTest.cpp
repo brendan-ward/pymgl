@@ -341,7 +341,7 @@ TEST(Style, LayerFilter) {
 }
 
 TEST(Style, AddBackgroundLayer) {
-    const string test = "add-background";
+    const string test = "add-background-layer";
 
     Map map = Map("", 100, 100, 1);
 
@@ -365,7 +365,7 @@ TEST(Style, AddBackgroundLayer) {
 }
 
 TEST(Style, AddGeoJSONPointLayer) {
-    const string test = "add-geojson-point";
+    const string test = "add-geojson-point-layer";
 
     Map map = Map("", 100, 100, 1, 0, 0, 0);
 
