@@ -339,3 +339,58 @@ TEST(Style, LayerFilter) {
     write_test_image(img, img_filename, false);
     EXPECT_TRUE(image_matches(img_filename, 10));
 }
+
+TEST(Style, AddBackgroundLayer) {
+    const string test = "add-background-layer";
+
+    Map map = Map("", 100, 100, 1);
+
+    map.addLayer(R"({
+        "id": "background",
+        "type": "background",
+        "paint": {
+            "background-color": "#0000FF"
+        }
+    })");
+
+    auto img = map.renderPNG();
+
+    const string img_filename = test + ".png";
+
+    // to write out expected image, uncomment
+    // write_test_image(img, img_filename, true);
+
+    write_test_image(img, img_filename, false);
+    EXPECT_TRUE(image_matches(img_filename, 10));
+}
+
+TEST(Style, AddGeoJSONPointLayer) {
+    const string test = "add-geojson-point-layer";
+
+    Map map = Map("", 100, 100, 1, 0, 0, 0);
+
+    map.addSource("geojson", R"({
+        "type": "geojson",
+        "data": {"type": "Point", "coordinates": [0, 0]}
+    })");
+
+    map.addLayer(R"({
+        "id": "geojson-point",
+        "source": "geojson",
+        "type": "circle",
+        "paint": {
+            "circle-radius": 10,
+            "circle-color": "red"
+        }
+    })");
+
+    auto img = map.renderPNG();
+
+    const string img_filename = test + ".png";
+
+    // to write out expected image, uncomment
+    // write_test_image(img, img_filename, true);
+
+    write_test_image(img, img_filename, false);
+    EXPECT_TRUE(image_matches(img_filename, 10));
+}

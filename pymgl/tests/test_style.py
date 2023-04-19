@@ -1,3 +1,4 @@
+import json
 import os
 
 from PIL import Image
@@ -194,11 +195,6 @@ def test_bad_glyphs():
         map.renderPNG()
 
 
-def test_missing_style():
-    with pytest.raises(ValueError, match="style is not valid"):
-        Map("")
-
-
 @pytest.mark.parametrize(
     "style,error_type,match",
     [
@@ -265,6 +261,54 @@ def test_layer_filter():
 
     map.setLayerFilter("box", """["==", "id", 2]""")
     assert map.getLayerFilter("box") == """["==", "id", 2]"""
+
+    img_data = map.renderPNG()
+
+    assert image_matches(img_data, f"{test}.png")
+
+
+def test_add_background_layer():
+    test = "add-background-layer"
+
+    map = Map("", 100, 100, 1)
+
+    map.addLayer(
+        json.dumps(
+            {
+                "id": "background",
+                "type": "background",
+                "paint": {"background-color": "#0000FF"},
+            }
+        )
+    )
+
+    img_data = map.renderPNG()
+
+    assert image_matches(img_data, f"{test}.png")
+
+
+def test_add_geojson_point_layer():
+    test = "add-geojson-point-layer"
+
+    map = Map("", 100, 100, 1, 0, 0, 0)
+
+    map.addSource(
+        "geojson",
+        json.dumps(
+            {"type": "geojson", "data": {"type": "Point", "coordinates": [0, 0]}}
+        ),
+    )
+
+    map.addLayer(
+        json.dumps(
+            {
+                "id": "geojson-point",
+                "source": "geojson",
+                "type": "circle",
+                "paint": {"circle-radius": 10, "circle-color": "red"},
+            }
+        )
+    )
 
     img_data = map.renderPNG()
 

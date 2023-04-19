@@ -124,6 +124,30 @@ TEST(Wrapper, SetBounds) {
     EXPECT_NEAR(map.getZoom(), 8.492, 1e-2);
 }
 
+TEST(Wrapper, SetGeoJSON) {
+    const string style = read_style("example-style-empty.json");
+
+    Map map = Map(style, 10, 10);
+
+    auto geoJSON = R"({"type": "Point", "coordinates": [0, 0]})";
+
+    // sourceID doesn't exist
+    EXPECT_THROW(map.setGeoJSON("geojson", geoJSON), std::runtime_error);
+
+    // wrong type
+    map.addSource("vector_url", R"({
+        "type": "vector",
+        "url": "mbtiles://land.mbtiles"
+    })");
+    EXPECT_THROW(map.setGeoJSON("vector_url", geoJSON), std::runtime_error);
+
+    map.addSource("geojson", R"({
+        "type": "geojson",
+        "data": {"type": "GeometryCollection", "geometries": []}
+    })");
+    map.setGeoJSON("geojson", geoJSON);
+}
+
 TEST(Wrapper, LayerFilter) {
     Map map = Map(read_style("example-style-geojson.json"), 10, 10);
     map.setLayerFilter("box", R"(["==", "foo", "bar"])");
@@ -310,4 +334,73 @@ TEST(Wrapper, ListSourcesRemoteStyle) {
     auto sources = map.listSources();
     EXPECT_EQ(sources.size(), 1);
     EXPECT_EQ(sources[0], "composite");
+}
+
+TEST(Wrapper, AddSource) {
+    Map map = Map("", 10, 10);
+
+    map.addSource("geojson", R"({
+        "type": "geojson",
+        "data": {"type": "Point", "coordinates": [0, 0]}
+    })");
+    map.addSource("vector_url", R"({
+        "type": "vector",
+        "url": "mbtiles://land.mbtiles"
+    })");
+    map.addSource("vector_tiles", R"({
+        "type": "vector",
+        "tiles": ["http://test/{x}/{y}/{z}.pbf"],
+        "minzoom": 2,
+        "maxzoom": 12
+    })");
+    map.addSource("raster_url", R"({
+        "type": "raster",
+        "url": "mbtiles://geography-class-png.mbtiles"
+    })");
+    map.addSource("raster_tiles", R"({
+        "type": "raster",
+        "tiles": ["http://test/{x}/{y}/{z}.pbf"],
+        "minzoom": 2,
+        "maxzoom": 12,
+        "tileSize": 256
+    })");
+    map.addSource("image", R"({
+        "type": "image",
+        "url": "https://services.arcgisonline.com/arcgis/rest/services/World_Terrain_Base/MapServer/tile/0/0/0",
+        "coordinates": [
+            [-180, 90],
+            [180, 90],
+            [180, -90],
+            [-180, -90]
+        ]
+    })");
+
+    auto sources = map.listSources();
+    EXPECT_EQ(sources.size(), 6);
+    EXPECT_EQ(sources[0], "geojson");
+    EXPECT_EQ(sources[5], "image");
+}
+
+TEST(Wrapper, AddLayer) {
+    Map map = Map("", 10, 10);
+
+    map.addLayer(R"({
+        "id": "background",
+        "type": "background",
+        "paint": {
+            "background-color": "#0000FF"
+        }
+    })");
+
+    // NOTE: adding layers does not validate them against their sources
+    map.addLayer(R"({
+        "id": "circle",
+        "source": "geojson",
+        "type": "circle"
+    })");
+
+    auto layers = map.listLayers();
+    EXPECT_EQ(layers.size(), 2);
+    EXPECT_EQ(layers[0], "background");
+    EXPECT_EQ(layers[1], "circle");
 }

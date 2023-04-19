@@ -339,6 +339,28 @@ You must register the image with the map instance before rendering the map. See
 
 You can use map images as fill patterns or icon images.
 
+### Adding sources and layers after construction
+
+You can add sources and layers dynamically after constructing the map instance:
+
+```Python
+import json
+
+map = Map("")  # construct with empty style
+
+map.addSource("my_id", json.dumps({
+    "type": "geojson",
+    "data": {"type": "Point", "coordinates": [0, 0]}
+}))
+
+map.addLayer(json.dumps({
+    "id": "geojson-point",
+    "source": "geojson",
+    "type": "circle",
+    "paint": { ... }
+}))
+```
+
 ### Unsupported features
 
 PyMGL does not support alternative projections or 3D terrain.

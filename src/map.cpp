@@ -10,10 +10,19 @@
 #include <mbgl/map/map_options.hpp>
 #include <mbgl/style/conversion/filter.hpp>
 #include <mbgl/style/conversion/json.hpp>
+#include <mbgl/style/conversion/layer.hpp>
+#include <mbgl/style/conversion/source.hpp>
+#include <mbgl/style/conversion/tileset.hpp>
+#include <mbgl/style/layers/background_layer.hpp>
+#include <mbgl/style/sources/geojson_source.hpp>
+#include <mbgl/style/sources/vector_source.hpp>
 #include <mbgl/style/style.hpp>
+#include <mbgl/util/color.hpp>
+#include <mbgl/util/geojson.hpp>
 #include <mbgl/util/image.hpp>
 #include <mbgl/util/mapbox.hpp>
 #include <mbgl/util/premultiply.hpp>
+#include <mbgl/util/range.hpp>
 
 #include <rapidjson/prettywriter.h>
 #include <rapidjson/stringbuffer.h>
@@ -23,12 +32,6 @@
 #include "spng.h"
 
 namespace mgl_wrapper {
-
-// helper function to parse filter expr from JSON string to Expression
-mbgl::style::Filter parseFilter(const std::string &expression) {
-    mbgl::style::conversion::Error error;
-    return *mbgl::style::conversion::convertJSON<mbgl::style::Filter>(expression, error);
-}
 
 // helper function to write JSON from mbgl::Value
 // adapted from mbgl-native-gl::/expression-test/expression_test_parser.cpp
@@ -146,6 +149,14 @@ Map::Map(const std::string &style,
               };
 
         loop->run();
+    } else if (style.empty()) {
+        // construct blank JSON
+        map->getStyle().loadJSON(R"({
+            "version": 8,
+            "name": "test style",
+            "sources": {},
+            "layers": []
+        })");
     } else {
         throw std::invalid_argument("style is not valid");
     }
@@ -185,6 +196,36 @@ void Map::addImage(const std::string &name,
 
     map->getStyle().addImage(std::make_unique<mbgl::style::Image>(
         name, std::move(cPremultipliedImage), ratio, make_sdf));
+}
+
+void Map::addSource(const std::string &id, const std::string &options) {
+    using namespace mbgl::style;
+    using namespace mbgl::style::conversion;
+
+    Error error;
+    mbgl::optional<std::unique_ptr<Source>> source
+        = convertJSON<std::unique_ptr<Source>>(options, error, id);
+
+    if (!source.has_value()) {
+        throw std::invalid_argument(error.message.c_str());
+    }
+
+    map->getStyle().addSource(std::move(*source));
+}
+
+void Map::addLayer(const std::string &options) {
+    using namespace mbgl::style;
+    using namespace mbgl::style::conversion;
+
+    Error error;
+    mbgl::optional<std::unique_ptr<Layer>> layer
+        = convertJSON<std::unique_ptr<Layer>>(options, error);
+
+    if (!layer.has_value()) {
+        throw std::invalid_argument(error.message.c_str());
+    }
+
+    map->getStyle().addLayer(std::move(*layer));
 }
 
 const double Map::getBearing() { return std::abs(map->getCameraOptions().bearing.value_or(0)); }
@@ -304,7 +345,26 @@ void Map::setBounds(const double &xmin,
         {}));
 }
 
+void Map::setGeoJSON(const std::string &sourceID, const std::string &geoJSON) {
+    using namespace mbgl::style;
+
+    GeoJSONSource *source = static_cast<GeoJSONSource *>(map->getStyle().getSource(sourceID));
+
+    if (source == nullptr) {
+        throw std::runtime_error(sourceID + " is not a valid source in map");
+    }
+
+    if (source->getType() != SourceType::GeoJSON) {
+        throw std::runtime_error(sourceID + " is not a GeoJSON source");
+    }
+
+    source->setGeoJSON(mapbox::geojson::parse(geoJSON));
+}
+
 void Map::setLayerFilter(const std::string &id, const std::optional<std::string> &expression) {
+    using namespace mbgl::style;
+    using namespace mbgl::style::conversion;
+
     auto layer = map->getStyle().getLayer(id);
     if (layer == nullptr) {
         throw std::runtime_error(id + " is not a valid layer id in map");
@@ -313,7 +373,8 @@ void Map::setLayerFilter(const std::string &id, const std::optional<std::string>
     if (!expression.has_value() || expression.value().empty()) {
         layer->setFilter(mbgl::style::Filter());
     } else {
-        auto filter = parseFilter(expression.value());
+        Error error;
+        auto filter = *convertJSON<Filter>(expression.value(), error);
         layer->setFilter(filter);
     }
 }

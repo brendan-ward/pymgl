@@ -226,3 +226,107 @@ def test_list_sources_remote_style():
     )
 
     assert map.listSources() == ["composite"]
+
+
+def test_add_source():
+    map = Map("", 10, 10)
+
+    map.addSource(
+        "geojson",
+        json.dumps(
+            {"type": "geojson", "data": {"type": "Point", "coordinates": [0, 0]}}
+        ),
+    )
+    map.addSource(
+        "vector_url", json.dumps({"type": "vector", "url": "mbtiles://land.mbtiles"})
+    )
+    map.addSource(
+        "vector_tiles",
+        json.dumps(
+            {
+                "type": "vector",
+                "tiles": ["http://test/{x}/{y}/{z}.pbf"],
+                "minzoom": 2,
+                "maxzoom": 12,
+            }
+        ),
+    )
+    map.addSource(
+        "raster_url",
+        json.dumps({"type": "raster", "url": "mbtiles://geography-class-png.mbtiles"}),
+    )
+    map.addSource(
+        "raster_tiles",
+        json.dumps(
+            {
+                "type": "raster",
+                "tiles": ["http://test/{x}/{y}/{z}.pbf"],
+                "minzoom": 2,
+                "maxzoom": 12,
+                "tileSize": 256,
+            }
+        ),
+    )
+    map.addSource(
+        "image",
+        json.dumps(
+            {
+                "type": "image",
+                "url": "https://services.arcgisonline.com/arcgis/rest/services/World_Terrain_Base/MapServer/tile/0/0/0",
+                "coordinates": [[-180, 90], [180, 90], [180, -90], [-180, -90]],
+            }
+        ),
+    )
+
+    assert map.listSources() == [
+        "geojson",
+        "vector_url",
+        "vector_tiles",
+        "raster_url",
+        "raster_tiles",
+        "image",
+    ]
+
+
+def test_add_layer():
+    map = Map("", 10, 10)
+
+    map.addLayer(
+        json.dumps(
+            {
+                "id": "background",
+                "type": "background",
+                "paint": {"background-color": "#0000FF"},
+            }
+        )
+    )
+
+    map.addLayer(json.dumps({"id": "circle", "source": "geojson", "type": "circle"}))
+
+    assert map.listLayers() == ["background", "circle"]
+
+
+def test_set_geojson():
+    map = Map("", 10, 10)
+
+    geoJSON = json.dumps({"type": "Point", "coordinates": [0, 0]})
+
+    with pytest.raises(RuntimeError, match="geojson is not a valid source"):
+        map.setGeoJSON("geojson", geoJSON)
+
+    map.addSource(
+        "vector_url", json.dumps({"type": "vector", "url": "mbtiles://land.mbtiles"})
+    )
+    with pytest.raises(RuntimeError, match="vector_url is not a GeoJSON source"):
+        map.setGeoJSON("vector_url", geoJSON)
+
+    map.addSource(
+        "geojson",
+        json.dumps(
+            {
+                "type": "geojson",
+                "data": {"type": "GeometryCollection", "geometries": []},
+            }
+        ),
+    )
+    map.setGeoJSON("geojson", geoJSON)

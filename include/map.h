@@ -68,6 +68,9 @@ public:
                   float ratio,
                   bool make_sdf);
 
+    void addSource(const std::string &id, const std::string &options);
+    void addLayer(const std::string &options);
+
     void setBearing(const double &bearing);
     void setCenter(const double &longitude, const double &latitude);
     void setBounds(const double &xmin,
@@ -75,6 +78,7 @@ public:
                    const double &xmax,
                    const double &ymax,
                    const double &padding = 0);
+    void setGeoJSON(const std::string &sourceID, const std::string &geoJSON);
     void setLayerFilter(const std::string &id, const std::optional<std::string> &expression);
     void setLayerVisibility(const std::string &id, bool visible);
     void setPitch(const double &pitch);

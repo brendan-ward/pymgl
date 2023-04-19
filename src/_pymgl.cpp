@@ -121,6 +121,31 @@ NB_MODULE(_pymgl, m) {
                 the Mapbox Style Specification for more information about
                 SDF images.
         )pbdoc")
+        .def("addSource",
+             &Map::addSource,
+             R"pbdoc(
+                Add a source to the map.
+
+                Parameters
+                ---------
+                id : str
+                    ID of the source.  Used when referencing this source in the style.
+                options : str
+                    JSON-encoded source options.  Fields are specific to the source type.
+            )pbdoc",
+             nb::arg("id"),
+             nb::arg("options"))
+        .def("addLayer",
+             &Map::addLayer,
+             R"pbdoc(
+                Add a layer to the map.
+
+                Parameters
+                ----------
+                options : str
+                    JSON-encoded layer options.  Fields are specific to the layer type.
+            )pbdoc",
+             nb::arg("options"))
         .def_prop_ro("bearing", &Map::getBearing)
         .def_prop_ro("center", &Map::getCenter)
         .def_prop_ro("pitch", &Map::getPitch)
@@ -248,6 +273,20 @@ NB_MODULE(_pymgl, m) {
             )pbdoc",
              nb::arg("longitude"),
              nb::arg("latitude"))
+        .def("setGeoJSON",
+             &Map::setGeoJSON,
+             R"pbdoc(
+                Set GeoJSON data on a GeoJSON source in the map.
+
+                Parameters
+                ----------
+                sourceID : str
+                    ID of the source, which must already exist in the map
+                geoJSON : str
+                    JSON-encoded GeoJSON data
+             )pbdoc",
+             nb::arg("sourceID"),
+             nb::arg("geoJSON"))
         .def("setLayerFilter",
              &Map::setLayerFilter,
              R"pbdoc(
