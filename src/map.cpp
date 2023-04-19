@@ -10,6 +10,7 @@
 #include <mbgl/map/map_options.hpp>
 #include <mbgl/style/conversion/filter.hpp>
 #include <mbgl/style/conversion/json.hpp>
+#include <mbgl/style/conversion/source.hpp>
 #include <mbgl/style/conversion/tileset.hpp>
 #include <mbgl/style/layers/background_layer.hpp>
 #include <mbgl/style/sources/geojson_source.hpp>
@@ -33,8 +34,11 @@ namespace mgl_wrapper {
 
 // helper function to parse filter expr from JSON string to Expression
 mbgl::style::Filter parseFilter(const std::string &expression) {
-    mbgl::style::conversion::Error error;
-    return *mbgl::style::conversion::convertJSON<mbgl::style::Filter>(expression, error);
+    using namespace mbgl::style;
+    using namespace mbgl::style::conversion;
+
+    Error error;
+    return *convertJSON<Filter>(expression, error);
 }
 
 // helper function to write JSON from mbgl::Value
@@ -202,55 +206,19 @@ void Map::addImage(const std::string &name,
         name, std::move(cPremultipliedImage), ratio, make_sdf));
 }
 
-void Map::addGeoJSONSource(const std::string &id,
-                           const std::optional<std::string> &geoJSON,
-                           const std::optional<uint8_t> minzoom,
-                           const std::optional<uint8_t> maxzoom) {
-
-    using namespace mbgl;
+void Map::addSource(const std::string &id, const std::string &options) {
     using namespace mbgl::style;
+    using namespace mbgl::style::conversion;
 
-    Mutable<GeoJSONOptions> options = makeMutable<GeoJSONOptions>();
-    options->minzoom                = minzoom.value_or(0);
-    options->maxzoom                = maxzoom.value_or(18); // default in geojson_source.hpp
-    auto source                     = std::make_unique<GeoJSONSource>(id, std::move(options));
+    Error error;
+    mbgl::optional<std::unique_ptr<Source>> source
+        = convertJSON<std::unique_ptr<Source>>(options, error, id);
 
-    if (geoJSON.has_value()) {
-        source->setGeoJSON(mapbox::geojson::parse(geoJSON.value()));
+    if (!source.has_value()) {
+        throw std::invalid_argument(error.message.c_str());
     }
 
-    map->getStyle().addSource(std::move(source));
-}
-
-void Map::addVectorSourceURL(const std::string &id,
-                             const std::string &url,
-                             const std::optional<float> minzoom,
-                             const std::optional<float> maxzoom) {
-
-    map->getStyle().addSource(std::make_unique<mbgl::style::VectorSource>(
-        id,
-        url,
-        maxzoom.has_value() ? mbgl::optional<float>(maxzoom.value()) : mbgl::optional<float>(),
-        minzoom.has_value() ? mbgl::optional<float>(minzoom.value()) : mbgl::optional<float>()));
-}
-
-void Map::addVectorSourceTiles(const std::string &id,
-                               const std::vector<std::string> &tiles,
-                               const std::optional<uint8_t> minzoom,
-                               const std::optional<uint8_t> maxzoom,
-                               const std::optional<std::string> &attribution,
-                               const std::optional<std::string> &scheme) {
-
-    using namespace mbgl::style;
-
-    auto tileset = mbgl::Tileset(
-        tiles,
-        mbgl::Range<uint8_t>(minzoom.value_or(0), maxzoom.value_or(mbgl::util::MAX_ZOOM)),
-        attribution.value_or(""),
-        scheme.has_value() && (scheme.value() != "xyz") ? mbgl::Tileset::Scheme::TMS
-                                                        : mbgl::Tileset::Scheme::XYZ);
-
-    map->getStyle().addSource(std::make_unique<VectorSource>(id, tileset));
+    map->getStyle().addSource(std::move(*source));
 }
 
 void Map::addBackgroundLayer(const std::string &id, const std::string &color) {
