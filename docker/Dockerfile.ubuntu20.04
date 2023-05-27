@@ -39,4 +39,4 @@ RUN apt-get update && \
     /usr/sbin/update-ccache-symlinks
 
 #  Install python test deps
-RUN python3 -m pip install pytest pytest-benchmark pytest-valgrind python-dotenv Pillow numpy pixelmatch requests
+RUN python3 -m pip install pytest pytest-benchmark pytest-valgrind python-dotenv Pillow numpy pixelmatch requests versioneer
