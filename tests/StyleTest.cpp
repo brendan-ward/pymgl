@@ -67,6 +67,39 @@ TEST(Style, FileGeoJSON) {
     EXPECT_TRUE(image_matches(img_filename, 10));
 }
 
+TEST(Style, LocalStyleGeoJSON) {
+    const string test = "example-style-geojson";
+    string style      = "file://" + FIXTURES_PATH + test + ".json";
+
+    Map map = Map(style, 100, 100, 1);
+    map.setBounds(-125, 37.5, -115, 42.5);
+    auto img = map.renderPNG();
+
+    const string img_filename = test + ".png";
+
+    // to write out expected image, uncomment
+    // write_test_image(img, img_filename, true);
+
+    write_test_image(img, img_filename, false);
+    EXPECT_TRUE(image_matches(img_filename, 10));
+}
+
+TEST(Style, LocalStyleFileRemoteRaster) {
+    const string test = "example-style-remote-raster";
+    string style      = "file://" + FIXTURES_PATH + test + ".json";
+
+    Map map  = Map(style, 256, 256, 1);
+    auto img = map.renderPNG();
+
+    const string img_filename = test + ".png";
+
+    // to write out expected image, uncomment
+    // write_test_image(img, img_filename, true);
+
+    write_test_image(img, img_filename, false);
+    EXPECT_TRUE(image_matches(img_filename, 10));
+}
+
 TEST(Style, RemoteRaster) {
     const string test  = "example-style-remote-raster";
     const string style = read_style(test + ".json");
@@ -127,8 +160,10 @@ TEST(Style, MapboxStyle) {
         GTEST_SKIP_("Missing Mapbox Token");
     }
 
-    Map map  = Map("mapbox://styles/mapbox/streets-v11", 256, 256, 1, 0, 0, 0, token, "mapbox");
+    Map map = Map("mapbox://styles/mapbox/streets-v11", 256, 256, 1, 0, 0, 0, token, "mapbox");
+    std::cout << "Before render map" << std::endl;
     auto img = map.renderPNG();
+    std::cout << "After render map" << std::endl;
 
     const string img_filename = "mapbox-streets-v11.png";
 
@@ -140,7 +175,9 @@ TEST(Style, MapboxStyle) {
 }
 
 TEST(Style, BadRemoteStyleURL) {
-    EXPECT_THROW(Map("https://google.com/bogus_style", 10, 10), std::runtime_error);
+    Map map = Map("https://google.com/bogus_style", 10, 10);
+
+    EXPECT_THROW(map.renderPNG(), std::runtime_error);
 }
 
 TEST(Style, Labels) {
