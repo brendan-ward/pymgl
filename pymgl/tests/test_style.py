@@ -101,7 +101,7 @@ def test_slow_remote_style_url(poorconn_http_server, tmp_path):
     with pytest.raises(RuntimeError, match="request timed out"):
         Map(
             "http://localhost:8111/bogus_style",
-        )
+        ).load()
         # NOTE: this emits errors from poorconn
 
 

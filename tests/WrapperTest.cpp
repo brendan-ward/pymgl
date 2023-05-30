@@ -345,8 +345,8 @@ TEST(Wrapper, ListLayersRemoteStyle) {
     }
 
     Map map = Map("mapbox://styles/mapbox/streets-v11", 10, 10, 1, 0, 0, 0, token, "mapbox");
-    // remote map requires render call to load all remote assets
-    map.renderPNG();
+    // remote map must be loaded to fetch all remote assets
+    map.load();
 
     EXPECT_EQ(map.listLayers().size(), 111);
 }
@@ -370,8 +370,8 @@ TEST(Wrapper, ListSourcesRemoteStyle) {
     }
 
     Map map = Map("mapbox://styles/mapbox/streets-v11", 10, 10, 1, 0, 0, 0, token, "mapbox");
-    // remote map requires render call to load all remote assets
-    map.renderPNG();
+    // remote map must be loaded to fetch all remote assets
+    map.load();
 
     auto sources = map.listSources();
     EXPECT_EQ(sources.size(), 1);
@@ -445,4 +445,61 @@ TEST(Wrapper, AddLayer) {
     EXPECT_EQ(layers.size(), 2);
     EXPECT_EQ(layers[0], "background");
     EXPECT_EQ(layers[1], "circle");
+}
+
+TEST(Wrapper, FeatureState) {
+    Map map = Map(read_style("example-style-geojson-features.json"), 10, 10);
+
+    // feature state is always empty before map is loaded
+    EXPECT_EQ(map.getFeatureState("geojson", "box", "0").has_value(), false);
+
+    // force map to load before setting state
+    map.load();
+    EXPECT_EQ(map.getFeatureState("geojson", "box", "0").has_value(), false);
+
+    map.setFeatureState("geojson", "box", "0", R"({"a": true})");
+    EXPECT_EQ(map.getFeatureState("geojson", "box", "0").has_value(), true);
+    EXPECT_EQ(map.getFeatureState("geojson", "box", "0").value(), R"({
+    "a": true
+})");
+
+    map.setFeatureState("geojson", "box", "0", R"({"a": false})");
+    EXPECT_EQ(map.getFeatureState("geojson", "box", "0").has_value(), true);
+    EXPECT_EQ(map.getFeatureState("geojson", "box", "0").value(), R"({
+    "a": false
+})");
+
+    map.setFeatureState("geojson", "box", "0", R"({"b": "value"})");
+    EXPECT_EQ(map.getFeatureState("geojson", "box", "0").has_value(), true);
+    EXPECT_EQ(map.getFeatureState("geojson", "box", "0").value().size(), 36);
+
+    // NOTE: this gets flattened to d:1, internal:1
+    map.setFeatureState("geojson", "box", "0", R"({"d": {"internal": 1}})");
+    EXPECT_EQ(map.getFeatureState("geojson", "box", "0").has_value(), true);
+    EXPECT_EQ(map.getFeatureState("geojson", "box", "0").value().size(), 67);
+
+    map.removeFeatureState("geojson", "box", "0", "a");
+    // map must be rendered to force feature state to update
+    map.render();
+    EXPECT_EQ(map.getFeatureState("geojson", "box", "0").has_value(), true);
+    EXPECT_EQ(map.getFeatureState("geojson", "box", "0").value().size(), 51);
+
+    // can still set state on a feature that doesn't exist
+    EXPECT_EQ(map.getFeatureState("geojson", "box", "1").has_value(), false);
+    map.setFeatureState("geojson", "box", "1", R"({"a": true})");
+    EXPECT_EQ(map.getFeatureState("geojson", "box", "1").has_value(), true);
+    map.removeFeatureState("geojson", "box", "1", "a");
+    map.render();
+    EXPECT_EQ(map.getFeatureState("geojson", "box", "1").has_value(), false);
+
+    EXPECT_THROW(map.getFeatureState("invalid-source", "box", "0"), std::runtime_error);
+    EXPECT_THROW(map.getFeatureState("geojson", "invalid-layer", "0"), std::runtime_error);
+
+    EXPECT_THROW(map.setFeatureState("invalid-source", "box", "0", R"({"a": true})"),
+                 std::runtime_error);
+    EXPECT_THROW(map.setFeatureState("geojson", "invalid-layer", "0", R"({"a": true})"),
+                 std::runtime_error);
+
+    EXPECT_THROW(map.removeFeatureState("invalid-source", "box", "0", "a"), std::runtime_error);
+    EXPECT_THROW(map.removeFeatureState("geojson", "invalid-layer", "0", "a"), std::runtime_error);
 }

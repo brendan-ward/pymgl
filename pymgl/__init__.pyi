@@ -102,6 +102,24 @@ class Map:
     @property
     def zoom(self) -> float:
         """map zoom"""
+    def getFeatureState(self, sourceID: str, layerID: str, featureID: str) -> str:
+        """Get the current feature state of a feature
+
+        NOTE: map must be loaded first.
+
+        Parameters
+        ----------
+        sourceID : str
+            source ID
+        layerID : str
+            layer ID
+        featureID : str
+            feature ID
+
+        Returns
+        -------
+        JSON str or None
+        """
     def getLayerFilter(self, id: str) -> str:
         """Get the filter of a layer in the map
 
@@ -165,6 +183,29 @@ class Map:
         -------
         list
         """
+    def load(self) -> None:
+        """Force map to load all assets."""
+    def removeFeatureState(
+        self, sourceID: str, layerID: str, featureID: str, stateKey: str
+    ) -> None:
+        """Removes the feature state for a single state key of a feature.
+
+        NOTE: map must be loaded first and map must be rendered after
+        calling removeFeatureState to update state.
+
+        Parameters
+        ----------
+        sourceID : str
+            source ID
+        layerID : str
+            layer ID
+        featureID : str
+            feature ID
+        stateKey : str
+            key in feature state to remove
+        """
+    def render(self) -> None:
+        """Force the map to render in order to load assets and update state."""
     def renderPNG(self) -> bytes:
         """Render the map to PNG bytes."""
     def renderBuffer(self) -> np.ndarray[np.uint8]:
@@ -189,6 +230,24 @@ class Map:
         xmax : float
         ymax : float
         padding : int, optional (default: 0)
+        """
+    def setFeatureState(
+        self, sourceID: str, layerID: str, featureID: str, state: str
+    ) -> None:
+        """Sets the current feature state of a feature.
+
+        NOTE: map must be loaded first.
+
+        Parameters
+        ----------
+        sourceID : str
+            source ID
+        layerID : str
+            layer ID
+        featureID : str
+            feature ID
+        state : str
+            JSON-encoded feature state
         """
     def setGeoJSON(self, sourceID: str, geoJSON: str) -> None:
         """Set GeoJSON data on a GeoJSON source in the map.

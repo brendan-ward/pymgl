@@ -8,6 +8,7 @@
 
 #include <mbgl/map/map_observer.hpp>
 #include <mbgl/map/map_options.hpp>
+#include <mbgl/renderer/renderer.hpp>
 #include <mbgl/style/conversion/filter.hpp>
 #include <mbgl/style/conversion/json.hpp>
 #include <mbgl/style/conversion/layer.hpp>
@@ -224,6 +225,33 @@ const std::pair<double, double> Map::getCenter() {
     return std::pair<double, double>(center.longitude(), center.latitude());
 }
 
+const std::optional<std::string> Map::getFeatureState(const std::string &sourceID,
+                                                      const std::string &layerID,
+                                                      const std::string &featureID) {
+
+    if (map->getStyle().getSource(sourceID) == nullptr) {
+        throw std::runtime_error(sourceID + " is not a valid source in map");
+    }
+
+    if (map->getStyle().getLayer(layerID) == nullptr) {
+        throw std::runtime_error(layerID + " is not a valid layer id in map");
+    }
+
+    mbgl::FeatureState state;
+    frontend->getRenderer()->getFeatureState(state, sourceID, layerID, featureID);
+
+    if (state.size() == 0) {
+        return std::optional<std::string>();
+    }
+
+    rapidjson::StringBuffer buffer;
+    rapidjson::PrettyWriter<rapidjson::StringBuffer> writer(buffer);
+    writer.SetFormatOptions(rapidjson::kFormatSingleLineArray);
+    writeJSON(writer, state);
+
+    return buffer.GetString();
+}
+
 const std::optional<std::string> Map::getLayerFilter(const std::string &id) {
     auto layer = map->getStyle().getLayer(id);
     if (layer == nullptr) {
@@ -344,6 +372,28 @@ const std::vector<std::string> Map::listSources() {
     return sourceIds;
 }
 
+void Map::load() {
+    if (!map->isFullyLoaded()) {
+        frontend->render(*map);
+    } else {
+    }
+}
+
+void Map::removeFeatureState(const std::string &sourceID,
+                             const std::string &layerID,
+                             const std::string &featureID,
+                             const std::string &stateKey) {
+    if (map->getStyle().getSource(sourceID) == nullptr) {
+        throw std::runtime_error(sourceID + " is not a valid source in map");
+    }
+
+    if (map->getStyle().getLayer(layerID) == nullptr) {
+        throw std::runtime_error(layerID + " is not a valid layer id in map");
+    }
+
+    frontend->getRenderer()->removeFeatureState(sourceID, layerID, featureID, stateKey);
+}
+
 void Map::setCenter(const double &longitude, const double &latitude) {
     map->jumpTo(mbgl::CameraOptions().withCenter(mbgl::LatLng{latitude, longitude}));
 }
@@ -374,6 +424,78 @@ void Map::setGeoJSON(const std::string &sourceID, const std::string &geoJSON) {
     }
 
     source->setGeoJSON(mapbox::geojson::parse(geoJSON));
+}
+
+void Map::setFeatureState(const std::string &sourceID,
+                          const std::string &layerID,
+                          const std::string &featureID,
+                          const std::string &state) {
+
+    using namespace mbgl::style;
+    using namespace mbgl::style::conversion;
+
+    if (map->getStyle().getSource(sourceID) == nullptr) {
+        throw std::runtime_error(sourceID + " is not a valid source in map");
+    }
+
+    if (map->getStyle().getLayer(layerID) == nullptr) {
+        throw std::runtime_error(layerID + " is not a valid layer id in map");
+    }
+
+    // parse JSON into an object
+    mbgl::JSDocument d;
+    d.Parse<0>(state.c_str(), state.length());
+    if (d.HasParseError()) {
+        throw std::runtime_error("error parsing feature state: " + mbgl::formatJSONParseError(d));
+    }
+    const mbgl::JSValue *stateJSON = &d;
+
+    // parse object into FeatureState
+    std::string stateKey;
+    mbgl::Value stateValue;
+    bool valueParsed = false;
+    mbgl::FeatureState featureState;
+
+    // Adapted from maplibre-gl-native::platform/node/src/node_map.cpp
+    const std::function<std::experimental::optional<Error>(const std::string &,
+                                                           const Convertible &)>
+        convertFn
+        = [&](const std::string &k, const Convertible &v) -> std::experimental::optional<Error> {
+        std::experimental::optional<mbgl::Value> value = toValue(v);
+        if (value) {
+            stateValue  = std::move(*value);
+            valueParsed = true;
+        } else if (isArray(v)) {
+            std::vector<mbgl::Value> array;
+            std::size_t length = arrayLength(v);
+            array.reserve(length);
+            for (size_t i = 0; i < length; ++i) {
+                std::experimental::optional<mbgl::Value> arrayVal = toValue(arrayMember(v, i));
+                if (arrayVal) {
+                    array.emplace_back(*arrayVal);
+                }
+            }
+            std::unordered_map<std::string, mbgl::Value> result;
+            result[k]   = std::move(array);
+            stateValue  = std::move(result);
+            valueParsed = true;
+            return {};
+
+        } else if (isObject(v)) {
+            eachMember(v, convertFn);
+        }
+        if (!valueParsed) {
+            throw std::runtime_error("could not parse feature state value");
+        }
+
+        stateKey               = k;
+        featureState[stateKey] = stateValue;
+        return std::experimental::nullopt;
+    };
+
+    eachMember(stateJSON, convertFn);
+
+    frontend->getRenderer()->setFeatureState(sourceID, layerID, featureID, featureState);
 }
 
 void Map::setLayerFilter(const std::string &id, const std::optional<std::string> &expression) {
@@ -440,6 +562,8 @@ void Map::setZoom(const double &zoom) {
     validateZoom(zoom);
     map->jumpTo(mbgl::CameraOptions().withZoom(zoom));
 }
+
+void Map::render() { frontend->render(*map); }
 
 const std::string Map::renderPNG() {
     // render produces premultiplied image; unpremultiply it
