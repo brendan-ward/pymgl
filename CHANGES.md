@@ -20,6 +20,7 @@
     sources and layers after construction (#14)
 -   add support for getting and setting paint property of a layer:
     `getLayerPaintProperty`, `setLayerPaintProperty` (#16)
+-   add support for getting, setting, and removing feature state (#17)
 
 ## 0.3.1 (1/10/2023)
 
