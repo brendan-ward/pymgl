@@ -112,7 +112,20 @@ class Map:
 
         Returns
         -------
-        str or None
+        JSON str or None
+        """
+    def getLayerPaintProperty(self, id: str, property: str) -> str:
+        """Get the value of a layer paint property in the map
+
+        Parameters
+        ----------
+        id : str
+            id of layer in map
+        property : str
+
+        Returns
+        -------
+        JSON str or None
         """
     def getLayerJSON(self, id: str) -> str:
         """Get JSON that describes a layer
@@ -124,7 +137,7 @@ class Map:
 
         Returns
         -------
-        str
+        JSON str
         """
     def getLayerVisibility(self, id: str) -> bool:
         """Get the visibility of a layer in the map
@@ -196,6 +209,18 @@ class Map:
             id of layer in map
         visible : str, optional (default None)
             JSON string or None / empty string to clear filter
+        """
+    def setLayerPaintProperty(self, id: str, property: str, value: str) -> None:
+        """Set the filter of a layer in the map
+
+        Parameters
+        ----------
+        id : str
+            id of layer in map
+        property : str
+            name of paint property
+        value : JSON str
+            JSON-encoded value of paint property
         """
     def setLayerVisibility(self, id: str, visible: bool) -> None:
         """Set the visibility of a layer in the map

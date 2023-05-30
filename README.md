@@ -164,6 +164,8 @@ map.setPitch(pitch)  # map pitch in degrees
 
 map.setLayerFilter(layerId, filterJSON or None)
 
+map.setLayerPaintProperty(layerId, property, value)
+
 map.setLayerVisibility(layerId, True / False)
 ```
 
@@ -188,8 +190,15 @@ map.listLayers()  # [<layerId1>, ...]
 
 map.listSources()  # [<sourceId1>, ...]
 
+map.getLayerFilter(<layerId>)  # returns JSON value or None
+
+map.getLayerPaintProperty(<layerId>, <property>)  # returns JSON value or None
+
 map.getLayerJSON(<layerId>)  # returns JSON describing layer
 ```
+
+NOTE: paint properties may be decoded to their internal representation. For
+example, a CSS color string `#FF0000` will be returned as `["rgba", 255, 0, 0, 1]`.
 
 IMPORTANT: if you are using a remotely-hosted style, you need to force the map
 to render - which loads all underying assets - before listing the style's layers,

@@ -170,6 +170,42 @@ TEST(Wrapper, LayerFilter) {
                  std::runtime_error);
 }
 
+TEST(Wrapper, LayerPaintProperty) {
+    Map map = Map(read_style("example-style-geojson.json"), 10, 10);
+
+    // an undefined value should be blank
+    auto invalidProperty = map.getLayerPaintProperty("box", "invalid");
+    EXPECT_EQ(invalidProperty.has_value(), false);
+
+    // RGB(A) get parsed to arrays
+    auto fillColor = map.getLayerPaintProperty("box", "fill-color");
+    EXPECT_EQ(fillColor.value(), R"(["rgba", 255, 0, 0, 1])");
+
+    auto fillOpacity = map.getLayerPaintProperty("box", "fill-opacity");
+    EXPECT_EQ(fillOpacity.value(), "0.5");
+
+    map.setLayerPaintProperty("box", "fill-opacity", "0.75");
+    EXPECT_EQ(map.getLayerPaintProperty("box", "fill-opacity").value(), "0.75");
+
+    map.setLayerPaintProperty("box", "fill-opacity", "{\"stops\": [[0, 0], [2, 1]]}");
+    EXPECT_EQ(map.getLayerPaintProperty("box", "fill-opacity").value(),
+              R"(["interpolate", ["linear"], ["zoom"], 0, 0, 2, 1])");
+
+    map.setLayerPaintProperty("box", "fill-color", "\"#00FF00\"");
+    EXPECT_EQ(map.getLayerPaintProperty("box", "fill-color").value(), R"(["rgba", 0, 255, 0, 1])");
+
+    map.setLayerPaintProperty("box", "fill-color", "\"rgba(0,0,255,0.5)\"");
+    EXPECT_EQ(map.getLayerPaintProperty("box", "fill-color").value(),
+              R"(["rgba", 0, 0, 255, 0.5])");
+
+    EXPECT_THROW(map.setLayerPaintProperty("invalid_layer", "invalid_property", "invalid_value"),
+                 std::runtime_error);
+    EXPECT_THROW(map.setLayerPaintProperty("box", "invalid_property", "invalid_value"),
+                 std::runtime_error);
+    EXPECT_THROW(map.setLayerPaintProperty("box", "fill-color", "invalid_value"),
+                 std::runtime_error);
+}
+
 TEST(Wrapper, LayerJSON) {
     Map map = Map(read_style("example-style-geojson.json"), 10, 10);
 
