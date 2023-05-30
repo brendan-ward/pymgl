@@ -232,8 +232,8 @@ def test_list_layers_remote_style():
         provider="mapbox",
     )
 
-    # remote styles require render to load all assets
-    map.renderPNG()
+    # remote map must be loaded to fetch all remote assets
+    map.load()
 
     assert len(map.listLayers()) == 111
 
@@ -367,3 +367,40 @@ def test_set_geojson():
         ),
     )
     map.setGeoJSON("geojson", geoJSON)
+
+
+def test_feature_state():
+    map = Map(read_style("example-style-geojson-features.json"), 10, 10, 1)
+
+    assert map.getFeatureState("geojson", "box", "0") is None
+
+    map.load()
+    assert map.getFeatureState("geojson", "box", "0") is None
+
+    map.setFeatureState("geojson", "box", "0", '{"a": true}')
+    state = map.getFeatureState("geojson", "box", "0")
+
+    assert state is not None
+    assert json.loads(state) == {"a": True}
+
+
+def test_feature_state_invalid():
+    map = Map(read_style("example-style-geojson-features.json"), 10, 10, 1)
+
+    with pytest.raises(RuntimeError, match="invalid-source is not a valid source"):
+        map.getFeatureState("invalid-source", "box", "0")
+
+    with pytest.raises(RuntimeError, match="invalid-source is not a valid source"):
+        map.setFeatureState("invalid-source", "box", "0", '{"a": true}')
+
+    with pytest.raises(RuntimeError, match="invalid-source is not a valid source"):
+        map.removeFeatureState("invalid-source", "box", "0", "a")
+
+    with pytest.raises(RuntimeError, match="invalid-layer is not a valid layer"):
+        map.getFeatureState("geojson", "invalid-layer", "0")
+
+    with pytest.raises(RuntimeError, match="invalid-layer is not a valid layer"):
+        map.setFeatureState("geojson", "invalid-layer", "0", '{"a": true}')
+
+    with pytest.raises(RuntimeError, match="invalid-layer is not a valid layer"):
+        map.removeFeatureState("geojson", "invalid-layer", "0", "a")

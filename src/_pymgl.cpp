@@ -151,6 +151,29 @@ NB_MODULE(_pymgl, m) {
         .def_prop_ro("pitch", &Map::getPitch)
         .def_prop_ro("size", &Map::getSize)
         .def_prop_ro("zoom", &Map::getZoom)
+        .def("getFeatureState",
+             &Map::getFeatureState,
+             R"pbdoc(
+                Get the current feature state of a feature
+
+                NOTE: map must be loaded first.
+
+                Parameters
+                ----------
+                sourceID : str
+                    source ID
+                layerID : str
+                    layer ID
+                featureID : str
+                    feature ID
+
+                Returns
+                -------
+                JSON str or None
+            )pbdoc",
+             nb::arg("sourceID"),
+             nb::arg("layerID"),
+             nb::arg("featureID"))
         .def("getLayerFilter",
              &Map::getLayerFilter,
              R"pbdoc(
@@ -216,6 +239,35 @@ NB_MODULE(_pymgl, m) {
              nb::arg("id"))
         .def("listLayers", &Map::listLayers)
         .def("listSources", &Map::listSources)
+        .def("load", &Map::load)
+        .def("removeFeatureState",
+             &Map::removeFeatureState,
+             R"pbdoc(
+                Removes the feature state for a single state key of a feature.
+
+                NOTE: map must be loaded first and map must be rendered after
+                calling removeFeatureState to update state.
+
+                Parameters
+                ----------
+                sourceID : str
+                    source ID
+                layerID : str
+                    layer ID
+                featureID : str
+                    feature ID
+                stateKey : str
+                    key in feature state to remove
+            )pbdoc",
+             nb::arg("sourceID"),
+             nb::arg("layerID"),
+             nb::arg("featureID"),
+             nb::arg("stateKey"))
+        .def("render",
+             &Map::render,
+             R"pbdoc(
+                Force the map to render in order to load assets and update state.
+            )pbdoc")
         .def(
             "renderPNG",
             [](Map &self) -> nb::bytes {
@@ -291,6 +343,28 @@ NB_MODULE(_pymgl, m) {
             )pbdoc",
              nb::arg("longitude"),
              nb::arg("latitude"))
+        .def("setFeatureState",
+             &Map::setFeatureState,
+             R"pbdoc(
+                Sets the current feature state of a feature.
+
+                NOTE: map must be loaded first.
+
+                Parameters
+                ----------
+                sourceID : str
+                    source ID
+                layerID : str
+                    layer ID
+                featureID : str
+                    feature ID
+                state : str
+                    JSON-encoded feature state
+            )pbdoc",
+             nb::arg("sourceID"),
+             nb::arg("layerID"),
+             nb::arg("featureID"),
+             nb::arg("state"))
         .def("setGeoJSON",
              &Map::setGeoJSON,
              R"pbdoc(

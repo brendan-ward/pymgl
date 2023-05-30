@@ -46,11 +46,15 @@ public:
     Map(const Map &) = delete;
     ~Map();
 
+    void render();
     const std::string renderPNG();
     const std::unique_ptr<uint8_t[]> renderBuffer();
 
     const double getBearing();
     const std::pair<double, double> getCenter();
+    const std::optional<std::string> getFeatureState(const std::string &sourceID,
+                                                     const std::string &layerID,
+                                                     const std::string &featureID);
     const std::optional<std::string> getLayerFilter(const std::string &id);
     const std::optional<std::string> getLayerPaintProperty(const std::string &id,
                                                            const std::string &property);
@@ -63,6 +67,8 @@ public:
     const std::vector<std::string> listLayers();
     const std::vector<std::string> listSources();
 
+    void load();
+
     void addImage(const std::string &name,
                   const std::string &image,
                   uint32_t width,
@@ -73,6 +79,11 @@ public:
     void addSource(const std::string &id, const std::string &options);
     void addLayer(const std::string &options);
 
+    void removeFeatureState(const std::string &sourceID,
+                            const std::string &layerID,
+                            const std::string &featureID,
+                            const std::string &stateKey);
+
     void setBearing(const double &bearing);
     void setCenter(const double &longitude, const double &latitude);
     void setBounds(const double &xmin,
@@ -81,6 +92,10 @@ public:
                    const double &ymax,
                    const double &padding = 0);
     void setGeoJSON(const std::string &sourceID, const std::string &geoJSON);
+    void setFeatureState(const std::string &sourceID,
+                         const std::string &layerID,
+                         const std::string &featureID,
+                         const std::string &state);
     void setLayerFilter(const std::string &id, const std::optional<std::string> &expression);
     void setLayerPaintProperty(const std::string &id,
                                const std::string &property,

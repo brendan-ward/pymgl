@@ -201,14 +201,14 @@ NOTE: paint properties may be decoded to their internal representation. For
 example, a CSS color string `#FF0000` will be returned as `["rgba", 255, 0, 0, 1]`.
 
 IMPORTANT: if you are using a remotely-hosted style, you need to force the map
-to render - which loads all underying assets - before listing the style's layers,
+to load - which loads all underying assets - before listing the style's layers,
 sources, or other properties.
 
 ```Python
 map = Map("mapbox://styles/mapbox/streets-v11", token=<mapbox token>, provider="mapbox")
 
 map.listLayers()  # []
-map.renderPNG()
+map.load()
 map.listLayers()  # [<layerId1>, ...]
 ```
 
@@ -396,6 +396,32 @@ map.addLayer(json.dumps({
     "paint": { ... }
 }))
 ```
+
+### Feature state
+
+You can get, set, and remove feature state after the map has been loaded.
+
+```Python
+
+map = Map(<style with source "exampleSource" and layer "exampleLayer">, ...)
+
+map.load()
+map.getFeatureState("exampleSource", "exampleLayer", "0")  # returns None
+map.setFeatureState("exampleSource", "exampleLayer", "0", "{\"a\": true}")
+map.getFeatureState("exampleSource", "exampleLayer", "0")  # returns "{\"a\": true}"
+
+# remove the state value for key "a"
+map.removeFeatureState("exampleSource", "exampleLayer", "0", "a")
+map.render()
+map.getFeatureState("exampleSource", "exampleLayer", "0")  # returns None
+```
+
+NOTE: features must already have a unique, numeric ID set on each feature. There
+is currently no support for `promoteId` like in MapLibre GL JS.
+
+IMPORTANT: the map must be loaded before getting or setting feature state. You
+must manually force a render in order for the map to update feature state after
+removing a state key
 
 ### Unsupported features
 
