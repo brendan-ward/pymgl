@@ -52,6 +52,8 @@ public:
     const double getBearing();
     const std::pair<double, double> getCenter();
     const std::optional<std::string> getLayerFilter(const std::string &id);
+    const std::optional<std::string> getLayerPaintProperty(const std::string &id,
+                                                           const std::string &property);
     const std::optional<std::string> getLayerJSON(const std::string &id);
     const bool getLayerVisibility(const std::string &id);
     const double getPitch();
@@ -80,6 +82,9 @@ public:
                    const double &padding = 0);
     void setGeoJSON(const std::string &sourceID, const std::string &geoJSON);
     void setLayerFilter(const std::string &id, const std::optional<std::string> &expression);
+    void setLayerPaintProperty(const std::string &id,
+                               const std::string &property,
+                               const std::string &value);
     void setLayerVisibility(const std::string &id, bool visible);
     void setPitch(const double &pitch);
     void setZoom(const double &zoom);

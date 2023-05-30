@@ -243,6 +243,32 @@ const std::optional<std::string> Map::getLayerFilter(const std::string &id) {
     return buffer.GetString();
 }
 
+const std::optional<std::string> Map::getLayerPaintProperty(const std::string &id,
+                                                            const std::string &property) {
+
+    using namespace mbgl::style;
+
+    auto layer = map->getStyle().getLayer(id);
+    if (layer == nullptr) {
+        throw std::runtime_error(id + " is not a valid layer id in map");
+    }
+
+    auto paintProperty = layer->getProperty(property);
+    auto kind          = paintProperty.getKind();
+    auto value         = paintProperty.getValue();
+
+    if (kind == StyleProperty::Kind::Undefined) {
+        return std::optional<std::string>();
+    }
+
+    rapidjson::StringBuffer buffer;
+    rapidjson::PrettyWriter<rapidjson::StringBuffer> writer(buffer);
+    writer.SetFormatOptions(rapidjson::kFormatSingleLineArray);
+    writeJSON(writer, value);
+
+    return buffer.GetString();
+}
+
 const std::optional<std::string> Map::getLayerJSON(const std::string &id) {
     auto layer = map->getStyle().getLayer(id);
     if (layer == nullptr) {
@@ -366,6 +392,27 @@ void Map::setLayerFilter(const std::string &id, const std::optional<std::string>
         auto filter = *convertJSON<Filter>(expression.value(), error);
         layer->setFilter(filter);
     }
+}
+
+void Map::setLayerPaintProperty(const std::string &id,
+                                const std::string &property,
+                                const std::string &value) {
+
+    using namespace mbgl::style::conversion;
+
+    auto layer = map->getStyle().getLayer(id);
+    if (layer == nullptr) {
+        throw std::runtime_error(id + " is not a valid layer id in map");
+    }
+
+    mbgl::JSDocument d;
+    d.Parse<0>(value.c_str(), value.length());
+    if (d.HasParseError()) {
+        throw std::runtime_error("error parsing paint property: " + mbgl::formatJSONParseError(d));
+    }
+
+    const mbgl::JSValue *propertyValue = &d;
+    layer->setProperty(property, propertyValue);
 }
 
 void Map::setLayerVisibility(const std::string &id, bool visible) {

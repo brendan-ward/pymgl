@@ -163,9 +163,27 @@ NB_MODULE(_pymgl, m) {
 
                 Returns
                 -------
-                str or None
+                JSON str or None
             )pbdoc",
              nb::arg("id"))
+        .def("getLayerPaintProperty",
+             &Map::getLayerPaintProperty,
+             R"pbdoc(
+                Get the value of a layer paint property in the map
+
+                Parameters
+                ----------
+                id : str
+                    id of layer in map
+                property : str
+                    name of the paint property
+
+                Returns
+                -------
+                JSON str or None
+            )pbdoc",
+             nb::arg("id"),
+             nb::arg("property"))
         .def("getLayerJSON",
              &Map::getLayerJSON,
              R"pbdoc(
@@ -301,6 +319,23 @@ NB_MODULE(_pymgl, m) {
             )pbdoc",
              nb::arg("id"),
              nb::arg("filter") = nb::none())
+        .def("setLayerPaintProperty",
+             &Map::setLayerPaintProperty,
+             R"pbdoc(
+                Set a paint property of a layer in the map
+
+                Parameters
+                ----------
+                id : str
+                    id of layer in map
+                property : str
+                    name of the paint property
+                value : str
+                    JSON string of paint property value
+            )pbdoc",
+             nb::arg("id"),
+             nb::arg("property"),
+             nb::arg("value"))
         .def("setLayerVisibility",
              &Map::setLayerVisibility,
              R"pbdoc(
