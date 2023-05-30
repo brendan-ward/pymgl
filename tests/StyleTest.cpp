@@ -340,12 +340,12 @@ TEST(Style, LayerVisibility) {
     Map map = Map(style, 100, 100, 1);
     map.setBounds(-125, 37.5, -115, 42.5);
     // toggle visible box hidden
-    map.setLayerVisibility("box", false);
-    EXPECT_EQ(map.getLayerVisibility("box"), false);
+    map.setVisibility("box", false);
+    EXPECT_EQ(map.getVisibility("box"), false);
 
     // toggle hidden box visible
-    map.setLayerVisibility("box2", true);
-    EXPECT_EQ(map.getLayerVisibility("box2"), true);
+    map.setVisibility("box2", true);
+    EXPECT_EQ(map.getVisibility("box2"), true);
 
     auto img = map.renderPNG();
 
@@ -364,7 +364,7 @@ TEST(Style, LayerFilter) {
 
     Map map = Map(style, 100, 100, 1);
     map.setBounds(-125, 37.5, -115, 42.5);
-    map.setLayerFilter("box", R"(["==", "id", 2])");
+    map.setFilter("box", R"(["==", "id", 2])");
 
     auto img = map.renderPNG();
 

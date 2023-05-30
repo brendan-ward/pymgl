@@ -150,60 +150,57 @@ TEST(Wrapper, SetGeoJSON) {
 
 TEST(Wrapper, LayerFilter) {
     Map map = Map(read_style("example-style-geojson.json"), 10, 10);
-    map.setLayerFilter("box", R"(["==", "foo", "bar"])");
+    map.setFilter("box", R"(["==", "foo", "bar"])");
 
-    EXPECT_TRUE(map.getLayerFilter("box").has_value());
-    EXPECT_EQ(map.getLayerFilter("box").value(), R"(["==", "foo", "bar"])");
+    EXPECT_TRUE(map.getFilter("box").has_value());
+    EXPECT_EQ(map.getFilter("box").value(), R"(["==", "foo", "bar"])");
 
-    map.setLayerFilter("box", "");
-    EXPECT_FALSE(map.getLayerFilter("box").has_value());
+    map.setFilter("box", "");
+    EXPECT_FALSE(map.getFilter("box").has_value());
 
-    map.setLayerFilter("box", std::optional<std::string>());
-    EXPECT_FALSE(map.getLayerFilter("box").has_value());
+    map.setFilter("box", std::optional<std::string>());
+    EXPECT_FALSE(map.getFilter("box").has_value());
 
     // empty style has no layers to set; should throw errors
     Map map2 = Map(read_style("example-style-empty.json"), 10, 10);
-    EXPECT_THROW(map2.getLayerFilter("any_layer"), std::runtime_error);
-    EXPECT_THROW(map2.setLayerFilter("any_layer", R"(["==", "foo", "bar"])"), std::runtime_error);
-    EXPECT_THROW(map2.setLayerFilter("any_layer", ""), std::runtime_error);
-    EXPECT_THROW(map2.setLayerFilter("any_layer", std::optional<std::string>()),
-                 std::runtime_error);
+    EXPECT_THROW(map2.getFilter("any_layer"), std::runtime_error);
+    EXPECT_THROW(map2.setFilter("any_layer", R"(["==", "foo", "bar"])"), std::runtime_error);
+    EXPECT_THROW(map2.setFilter("any_layer", ""), std::runtime_error);
+    EXPECT_THROW(map2.setFilter("any_layer", std::optional<std::string>()), std::runtime_error);
 }
 
 TEST(Wrapper, LayerPaintProperty) {
     Map map = Map(read_style("example-style-geojson.json"), 10, 10);
 
     // an undefined value should be blank
-    auto invalidProperty = map.getLayerPaintProperty("box", "invalid");
+    auto invalidProperty = map.getPaintProperty("box", "invalid");
     EXPECT_EQ(invalidProperty.has_value(), false);
 
     // RGB(A) get parsed to arrays
-    auto fillColor = map.getLayerPaintProperty("box", "fill-color");
+    auto fillColor = map.getPaintProperty("box", "fill-color");
     EXPECT_EQ(fillColor.value(), R"(["rgba", 255, 0, 0, 1])");
 
-    auto fillOpacity = map.getLayerPaintProperty("box", "fill-opacity");
+    auto fillOpacity = map.getPaintProperty("box", "fill-opacity");
     EXPECT_EQ(fillOpacity.value(), "0.5");
 
-    map.setLayerPaintProperty("box", "fill-opacity", "0.75");
-    EXPECT_EQ(map.getLayerPaintProperty("box", "fill-opacity").value(), "0.75");
+    map.setPaintProperty("box", "fill-opacity", "0.75");
+    EXPECT_EQ(map.getPaintProperty("box", "fill-opacity").value(), "0.75");
 
-    map.setLayerPaintProperty("box", "fill-opacity", "{\"stops\": [[0, 0], [2, 1]]}");
-    EXPECT_EQ(map.getLayerPaintProperty("box", "fill-opacity").value(),
+    map.setPaintProperty("box", "fill-opacity", "{\"stops\": [[0, 0], [2, 1]]}");
+    EXPECT_EQ(map.getPaintProperty("box", "fill-opacity").value(),
               R"(["interpolate", ["linear"], ["zoom"], 0, 0, 2, 1])");
 
-    map.setLayerPaintProperty("box", "fill-color", "\"#00FF00\"");
-    EXPECT_EQ(map.getLayerPaintProperty("box", "fill-color").value(), R"(["rgba", 0, 255, 0, 1])");
+    map.setPaintProperty("box", "fill-color", "\"#00FF00\"");
+    EXPECT_EQ(map.getPaintProperty("box", "fill-color").value(), R"(["rgba", 0, 255, 0, 1])");
 
-    map.setLayerPaintProperty("box", "fill-color", "\"rgba(0,0,255,0.5)\"");
-    EXPECT_EQ(map.getLayerPaintProperty("box", "fill-color").value(),
-              R"(["rgba", 0, 0, 255, 0.5])");
+    map.setPaintProperty("box", "fill-color", "\"rgba(0,0,255,0.5)\"");
+    EXPECT_EQ(map.getPaintProperty("box", "fill-color").value(), R"(["rgba", 0, 0, 255, 0.5])");
 
-    EXPECT_THROW(map.setLayerPaintProperty("invalid_layer", "invalid_property", "invalid_value"),
+    EXPECT_THROW(map.setPaintProperty("invalid_layer", "invalid_property", "invalid_value"),
                  std::runtime_error);
-    EXPECT_THROW(map.setLayerPaintProperty("box", "invalid_property", "invalid_value"),
+    EXPECT_THROW(map.setPaintProperty("box", "invalid_property", "invalid_value"),
                  std::runtime_error);
-    EXPECT_THROW(map.setLayerPaintProperty("box", "fill-color", "invalid_value"),
-                 std::runtime_error);
+    EXPECT_THROW(map.setPaintProperty("box", "fill-color", "invalid_value"), std::runtime_error);
 }
 
 TEST(Wrapper, LayerJSON) {
@@ -242,17 +239,17 @@ TEST(Wrapper, LayerJSON) {
 
 TEST(Wrapper, LayerVisibility) {
     Map map = Map(read_style("example-style-geojson.json"), 10, 10);
-    map.setLayerVisibility("box", true);
-    EXPECT_EQ(map.getLayerVisibility("box"), true);
+    map.setVisibility("box", true);
+    EXPECT_EQ(map.getVisibility("box"), true);
 
-    map.setLayerVisibility("box", false);
-    EXPECT_EQ(map.getLayerVisibility("box"), false);
+    map.setVisibility("box", false);
+    EXPECT_EQ(map.getVisibility("box"), false);
 
     // empty style has no layers to set; should throw errors
     Map map2 = Map(read_style("example-style-empty.json"), 10, 10);
-    EXPECT_THROW(map2.setLayerVisibility("any_layer", true), std::runtime_error);
-    EXPECT_THROW(map2.setLayerVisibility("any_layer", false), std::runtime_error);
-    EXPECT_THROW(map2.getLayerVisibility("any_layer"), std::runtime_error);
+    EXPECT_THROW(map2.setVisibility("any_layer", true), std::runtime_error);
+    EXPECT_THROW(map2.setVisibility("any_layer", false), std::runtime_error);
+    EXPECT_THROW(map2.getVisibility("any_layer"), std::runtime_error);
 }
 
 TEST(Wrapper, SetPitch) {

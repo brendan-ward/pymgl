@@ -162,11 +162,11 @@ map.setBearing(bearing)  # map bearing in degrees
 
 map.setPitch(pitch)  # map pitch in degrees
 
-map.setLayerFilter(layerId, filterJSON or None)
+map.setFilter(layerId, filterJSON or None)
 
-map.setLayerPaintProperty(layerId, property, value)
+map.setPaintProperty(layerId, property, value)
 
-map.setLayerVisibility(layerId, True / False)
+map.setVisibility(layerId, True / False)
 ```
 
 You can retrieve these values using attributes, if needed:
@@ -190,9 +190,9 @@ map.listLayers()  # [<layerId1>, ...]
 
 map.listSources()  # [<sourceId1>, ...]
 
-map.getLayerFilter(<layerId>)  # returns JSON value or None
+map.getFilter(<layerId>)  # returns JSON value or None
 
-map.getLayerPaintProperty(<layerId>, <property>)  # returns JSON value or None
+map.getPaintProperty(<layerId>, <property>)  # returns JSON value or None
 
 map.getLayerJSON(<layerId>)  # returns JSON describing layer
 ```

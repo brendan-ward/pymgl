@@ -174,29 +174,29 @@ NB_MODULE(_pymgl, m) {
              nb::arg("sourceID"),
              nb::arg("layerID"),
              nb::arg("featureID"))
-        .def("getLayerFilter",
-             &Map::getLayerFilter,
+        .def("getFilter",
+             &Map::getFilter,
              R"pbdoc(
                 Get the filter of a layer in the map
 
                 Parameters
                 ----------
-                id : str
+                layerID : str
                     id of layer in map
 
                 Returns
                 -------
                 JSON str or None
             )pbdoc",
-             nb::arg("id"))
-        .def("getLayerPaintProperty",
-             &Map::getLayerPaintProperty,
+             nb::arg("layerID"))
+        .def("getPaintProperty",
+             &Map::getPaintProperty,
              R"pbdoc(
                 Get the value of a layer paint property in the map
 
                 Parameters
                 ----------
-                id : str
+                layerID : str
                     id of layer in map
                 property : str
                     name of the paint property
@@ -205,7 +205,7 @@ NB_MODULE(_pymgl, m) {
                 -------
                 JSON str or None
             )pbdoc",
-             nb::arg("id"),
+             nb::arg("layerID"),
              nb::arg("property"))
         .def("getLayerJSON",
              &Map::getLayerJSON,
@@ -214,29 +214,29 @@ NB_MODULE(_pymgl, m) {
 
                 Parameters
                 ----------
-                id : str
+                layerID : str
                     id of layer in map
 
                 Returns
                 -------
                 str
             )pbdoc",
-             nb::arg("id"))
-        .def("getLayerVisibility",
-             &Map::getLayerVisibility,
+             nb::arg("layerID"))
+        .def("getVisibility",
+             &Map::getVisibility,
              R"pbdoc(
                 Get the visibility of a layer in the map
 
                 Parameters
                 ----------
-                id : str
+                layerID : str
                     id of layer in map
 
                 Returns
                 -------
                 bool
             )pbdoc",
-             nb::arg("id"))
+             nb::arg("layerID"))
         .def("listLayers", &Map::listLayers)
         .def("listSources", &Map::listSources)
         .def("load", &Map::load)
@@ -379,22 +379,22 @@ NB_MODULE(_pymgl, m) {
              )pbdoc",
              nb::arg("sourceID"),
              nb::arg("geoJSON"))
-        .def("setLayerFilter",
-             &Map::setLayerFilter,
+        .def("setFilter",
+             &Map::setFilter,
              R"pbdoc(
                 Set the filter of a layer in the map
 
                 Parameters
                 ----------
-                id : str
+                layerID : str
                     id of layer in map
                 visible : str, optional (default None)
                     JSON string or None / empty string to clear filter
             )pbdoc",
-             nb::arg("id"),
+             nb::arg("layerID"),
              nb::arg("filter") = nb::none())
-        .def("setLayerPaintProperty",
-             &Map::setLayerPaintProperty,
+        .def("setPaintProperty",
+             &Map::setPaintProperty,
              R"pbdoc(
                 Set a paint property of a layer in the map
 
@@ -407,22 +407,22 @@ NB_MODULE(_pymgl, m) {
                 value : str
                     JSON string of paint property value
             )pbdoc",
-             nb::arg("id"),
+             nb::arg("layerID"),
              nb::arg("property"),
              nb::arg("value"))
-        .def("setLayerVisibility",
-             &Map::setLayerVisibility,
+        .def("setVisibility",
+             &Map::setVisibility,
              R"pbdoc(
                 Set the visibility of a layer in the map
 
                 Parameters
                 ----------
-                id : str
+                layerID : str
                     id of layer in map
                 visible : bool
                     set to True to make layer visible
             )pbdoc",
-             nb::arg("id"),
+             nb::arg("layerID"),
              nb::arg("visible"))
         .def("setPitch",
              &Map::setPitch,

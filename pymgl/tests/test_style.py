@@ -241,11 +241,11 @@ def test_layer_visibility():
     map = Map(read_style(f"{test}.json"), 100, 100)
     map.setBounds(-125, 37.5, -115, 42.5)
 
-    map.setLayerVisibility("box", False)
-    assert map.getLayerVisibility("box") == False
+    map.setVisibility("box", False)
+    assert map.getVisibility("box") == False
 
-    map.setLayerVisibility("box2", True)
-    assert map.getLayerVisibility("box2") == True
+    map.setVisibility("box2", True)
+    assert map.getVisibility("box2") == True
 
     img_data = map.renderPNG()
 
@@ -257,10 +257,10 @@ def test_layer_filter():
     map = Map(read_style(f"{test}.json"), 100, 100)
     map.setBounds(-125, 37.5, -115, 42.5)
 
-    assert map.getLayerFilter("box") is None
+    assert map.getFilter("box") is None
 
-    map.setLayerFilter("box", """["==", "id", 2]""")
-    assert map.getLayerFilter("box") == """["==", "id", 2]"""
+    map.setFilter("box", """["==", "id", 2]""")
+    assert map.getFilter("box") == """["==", "id", 2]"""
 
     img_data = map.renderPNG()
 

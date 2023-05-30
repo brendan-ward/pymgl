@@ -252,10 +252,10 @@ const std::optional<std::string> Map::getFeatureState(const std::string &sourceI
     return buffer.GetString();
 }
 
-const std::optional<std::string> Map::getLayerFilter(const std::string &id) {
-    auto layer = map->getStyle().getLayer(id);
+const std::optional<std::string> Map::getFilter(const std::string &layerID) {
+    auto layer = map->getStyle().getLayer(layerID);
     if (layer == nullptr) {
-        throw std::runtime_error(id + " is not a valid layer id in map");
+        throw std::runtime_error(layerID + " is not a valid layer id in map");
     }
     auto filter = layer->getFilter();
     if (!filter) {
@@ -271,14 +271,14 @@ const std::optional<std::string> Map::getLayerFilter(const std::string &id) {
     return buffer.GetString();
 }
 
-const std::optional<std::string> Map::getLayerPaintProperty(const std::string &id,
-                                                            const std::string &property) {
+const std::optional<std::string> Map::getPaintProperty(const std::string &layerID,
+                                                       const std::string &property) {
 
     using namespace mbgl::style;
 
-    auto layer = map->getStyle().getLayer(id);
+    auto layer = map->getStyle().getLayer(layerID);
     if (layer == nullptr) {
-        throw std::runtime_error(id + " is not a valid layer id in map");
+        throw std::runtime_error(layerID + " is not a valid layer id in map");
     }
 
     auto paintProperty = layer->getProperty(property);
@@ -297,10 +297,10 @@ const std::optional<std::string> Map::getLayerPaintProperty(const std::string &i
     return buffer.GetString();
 }
 
-const std::optional<std::string> Map::getLayerJSON(const std::string &id) {
-    auto layer = map->getStyle().getLayer(id);
+const std::optional<std::string> Map::getLayerJSON(const std::string &layerID) {
+    auto layer = map->getStyle().getLayer(layerID);
     if (layer == nullptr) {
-        throw std::runtime_error(id + " is not a valid layer id in map");
+        throw std::runtime_error(layerID + " is not a valid layer id in map");
     }
 
     // adapted from expression_test_parser.cpp
@@ -313,10 +313,10 @@ const std::optional<std::string> Map::getLayerJSON(const std::string &id) {
     return buffer.GetString();
 }
 
-const bool Map::getLayerVisibility(const std::string &id) {
-    auto layer = map->getStyle().getLayer(id);
+const bool Map::getVisibility(const std::string &layerID) {
+    auto layer = map->getStyle().getLayer(layerID);
     if (layer == nullptr) {
-        throw std::runtime_error(id + " is not a valid layer id in map");
+        throw std::runtime_error(layerID + " is not a valid layer id in map");
     }
     return layer->getVisibility() == mbgl::style::VisibilityType::Visible;
 }
@@ -498,13 +498,13 @@ void Map::setFeatureState(const std::string &sourceID,
     frontend->getRenderer()->setFeatureState(sourceID, layerID, featureID, featureState);
 }
 
-void Map::setLayerFilter(const std::string &id, const std::optional<std::string> &expression) {
+void Map::setFilter(const std::string &layerID, const std::optional<std::string> &expression) {
     using namespace mbgl::style;
     using namespace mbgl::style::conversion;
 
-    auto layer = map->getStyle().getLayer(id);
+    auto layer = map->getStyle().getLayer(layerID);
     if (layer == nullptr) {
-        throw std::runtime_error(id + " is not a valid layer id in map");
+        throw std::runtime_error(layerID + " is not a valid layer id in map");
     }
 
     if (!expression.has_value() || expression.value().empty()) {
@@ -516,15 +516,15 @@ void Map::setLayerFilter(const std::string &id, const std::optional<std::string>
     }
 }
 
-void Map::setLayerPaintProperty(const std::string &id,
-                                const std::string &property,
-                                const std::string &value) {
+void Map::setPaintProperty(const std::string &layerID,
+                           const std::string &property,
+                           const std::string &value) {
 
     using namespace mbgl::style::conversion;
 
-    auto layer = map->getStyle().getLayer(id);
+    auto layer = map->getStyle().getLayer(layerID);
     if (layer == nullptr) {
-        throw std::runtime_error(id + " is not a valid layer id in map");
+        throw std::runtime_error(layerID + " is not a valid layer id in map");
     }
 
     mbgl::JSDocument d;
@@ -537,10 +537,10 @@ void Map::setLayerPaintProperty(const std::string &id,
     layer->setProperty(property, propertyValue);
 }
 
-void Map::setLayerVisibility(const std::string &id, bool visible) {
-    auto layer = map->getStyle().getLayer(id);
+void Map::setVisibility(const std::string &layerID, bool visible) {
+    auto layer = map->getStyle().getLayer(layerID);
     if (layer == nullptr) {
-        throw std::runtime_error(id + " is not a valid layer id in map");
+        throw std::runtime_error(layerID + " is not a valid layer id in map");
     }
     layer->setVisibility(visible ? mbgl::style::VisibilityType::Visible
                                  : mbgl::style::VisibilityType::None);
