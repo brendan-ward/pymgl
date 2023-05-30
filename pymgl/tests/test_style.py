@@ -91,8 +91,8 @@ def test_mapbox_style_missing_token():
 
 
 def test_bad_remote_style_url():
-    with pytest.raises(RuntimeError, match="loading style failed"):
-        Map("https://google.com/bogus_style")
+    with pytest.raises(RuntimeError, match="HTTP status code 404"):
+        Map("https://google.com/bogus_style").renderPNG()
 
 
 @pytest.mark.skipif(not has_poorconn, reason="poorconn test lib not available")

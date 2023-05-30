@@ -136,19 +136,8 @@ Map::Map(const std::string &style,
         map->getStyle().loadJSON(style);
     } else if (style.find("://") != -1) {
         // otherwise must be URL-like reference, like "mapbox://styles/mapbox/streets-v11"
-
+        // if local, must be an absolute path: file://<absolute_path>
         map->getStyle().loadURL(style);
-
-        // run the looop until the style is loaded
-        observer->didFinishLoadingStyleCallback = [&]() { loop->stop(); };
-
-        observer->didFailLoadingMapCallback
-            = [&](mbgl::MapLoadError type, const std::string &description) {
-                  loop->stop();
-                  throw std::runtime_error(description);
-              };
-
-        loop->run();
     } else if (style.empty()) {
         // construct blank JSON
         map->getStyle().loadJSON(R"({

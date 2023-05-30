@@ -188,7 +188,34 @@ map.listLayers()  # [<layerId1>, ...]
 
 map.listSources()  # [<sourceId1>, ...]
 
-map.getLayerJSON()  # returns JSON describing layer
+map.getLayerJSON(<layerId>)  # returns JSON describing layer
+```
+
+IMPORTANT: if you are using a remotely-hosted style, you need to force the map
+to render - which loads all underying assets - before listing the style's layers,
+sources, or other properties.
+
+```Python
+map = Map("mapbox://styles/mapbox/streets-v11", token=<mapbox token>, provider="mapbox")
+
+map.listLayers()  # []
+map.renderPNG()
+map.listLayers()  # [<layerId1>, ...]
+```
+
+Alternatively, you can download the style yourself and provide that as input to
+the Map, and it will show all layers without requiring a render first. However, not all assets will be loaded until the first render.
+
+```Python
+from urllib.request import urlopen
+
+url = f"https://api.mapbox.com/styles/v1/mapbox/streets-v11?access_token={MAPBOX_TOKEN}"
+
+with urlopen(url) as r:
+    style = r.read()
+
+map = Map(style.decode("UTF-8") token=<mapbox token>, provider="mapbox")
+map.listLayers()  # [<layerId1>, ...]
 ```
 
 You can auto-fit the map to bounds instead of using center longitude / lantitude
@@ -463,10 +490,6 @@ git submodule add https://github.com/wjakob/nanobind vendor/nanobind
 cd vendor/nanobind
 git submodule update --init --recursive
 ```
-
-Temporary fix: update `vendor/nanobind/nanobind-config.cmake` to comment out
-`COMMAND xcodebuild -version` and
-`COMMAND pkgutil --pkg-info=com.apple.pkg.CLTools_Executables | awk '/version:/ {print $2}'`
 
 ### Maplibre-gl-native
 

@@ -201,6 +201,9 @@ def test_list_layers_remote_style():
         provider="mapbox",
     )
 
+    # remote styles require render to load all assets
+    map.renderPNG()
+
     assert len(map.listLayers()) == 111
 
 
@@ -224,6 +227,9 @@ def test_list_sources_remote_style():
         token=MAPBOX_TOKEN,
         provider="mapbox",
     )
+
+    # remote styles require render to load all assets
+    map.renderPNG()
 
     assert map.listSources() == ["composite"]
 

@@ -23,9 +23,6 @@ python3 setup.py develop
 # tests require virtual display
 Xvfb ${DISPLAY} -screen 0 "1024x768x24" -ac +render -noreset -nolisten tcp  &
 
-# or this if using GLX:
-# Xvfb ${DISPLAY} -screen 0 "1024x768x24" -ac +extension GLX +render -noreset  -nolisten tcp  &
-
 export MAPBOX_TOKEN=<your token>
 
 # run C++ test suite

@@ -309,6 +309,9 @@ TEST(Wrapper, ListLayersRemoteStyle) {
     }
 
     Map map = Map("mapbox://styles/mapbox/streets-v11", 10, 10, 1, 0, 0, 0, token, "mapbox");
+    // remote map requires render call to load all remote assets
+    map.renderPNG();
+
     EXPECT_EQ(map.listLayers().size(), 111);
 }
 
@@ -330,7 +333,10 @@ TEST(Wrapper, ListSourcesRemoteStyle) {
         GTEST_SKIP_("Missing Mapbox Token");
     }
 
-    Map map      = Map("mapbox://styles/mapbox/streets-v11", 10, 10, 1, 0, 0, 0, token, "mapbox");
+    Map map = Map("mapbox://styles/mapbox/streets-v11", 10, 10, 1, 0, 0, 0, token, "mapbox");
+    // remote map requires render call to load all remote assets
+    map.renderPNG();
+
     auto sources = map.listSources();
     EXPECT_EQ(sources.size(), 1);
     EXPECT_EQ(sources[0], "composite");
