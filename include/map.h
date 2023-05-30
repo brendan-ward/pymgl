@@ -55,11 +55,11 @@ public:
     const std::optional<std::string> getFeatureState(const std::string &sourceID,
                                                      const std::string &layerID,
                                                      const std::string &featureID);
-    const std::optional<std::string> getLayerFilter(const std::string &id);
-    const std::optional<std::string> getLayerPaintProperty(const std::string &id,
-                                                           const std::string &property);
-    const std::optional<std::string> getLayerJSON(const std::string &id);
-    const bool getLayerVisibility(const std::string &id);
+    const std::optional<std::string> getFilter(const std::string &layerID);
+    const std::optional<std::string> getPaintProperty(const std::string &layerID,
+                                                      const std::string &property);
+    const std::optional<std::string> getLayerJSON(const std::string &layerID);
+    const bool getVisibility(const std::string &layerID);
     const double getPitch();
     const std::pair<uint32_t, uint32_t> getSize();
     const double getZoom();
@@ -96,11 +96,11 @@ public:
                          const std::string &layerID,
                          const std::string &featureID,
                          const std::string &state);
-    void setLayerFilter(const std::string &id, const std::optional<std::string> &expression);
-    void setLayerPaintProperty(const std::string &id,
-                               const std::string &property,
-                               const std::string &value);
-    void setLayerVisibility(const std::string &id, bool visible);
+    void setFilter(const std::string &layerID, const std::optional<std::string> &expression);
+    void setPaintProperty(const std::string &layerID,
+                          const std::string &property,
+                          const std::string &value);
+    void setVisibility(const std::string &layerID, bool visible);
     void setPitch(const double &pitch);
     void setZoom(const double &zoom);
     void setSize(const uint32_t &width, const uint32_t &height);

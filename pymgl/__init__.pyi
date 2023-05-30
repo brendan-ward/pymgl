@@ -1,5 +1,4 @@
 import numpy as np
-import numpy.typing as npt
 
 class Map:
     def __init__(
@@ -120,24 +119,24 @@ class Map:
         -------
         JSON str or None
         """
-    def getLayerFilter(self, id: str) -> str:
+    def getFilter(self, layerID: str) -> str:
         """Get the filter of a layer in the map
 
         Parameters
         ----------
-        id : str
+        layerID : str
             id of layer in map
 
         Returns
         -------
         JSON str or None
         """
-    def getLayerPaintProperty(self, id: str, property: str) -> str:
+    def getPaintProperty(self, layerID: str, property: str) -> str:
         """Get the value of a layer paint property in the map
 
         Parameters
         ----------
-        id : str
+        layerID : str
             id of layer in map
         property : str
 
@@ -145,24 +144,24 @@ class Map:
         -------
         JSON str or None
         """
-    def getLayerJSON(self, id: str) -> str:
+    def getLayerJSON(self, layerID: str) -> str:
         """Get JSON that describes a layer
 
         Parameters
         ----------
-        id : str
+        layerID : str
             id of layer in map
 
         Returns
         -------
         JSON str
         """
-    def getLayerVisibility(self, id: str) -> bool:
+    def getVisibility(self, layerID: str) -> bool:
         """Get the visibility of a layer in the map
 
         Parameters
         ----------
-        id : str
+        layerID : str
             id of layer in map
 
         Returns
@@ -259,34 +258,34 @@ class Map:
         geoJSON : str
             JSON-encoded GeoJSON data
         """
-    def setLayerFilter(self, id: str, filter: str = None) -> None:
+    def setFilter(self, layerID: str, filter: str = None) -> None:
         """Set the filter of a layer in the map
 
         Parameters
         ----------
-        id : str
+        layerID : str
             id of layer in map
         visible : str, optional (default None)
             JSON string or None / empty string to clear filter
         """
-    def setLayerPaintProperty(self, id: str, property: str, value: str) -> None:
+    def setPaintProperty(self, layerID: str, property: str, value: str) -> None:
         """Set the filter of a layer in the map
 
         Parameters
         ----------
-        id : str
+        layerID : str
             id of layer in map
         property : str
             name of paint property
         value : JSON str
             JSON-encoded value of paint property
         """
-    def setLayerVisibility(self, id: str, visible: bool) -> None:
+    def setVisibility(self, layerID: str, visible: bool) -> None:
         """Set the visibility of a layer in the map
 
         Parameters
         ----------
-        id : str
+        layerID : str
             id of layer in map
         visible : bool
             set to True to make layer visible

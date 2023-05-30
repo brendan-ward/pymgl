@@ -135,50 +135,50 @@ def test_invalid_provider(empty_style):
 @pytest.mark.parametrize("visibility", [True, False])
 def test_layer_visibility_no_layers(empty_style, visibility):
     with pytest.raises(RuntimeError, match="any_layer is not a valid layer id in map"):
-        Map(empty_style).getLayerVisibility("any_layer")
+        Map(empty_style).getVisibility("any_layer")
 
     with pytest.raises(RuntimeError, match="any_layer is not a valid layer id in map"):
-        Map(empty_style).setLayerVisibility("any_layer", visibility)
+        Map(empty_style).setVisibility("any_layer", visibility)
 
 
 @pytest.mark.parametrize("filter", ["""["==", "foo", "bar"]""", "", None])
 def test_layer_filter_no_layers(empty_style, filter):
     with pytest.raises(RuntimeError, match="any_layer is not a valid layer id in map"):
-        Map(empty_style).getLayerFilter("any_layer")
+        Map(empty_style).getFilter("any_layer")
 
     with pytest.raises(RuntimeError, match="any_layer is not a valid layer id in map"):
-        Map(empty_style).setLayerFilter("any_layer", filter)
+        Map(empty_style).setFilter("any_layer", filter)
 
 
 def test_layer_paint_property_no_layers(empty_style):
     with pytest.raises(RuntimeError, match="any_layer is not a valid layer id in map"):
-        Map(empty_style).getLayerPaintProperty("any_layer", "fill-color")
+        Map(empty_style).getPaintProperty("any_layer", "fill-color")
 
     with pytest.raises(RuntimeError, match="any_layer is not a valid layer id in map"):
-        Map(empty_style).setLayerPaintProperty("any_layer", "fill-color", "#FF0000")
+        Map(empty_style).setPaintProperty("any_layer", "fill-color", "#FF0000")
 
 
 def test_layer_paint_property():
     map = Map(read_style("example-style-geojson.json"))
 
-    map.getLayerPaintProperty("box", "fill-opacity") == "0.5"
-    map.setLayerPaintProperty("box", "fill-opacity", "0.75")
-    map.getLayerPaintProperty("box", "fill-opacity") == "0.75"
+    map.getPaintProperty("box", "fill-opacity") == "0.5"
+    map.setPaintProperty("box", "fill-opacity", "0.75")
+    map.getPaintProperty("box", "fill-opacity") == "0.75"
 
-    map.getLayerPaintProperty("box", "fill-color") == '["rgba", 255, 0, 0, 1]'
-    map.getLayerPaintProperty("box", "fill-color") == '"#00FF00"'
-    map.getLayerPaintProperty("box", "fill-color") == '["rgba",0, 255,  0, 1]'
-    map.setLayerPaintProperty("box", "fill-color", '"rgba(0,255,0,0.5)"')
-    map.getLayerPaintProperty("box", "fill-color") == '["rgba", 0, 255, 0, 0.5]'
+    map.getPaintProperty("box", "fill-color") == '["rgba", 255, 0, 0, 1]'
+    map.getPaintProperty("box", "fill-color") == '"#00FF00"'
+    map.getPaintProperty("box", "fill-color") == '["rgba",0, 255,  0, 1]'
+    map.setPaintProperty("box", "fill-color", '"rgba(0,255,0,0.5)"')
+    map.getPaintProperty("box", "fill-color") == '["rgba", 0, 255, 0, 0.5]'
 
 
 def test_layer_paint_property_invalid():
     map = Map(read_style("example-style-geojson.json"))
     with pytest.raises(RuntimeError, match="Invalid value"):
-        map.setLayerPaintProperty("box", "invalid_property", "invalid_value")
+        map.setPaintProperty("box", "invalid_property", "invalid_value")
 
     with pytest.raises(RuntimeError, match="Invalid value"):
-        map.setLayerPaintProperty("box", "invalid_property", "#FF0000")
+        map.setPaintProperty("box", "invalid_property", "#FF0000")
 
 
 def test_layer_json_no_layers(empty_style):
@@ -203,12 +203,12 @@ def test_layer_json():
     assert actual["paint"]["fill-color"] == expected["paint"]["fill-color"]
     assert actual["paint"]["fill-opacity"] == expected["paint"]["fill-opacity"]
 
-    map.setLayerVisibility("box", False)
+    map.setVisibility("box", False)
     actual = json.loads(map.getLayerJSON("box"))
 
     assert actual["layout"] == {"visibility": "none"}
 
-    map.setLayerFilter("box", """["==", "id", 2]""")
+    map.setFilter("box", """["==", "id", 2]""")
     actual = json.loads(map.getLayerJSON("box"))
 
     assert actual["filter"] == ["==", "id", 2]

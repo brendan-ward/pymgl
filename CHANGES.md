@@ -7,10 +7,10 @@
 -   migrated bindings from `pybind11` to `nanobind` for smaller, faster bindings (#11)
 -   upgraded `maplibre-gl-native` to `02c196a`
 -   added several methods to describe layer and map style state (#12):
-    -   added `getLayerFilter` to retrieve a layer's filter and and
-        `setLayerFilter` to set it
-    -   added `getLayerVisibility` to retrieve a layer's visibility and
-        `setLayerVisibility` to set it
+    -   added `getFilter` to retrieve a layer's filter and and
+        `setFilter` to set it
+    -   added `getVisibility` to retrieve a layer's visibility and
+        `setVisibility` to set it
     -   added `getLayerJSON` to serialize a layer's properties to JSON
     -   added `listLayers` to list layers in the map's style, and `listSources`
         to list sources
@@ -19,7 +19,7 @@
 -   allow constructing map with an empty style `Map("")` in order to allow adding
     sources and layers after construction (#14)
 -   add support for getting and setting paint property of a layer:
-    `getLayerPaintProperty`, `setLayerPaintProperty` (#16)
+    `getPaintProperty`, `setPaintProperty` (#16)
 -   add support for getting, setting, and removing feature state (#17)
 
 ## 0.3.1 (1/10/2023)
