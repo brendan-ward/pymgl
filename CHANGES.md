@@ -1,6 +1,6 @@
 # CHANGELOG
 
-## 0.4 (in progress)
+## 0.4.0 (6/12/2023)
 
 ### Improvements
 
@@ -21,6 +21,14 @@
 -   add support for getting and setting paint property of a layer:
     `getPaintProperty`, `setPaintProperty` (#16)
 -   add support for getting, setting, and removing feature state (#17)
+
+### Breaking changes
+
+-   raise exceptions on certain types of invalid styles passed in as JSON (#13);
+    not all invalid styles are detected, and remote styles are not checked for
+    errors at map initialization due to other issues (see #15). Formerly, these
+    errors were not easily available from the style parsing steps of
+    `maplibre-gl-native`.
 
 ## 0.3.1 (1/10/2023)
 
