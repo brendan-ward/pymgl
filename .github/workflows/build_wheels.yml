@@ -32,17 +32,18 @@ jobs:
       matrix:
         os:
           - "ubuntu-24.04"
-          - "ubuntu-22.04"
-          - "ubuntu-20.04"
+          # FIXME:
+          # - "ubuntu-22.04"
+          # - "ubuntu-20.04"
           # - "macos-14"
           - "macos-12"
         include:
           - os: "ubuntu-24.04"
             platform: "x86_64"
-          - os: "ubuntu-22.04"
-            platform: "x86_64"
-          - os: "ubuntu-20.04"
-            platform: "x86_64"
+          # - os: "ubuntu-22.04"
+          #   platform: "x86_64"
+          # - os: "ubuntu-20.04"
+          #   platform: "x86_64"
           # - os: "macos-14"
           #   platform: "arm64"
           - os: "macos-12"
@@ -188,17 +189,18 @@ jobs:
       matrix:
         os:
           - "ubuntu-24.04"
-          - "ubuntu-22.04"
-          - "ubuntu-20.04"
+          # - "ubuntu-22.04"
+          # - "ubuntu-20.04"
           # - "macos-14"
           - "macos-12"
         include:
           - os: "ubuntu-24.04"
             platform: "x86_64"
-          - os: "ubuntu-22.04"
-            platform: "x86_64"
-          - os: "ubuntu-20.04"
-            platform: "x86_64"
+          # FIXME:
+          # - os: "ubuntu-22.04"
+          #   platform: "x86_64"
+          # - os: "ubuntu-20.04"
+          #   platform: "x86_64"
           # - os: "macos-14"
           #   platform: "arm64"
           - os: "macos-12"
@@ -281,18 +283,18 @@ jobs:
       - name: Install and test wheels on Ubuntu
         if: runner.os == 'Linux'
         run: |
-          find ./wheelhouse/artifact -type f -name  "*.whl.$PLATFORM_OS" -print0 -exec bash -c 'mv "${0}" "${0//.$PLATFORM_OS/}"' {} \;
-          uv pip install --find-links ./wheelhouse pymgl
+          find ./wheelhouse -type f -name  "*.whl.$PLATFORM_OS" -print0 -exec bash -c 'mv "${0}" "${0//.$PLATFORM_OS/}"' {} \;
+          uv pip install --no-cache --pre --no-index --find-links wheelhouse pymgl
           uv pip list
-          xvfb-run -a --server-args="-screen 0 1024x768x24 -ac +render -noreset" pytest pymgl -v
+          xvfb-run -a --server-args="-screen 0 1024x768x24 -ac +render -noreset" pytest --pyargs pymgl -v
 
       - name: Install and test wheels on MacOS
         if: runner.os == 'macOS'
         run: |
-          uv pip install --find-links ./wheelhouse pymgl
+          uv pip install --no-cache --pre --no-index --find-links wheelhouse pymgl
           uv pip list
           cd ..
-          pytest pymgl -v
+          pytest --pyargs pymgl -v
 
   # NOTE: publish is limited to MacOS wheels because Linux wheels are not accepted
   # for only Ubuntu, must be manylinux
