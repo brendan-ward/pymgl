@@ -28,7 +28,7 @@ requires-python = ">=3.9"
 dependencies = ["packaging"]
 
 [project.optional-dependencies]
-dev = ["numpy", "Pillow", "ruff", "setuptools", "versioneer"]
+dev = ["numpy", "Pillow", "pre-commit", "ruff", "setuptools", "versioneer"]
 test = [
     "numpy",
     "Pillow",
