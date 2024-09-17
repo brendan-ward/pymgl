@@ -177,7 +177,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: pymgl-wheel-${{ matrix.os }}-${{ matrix.platform }}-${{ matrix.python-version }}
-          path: ./dist/*.whl
+          path: ./dist/*
 
   test-wheels:
     name: TST ${{ matrix.os }} ${{ matrix.platform }} (Python ${{ matrix.python-version }})
