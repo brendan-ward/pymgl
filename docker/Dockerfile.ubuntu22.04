@@ -1,5 +1,7 @@
 FROM ubuntu:22.04
 
+ARG PYTHON_VERSION="3.12"
+
 WORKDIR /app
 
 ENV DISPLAY :99
@@ -22,7 +24,7 @@ RUN apt-get update && \
     # required dependencies
     libcurl4-openssl-dev \
     libicu-dev \
-    libturbojpeg0-dev \
+    libjpeg-turbo8-dev \
     libpng-dev \
     libprotobuf-dev \
     libuv1-dev \
@@ -39,6 +41,6 @@ RUN apt-get update && \
 RUN curl -LsSf https://astral.sh/uv/install.sh | sh && \
     . $HOME/.cargo/env && \
     mkdir /uv && \
-    uv python install 3.10 && \
+    uv python install ${PYTHON_VERSION} && \
     uv venv /uv/.venv
 

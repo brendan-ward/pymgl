@@ -73,7 +73,7 @@ jobs:
             pkg-config \
             libcurl4-openssl-dev \
             libicu-dev \
-            libturbojpeg0-dev \
+            libjpeg-turbo8-dev \
             libpng-dev \
             libprotobuf-dev \
             libuv1-dev \

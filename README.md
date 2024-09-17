@@ -473,7 +473,7 @@ via `homebrew`:
 -   libicu-dev
 -   libpng-dev
 -   libprotobuf-dev
--   libturbojpeg0-dev
+-   libjpeg-turbo8-dev
 -   libx11-dev
 -   libegl-dev
 -   libopengl-dev
@@ -506,7 +506,7 @@ apt-get -y install \
     pkg-config \
     libcurl4-openssl-dev \
     libicu-dev \
-    libturbojpeg0-dev \
+    libjpeg-turbo8-dev \
     libpng-dev \
     libprotobuf-dev \
     libuv1-dev \
