@@ -263,24 +263,38 @@ NB_MODULE(_pymgl, m) {
              nb::arg("layerID"),
              nb::arg("featureID"),
              nb::arg("stateKey"))
-        .def("render",
-             &Map::render,
-             R"pbdoc(
+        .def(
+            "render",
+            //  &Map::render,
+            [](Map &self) {
+                // release the GIL while rendering
+                nb::gil_scoped_release release;
+                self.render();
+            },
+            R"pbdoc(
                 Force the map to render in order to load assets and update state.
             )pbdoc")
         .def(
             "renderPNG",
             [](Map &self) -> nb::bytes {
+                // release the GIL while rendering to PNG but reacquire before
+                // returning Python objects
+                nb::gil_scoped_release release;
                 const std::string png = self.renderPNG();
+                nb::gil_scoped_acquire acquire;
+
                 return nb::bytes(png.c_str(), png.size());
             },
-            nb::call_guard<nb::gil_scoped_release>(),
             R"pbdoc(
                 Render the map to PNG bytes.
             )pbdoc")
         .def(
             "renderBuffer",
             [](Map &self) {
+                // release the GIL while rendering to PNG but reacquire before
+                // returning Python objects
+                nb::gil_scoped_release release;
+
                 // always returns width * height * 4 (RGBA)
                 std::pair<uint32_t, uint32_t> size = self.getSize();
                 size_t shape[1]                    = {size.first * size.second * 4};
@@ -288,6 +302,8 @@ NB_MODULE(_pymgl, m) {
                 // have to hold a reference until we are done
                 auto img = self.renderBuffer();
                 auto buf = img.get();
+
+                nb::gil_scoped_acquire acquire;
 
                 // return a view of the data instead, using capsule to handle
                 // delete of underlying memory
