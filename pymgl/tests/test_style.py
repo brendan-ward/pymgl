@@ -219,7 +219,7 @@ def test_invalid_style(style, error_type, match):
         """{"sources": []}""",
     ],
 )
-def test_style_parse_warnings(capsys, style):
+def test_style_parse_warnings(style):
     Map(style)
 
 

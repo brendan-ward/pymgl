@@ -4,7 +4,7 @@ requires = [
     "versioneer[toml]==0.28",
     # tomli is used by versioneer
     "tomli; python_version < '3.11'",
-    "ninja; sys_platform != 'win32'",
+    "ninja",
     "cmake>=3.12",
 ]
 build-backend = "setuptools.build_meta"
@@ -28,7 +28,15 @@ requires-python = ">=3.9"
 dependencies = ["packaging"]
 
 [project.optional-dependencies]
-dev = ["numpy", "Pillow", "pre-commit", "ruff", "setuptools", "versioneer"]
+dev = [
+    "ninja",
+    "numpy",
+    "Pillow",
+    "pre-commit",
+    "ruff",
+    "setuptools",
+    "versioneer",
+]
 test = [
     "numpy",
     "Pillow",
@@ -38,12 +46,18 @@ test = [
     "pytest-cov",
     "python-dotenv",
     "requests",
-    "poorconn",
 ]
+slownetwork = ["poorconn"]
 
 [project.urls]
 Home = "https://github.com/brendan-ward/pymgl"
 Repository = "https://github.com/brendan-ward/pymgl"
+
+[tool.setuptools]
+packages = ["pymgl", "pymgl.tests", "pymgl.tests.fixtures"]
+
+[tool.uv]
+package = false
 
 [tool.versioneer]
 VCS = "git"

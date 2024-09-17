@@ -1,9 +1,9 @@
+cmake_minimum_required(VERSION 3.18...3.22)
+
 cmake_policy(SET CMP0079 NEW)
 cmake_policy(SET CMP0048 NEW)
 
 project("_pymgl" VERSION "")
-
-cmake_minimum_required(VERSION 3.18...3.22)
 
 # find Python (note: this looks for at least Python 3.9)
 set(Python_FIND_FRAMEWORK LAST) # Prefer Brew/Conda to Apple framework python

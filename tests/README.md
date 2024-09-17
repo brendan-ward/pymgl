@@ -5,7 +5,7 @@ of this project. This creates an executable in `build/<subdir>/tests/pymgl_test`
 
 `<subdir>` is only present if you used python to do the compilation via something
 like `python setup.py build_ext --inplace`. It will be something like
-`temp.macosx-10.15-x86_64-3.9`.
+`temp.macosx-12.6-arm64-cpython-310`.
 
 If you used CMake directly, the executable will be at `build/tests/pymgl_test`.
 

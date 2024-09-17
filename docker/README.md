@@ -5,20 +5,19 @@
 Build the development container (using source files on host):
 
 ```bash
-docker build -f docker/Dockerfile.ubuntu22.04 -t pymgl-dev-ubuntu22.04 .
+docker build -f docker/Dockerfile.ubuntu24.04 -t pymgl-dev-ubuntu24.04 .
 ```
 
 Run the container mounted to the host filesystem for source files:
 
 ```bash
-docker run -it -v "$PWD/:/app" pymgl-dev-ubuntu22.04 /bin/bash
+docker run -it -v "$PWD/:/app" pymgl-dev-ubuntu24.04 /bin/bash
 ```
 
 Then from within the container, run:
 
 ```bash
-python3 setup.py build_ext --debug --inplace
-python3 setup.py develop
+uv pip install -e .[dev,test] -v
 
 # tests require virtual display
 Xvfb ${DISPLAY} -screen 0 "1024x768x24" -ac +render -noreset -nolisten tcp  &

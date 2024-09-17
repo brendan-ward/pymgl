@@ -60,6 +60,31 @@ python3 -m pip install --find-links . pymgl
 
 You also need to install the following runtime dependencies:
 
+**Ubuntu 24.04:**
+
+```bash
+apt-get install
+    libicu74 \
+    libcurl4 \
+    libjpeg-turbo8 \
+    libpng16-16 \
+    libprotobuf32 \
+    libuv1 \
+    libx11-6 \
+    libegl1 \
+    libopengl0 \
+    xvfb
+```
+
+You will also likely need to upgrade the Mesa packages:
+
+```bash
+apt-get install -y software-properties-common
+add-apt-repository -y ppa:kisak/kisak-mesa
+apt-get update
+apt-get install -y libglx-mesa0
+```
+
 **Ubuntu 22.04:**
 
 ```bash
@@ -439,7 +464,7 @@ via `homebrew`:
 -   cmake
 -   ninja
 
-#### Developing on Ubuntu 22.04 or 20.04 requires the following binary libraries:
+#### Developing on Ubuntu requires the following binary libraries:
 
 -   cmake
 -   ninja-build

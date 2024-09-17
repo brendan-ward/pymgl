@@ -15,5 +15,6 @@ dist/*
 
 Pipfile.lock
 poetry.lock
+uv.lock
 
 valgrind.log

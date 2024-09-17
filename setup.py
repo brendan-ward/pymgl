@@ -2,10 +2,9 @@ import os
 import sys
 import subprocess
 
-from setuptools import setup, Extension, find_packages
+from setuptools import setup, Extension
 from setuptools.command.build_ext import build_ext
 import versioneer
-
 
 # A CMakeExtension needs a sourcedir instead of a file list.
 # The name must be the _single_ output extension from the CMake build.
@@ -64,7 +63,6 @@ cmdclass.update({"build_ext": CMakeBuild})
 
 setup(
     version=versioneer.get_version(),
-    packages=find_packages(),
     include_package_data=True,
     exclude_package_data={"": ["*.h", "*.c"]},
     cmdclass=cmdclass,
