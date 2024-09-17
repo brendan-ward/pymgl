@@ -1,8 +1,8 @@
-cmake_minimum_required(VERSION 3.18...3.22)
+cmake_minimum_required(VERSION 3.19 FATAL_ERROR)
 
-cmake_policy(SET CMP0079 NEW)
-cmake_policy(SET CMP0048 NEW)
-
+# FIXME: remove
+# cmake_policy(SET CMP0079 NEW)
+# cmake_policy(SET CMP0048 NEW)
 project("_pymgl" VERSION "")
 
 # find Python (note: this looks for at least Python 3.9)
@@ -13,7 +13,7 @@ if(NOT CMAKE_BUILD_TYPE)
     set(CMAKE_BUILD_TYPE Release)
 endif()
 
-set(MBGL_SOURCE_DIR ${PROJECT_SOURCE_DIR}/vendor/maplibre-gl-native)
+set(MLN_SOURCE_DIR ${PROJECT_SOURCE_DIR}/vendor/maplibre-gl-native)
 
 # Adapted from maplibre-gl-native/CMakeLists.txt
 cmake_policy(SET CMP0063 NEW)
@@ -42,20 +42,20 @@ SET(CMAKE_C_ARCHIVE_FINISH "<CMAKE_RANLIB> -no_warning_for_no_symbols -c <TARGET
 SET(CMAKE_CXX_ARCHIVE_FINISH "<CMAKE_RANLIB> -no_warning_for_no_symbols -c <TARGET>")
 
 # ## Include headers we need from from maplibre-gl-native
-include_directories(${MBGL_SOURCE_DIR}/include)
-include_directories(${MBGL_SOURCE_DIR}/platform/default/include)
+include_directories(${MLN_SOURCE_DIR}/include)
+include_directories(${MLN_SOURCE_DIR}/platform/default/include)
 
 # Some headers are in the src directory, just for fun
-include_directories(${MBGL_SOURCE_DIR}/src)
+include_directories(${MLN_SOURCE_DIR}/src)
 
 # ## Include headers we need from from maplibre-gl-native dependencies
-include_directories(${MBGL_SOURCE_DIR}/vendor/mapbox-base/include)
-include_directories(${MBGL_SOURCE_DIR}/vendor/mapbox-base/deps/geometry.hpp/include)
-include_directories(${MBGL_SOURCE_DIR}/vendor/mapbox-base/deps/optional)
-include_directories(${MBGL_SOURCE_DIR}/vendor/mapbox-base/deps/variant/include)
+include_directories(${MLN_SOURCE_DIR}/vendor/mapbox-base/include)
+include_directories(${MLN_SOURCE_DIR}/vendor/mapbox-base/deps/geometry.hpp/include)
+include_directories(${MLN_SOURCE_DIR}/vendor/mapbox-base/deps/optional)
+include_directories(${MLN_SOURCE_DIR}/vendor/mapbox-base/deps/variant/include)
 
-# ## Build mbgl-core
-include(${PROJECT_SOURCE_DIR}/mbgl-core/maplibre-gl-native-core.cmake)
+# ## Build mln-core
+include(${PROJECT_SOURCE_DIR}/mln-core/maplibre-native-core.cmake)
 
 # ## Include headers for pymgl and build the wrapper
 include_directories(${PROJECT_SOURCE_DIR}/include)
@@ -69,7 +69,7 @@ add_library(
 target_link_libraries(
     mgl_wrapper PRIVATE
     Mapbox::Base
-    mbgl-core
+    mln-core
 )
 
 # ## Build Python module
@@ -81,7 +81,7 @@ nanobind_add_module(
     ${PROJECT_SOURCE_DIR}/src/_pymgl.cpp
 )
 
-# link against mbgl-core
+# link against mln-core
 target_link_libraries(
     _pymgl
     PRIVATE

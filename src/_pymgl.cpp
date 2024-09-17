@@ -265,7 +265,6 @@ NB_MODULE(_pymgl, m) {
              nb::arg("stateKey"))
         .def(
             "render",
-            //  &Map::render,
             [](Map &self) {
                 // release the GIL while rendering
                 nb::gil_scoped_release release;
