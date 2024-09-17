@@ -176,7 +176,8 @@ jobs:
       - name: "Upload artifacts"
         uses: actions/upload-artifact@v4
         with:
-          path: ./dist/*
+          name: pymgl-wheel-${{ matrix.os }}-${{ matrix.platform }}-${{ matrix.python-version }}
+          path: ./dist/*.whl
 
   test-wheels:
     name: TST ${{ matrix.os }} ${{ matrix.platform }} (Python ${{ matrix.python-version }})
@@ -200,6 +201,7 @@ jobs:
       - name: Download wheels from artifacts
         uses: actions/download-artifact@v4
         with:
+          pattern: pymgl-wheel-${{ matrix.os }}-${{ matrix.platform }}-${{ matrix.python-version }}
           path: wheelhouse
 
       - name: Install Ubuntu 24.04 runtime dependencies
@@ -293,26 +295,30 @@ jobs:
     steps:
       - uses: actions/download-artifact@v4
         with:
-          name: artifact
+          pattern: pymgl-wheel-*
           path: wheels
+          merge-multiple: true
 
+      # NOTE: MacOS wheel is the only one that can be published to PyPI
       - name: Copy MacOS wheel
         run: |
           mkdir wheels/dist
           cp wheels/*macos*.whl wheels/dist
 
       - name: Publish MacOS wheel to PyPI
-        uses: pypa/gh-action-pypi-publish@master
+        uses: pypa/gh-action-pypi-publish@release/v1
         with:
           user: __token__
           password: ${{ secrets.PYPI_API_TOKEN }}
           packages_dir: wheels/dist/
 
       - name: Release
-        uses: softprops/action-gh-release@v1
+        uses: softprops/action-gh-release@v2
         with:
-          token: ${{ secrets.GITHUB_TOKEN }}
+          name: Version ${{ github.ref_name }}
+          tag_name: ${{ github.ref }}
           draft: false
           prerelease: false
+          token: ${{ secrets.GITHUB_TOKEN }}
           files: |
             ./wheels/*
