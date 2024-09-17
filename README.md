@@ -36,7 +36,7 @@ python -m pip install pytest Pillow numpy pixelmatch python-dotenv
 python -m pytest --pyargs pymgl -v
 ```
 
-#### Ubuntu
+#### Ubuntu 20.04 - 24.04
 
 Due to the complexity of building manylinux wheels that include OpenGL and
 successfully compile `maplibre-gl-native`, wheels are only available for
@@ -524,6 +524,13 @@ It is included here as a git submodule, per the
 git submodule add https://github.com/wjakob/nanobind vendor/nanobind
 cd vendor/nanobind
 git submodule update --init --recursive
+```
+
+Then to upgrade to a specific version of nanobind for development, if needed:
+
+```bash
+cd vendor/nanobind
+git checkout <version tag>
 ```
 
 ### Maplibre-gl-native
