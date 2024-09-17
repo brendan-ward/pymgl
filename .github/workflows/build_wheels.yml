@@ -108,7 +108,7 @@ jobs:
         run: |
           brew install ccache
 
-      - name: Install python
+      - name: Install python & dependencies
         run: |
           curl -LsSf https://astral.sh/uv/install.sh | sh && \
           . $HOME/.cargo/env && \
@@ -116,12 +116,13 @@ jobs:
           uv venv .venv
           echo "VIRTUAL_ENV=.venv" >> $GITHUB_ENV
           echo "$PWD/.venv/bin" >> $GITHUB_PATH
+          uv pip install versioneer[toml]==0.29 tomli setuptools ninja
 
       - name: Prepare ccache
         run: ccache --clear --set-config cache_dir=~/.ccache
 
       - name: Cache ccache
-        uses: actions/cache@v3
+        uses: actions/cache@v4
         env:
           cache-name: ccache-v1
         with:
@@ -156,8 +157,7 @@ jobs:
         run: |
           sudo mkdir -p $BUILD_TEMP_DIR
           sudo chown -R $(id -u):$(id -g) $BUILD_TEMP_DIR
-          uv pip install versioneer[toml]==0.29 tomli setuptools ninja
-          python setup.py bdist_wheel
+          uv build --wheel
           echo "List wheels"
           ls ./dist
           find ./dist -type f -name '*.whl' -exec mv {} {}.$PLATFORM_OS \;
@@ -171,11 +171,10 @@ jobs:
         run: |
           sudo mkdir -p $BUILD_TEMP_DIR
           sudo chown -R $(id -u):$(id -g) $BUILD_TEMP_DIR
-          uv pip install versioneer[toml]==0.29 tomli setuptools ninja
-          python setup.py bdist_wheel
+          uv build --wheel
 
       - name: "Upload artifacts"
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           path: ./dist/*
 
@@ -199,7 +198,7 @@ jobs:
 
     steps:
       - name: Download wheels from artifacts
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v4
         with:
           path: wheelhouse
 
@@ -256,7 +255,7 @@ jobs:
             libopengl0 \
             xvfb
 
-      - name: Install python
+      - name: Install python & dependencies
         run: |
           curl -LsSf https://astral.sh/uv/install.sh | sh && \
           . $HOME/.cargo/env && \
@@ -264,28 +263,23 @@ jobs:
           uv venv .venv
           echo "VIRTUAL_ENV=.venv" >> $GITHUB_ENV
           echo "$PWD/.venv/bin" >> $GITHUB_PATH
-
-      - name: Install dependencies
-        shell: bash
-        run: |
           uv pip install pytest Pillow numpy pixelmatch python-dotenv
 
       - name: Install and test wheels on Ubuntu
         if: runner.os == 'Linux'
         run: |
           find ./wheelhouse/artifact -type f -name  "*.whl.$PLATFORM_OS" -print0 -exec bash -c 'mv "${0}" "${0//.$PLATFORM_OS/}"' {} \;
-          python -m pip install --find-links wheelhouse/artifact pymgl
-          python -m pip list
-          xvfb-run -a --server-args="-screen 0 1024x768x24 -ac +render -noreset" \
-            python -m pytest --pyargs pymgl -v
+          uv pip install --find-links wheelhouse/artifact pymgl
+          uv pip list
+          xvfb-run -a --server-args="-screen 0 1024x768x24 -ac +render -noreset" pytest --pyargs pymgl -v
 
       - name: Install and test wheels on MacOS
         if: runner.os == 'macOS'
         run: |
-          python -m pip install --find-links wheelhouse/artifact pymgl
-          python -m pip list
+          uv pip install --find-links wheelhouse/artifact pymgl
+          uv pip list
           cd ..
-          python -m pytest --pyargs pymgl -v
+          pytest --pyargs pymgl -v
 
   # NOTE: publish is limited to MacOS wheels because Linux wheels are not accepted
   # for only Ubuntu, must be manylinux
@@ -297,7 +291,7 @@ jobs:
     if: github.event_name == 'push' && startsWith(github.event.ref, 'refs/tags/')
 
     steps:
-      - uses: actions/download-artifact@v3
+      - uses: actions/download-artifact@v4
         with:
           name: artifact
           path: wheels
