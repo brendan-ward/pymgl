@@ -32,28 +32,23 @@ jobs:
       matrix:
         os:
           - "ubuntu-24.04"
-          # FIXME:
-          # - "ubuntu-22.04"
-          # - "ubuntu-20.04"
+          - "ubuntu-22.04"
+          - "ubuntu-20.04"
           # - "macos-14"
           - "macos-12"
         include:
           - os: "ubuntu-24.04"
             platform: "x86_64"
-          # - os: "ubuntu-22.04"
-          #   platform: "x86_64"
-          # - os: "ubuntu-20.04"
-          #   platform: "x86_64"
+          - os: "ubuntu-22.04"
+            platform: "x86_64"
+          - os: "ubuntu-20.04"
+            platform: "x86_64"
           # - os: "macos-14"
           #   platform: "arm64"
           - os: "macos-12"
             platform: "x86_64"
 
-        # FIXME:
-        python-version: [
-            # "3.9", "3.10", "3.11",
-            "3.12",
-          ]
+        python-version: ["3.9", "3.10", "3.11", "3.12"]
     env:
       PLATFORM_OS: ${{ matrix.os }}
 
@@ -193,28 +188,23 @@ jobs:
       matrix:
         os:
           - "ubuntu-24.04"
-          # - "ubuntu-22.04"
-          # - "ubuntu-20.04"
+          - "ubuntu-22.04"
+          - "ubuntu-20.04"
           # - "macos-14"
           - "macos-12"
         include:
           - os: "ubuntu-24.04"
             platform: "x86_64"
-          # FIXME:
-          # - os: "ubuntu-22.04"
-          #   platform: "x86_64"
-          # - os: "ubuntu-20.04"
-          #   platform: "x86_64"
+          - os: "ubuntu-22.04"
+            platform: "x86_64"
+          - os: "ubuntu-20.04"
+            platform: "x86_64"
           # - os: "macos-14"
           #   platform: "arm64"
           - os: "macos-12"
             platform: "x86_64"
 
-        # FIXME:
-        python-version: [
-            # "3.9", "3.10", "3.11",
-            "3.12",
-          ]
+        python-version: ["3.9", "3.10", "3.11", "3.12"]
 
     env:
       PLATFORM_OS: ${{ matrix.os }}
@@ -226,10 +216,6 @@ jobs:
           pattern: pymgl-wheel-${{ matrix.os }}-${{ matrix.platform }}-${{ matrix.python-version }}
           path: wheelhouse
           merge-multiple: true
-
-      - name: Check Download
-        run: |
-          ls wheelhouse
 
       - name: Install Ubuntu 24.04 runtime dependencies
         if: matrix.os == 'ubuntu-24.04'
@@ -323,21 +309,21 @@ jobs:
       - uses: actions/download-artifact@v4
         with:
           pattern: pymgl-wheel-*
-          path: wheels
+          path: wheelhouse
           merge-multiple: true
 
-      # NOTE: MacOS wheel is the only one that can be published to PyPI
+      # NOTE: MacOS wheel are the only ones that can be published to PyPI
       - name: Copy MacOS wheel
         run: |
-          mkdir wheels/dist
-          cp wheels/*macos*.whl wheels/dist
+          mkdir wheelhouse/dist
+          cp wheelhouse/*macos*.whl wheelhouse/dist
 
       - name: Publish MacOS wheel to PyPI
         uses: pypa/gh-action-pypi-publish@release/v1
         with:
           user: __token__
           password: ${{ secrets.PYPI_API_TOKEN }}
-          packages_dir: wheels/dist/
+          packages_dir: wheelhouse/dist/
 
       - name: Release
         uses: softprops/action-gh-release@v2
@@ -348,4 +334,4 @@ jobs:
           prerelease: false
           token: ${{ secrets.GITHUB_TOKEN }}
           files: |
-            ./wheels/*
+            ./wheelhouse/*
