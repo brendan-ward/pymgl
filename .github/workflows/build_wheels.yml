@@ -49,7 +49,11 @@ jobs:
           - os: "macos-12"
             platform: "x86_64"
 
-        python-version: ["3.9", "3.10", "3.11", "3.12"]
+        # FIXME:
+        python-version: [
+            # "3.9", "3.10", "3.11",
+            "3.12",
+          ]
     env:
       PLATFORM_OS: ${{ matrix.os }}
 
@@ -206,7 +210,12 @@ jobs:
           - os: "macos-12"
             platform: "x86_64"
 
-        python-version: ["3.9", "3.10", "3.11", "3.12"]
+        # FIXME:
+        python-version: [
+            # "3.9", "3.10", "3.11",
+            "3.12",
+          ]
+
     env:
       PLATFORM_OS: ${{ matrix.os }}
 
@@ -216,6 +225,11 @@ jobs:
         with:
           pattern: pymgl-wheel-${{ matrix.os }}-${{ matrix.platform }}-${{ matrix.python-version }}
           path: wheelhouse
+          merge-multiple: true
+
+      - name: Check Download
+        run: |
+          ls wheelhouse
 
       - name: Install Ubuntu 24.04 runtime dependencies
         if: matrix.os == 'ubuntu-24.04'
