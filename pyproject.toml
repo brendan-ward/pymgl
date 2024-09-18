@@ -1,36 +1,63 @@
-[tool.poetry]
-name = "pymgl"
-version = "0.0.0"
-description = "Python wrapper for MapLibre GL native"
-authors = ["Brendan C. Ward <bcward@astutespruce.com>"]
-license = "MIT"
-
-[tool.poetry.dependencies]
-python = "^3.8"
-
-[tool.poetry.dev-dependencies]
-black = "^22.6.0"
-pylint = "^2.14.5"
-Cython = "^0.29.30"
-pytest = "^7.1.2"
-python-dotenv = "^0.20.0"
-Pillow = "^9.2.0"
-poorconn = "^0.2.1"
-pixelmatch = "^0.3.0"
-numpy = "^1.23.1"
-
 [build-system]
 requires = [
-    "poetry-core>=1.0.0",
-    "setuptools>=42",
-    "wheel",
-    "versioneer[toml]==0.28",
+    "setuptools",
+    "versioneer[toml]==0.29",
     # tomli is used by versioneer
     "tomli; python_version < '3.11'",
-    "ninja; sys_platform != 'win32'",
+    "ninja",
     "cmake>=3.12",
 ]
-build-backend = "poetry.core.masonry.api"
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "pymgl"
+dynamic = ["version"]
+authors = [{ name = "Brendan C. Ward", email = "bcward@astutespruce.com" }]
+license = { file = "LICENSE" }
+description = "Python wrapper for MapLibre GL native"
+readme = "README.md"
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Science/Research",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python :: 3",
+    "Topic :: Scientific/Engineering :: GIS",
+]
+requires-python = ">=3.9"
+dependencies = ["packaging"]
+
+[project.optional-dependencies]
+dev = [
+    "ninja",
+    "numpy",
+    "Pillow",
+    "pre-commit",
+    "ruff",
+    "setuptools",
+    "versioneer",
+]
+test = [
+    "numpy",
+    "Pillow",
+    "pixelmatch",
+    "pytest",
+    "pytest-benchmark",
+    "pytest-cov",
+    "python-dotenv",
+    "requests",
+]
+slownetwork = ["poorconn"]
+
+[project.urls]
+Home = "https://github.com/brendan-ward/pymgl"
+Repository = "https://github.com/brendan-ward/pymgl"
+
+[tool.setuptools]
+packages = ["pymgl", "pymgl.tests", "pymgl.tests.fixtures"]
+
+[tool.uv]
+package = false
 
 [tool.versioneer]
 VCS = "git"

@@ -2,21 +2,21 @@
 
 # Add GoogleTest
 include_directories(
-    ${MBGL_SOURCE_DIR}/vendor/googletest/googletest
-    ${MBGL_SOURCE_DIR}/vendor/googletest/googletest/include
+    ${MLN_SOURCE_DIR}/vendor/googletest/googletest
+    ${MLN_SOURCE_DIR}/vendor/googletest/googletest/include
 )
 add_library(
     gtest STATIC EXCLUDE_FROM_ALL
-    ${MBGL_SOURCE_DIR}/vendor/googletest/googletest/src/gtest-all.cc
+    ${MLN_SOURCE_DIR}/vendor/googletest/googletest/src/gtest-all.cc
 )
 add_library(
     gtest_main STATIC
-    ${MBGL_SOURCE_DIR}/vendor/googletest/googletest/src/gtest_main.cc
+    ${MLN_SOURCE_DIR}/vendor/googletest/googletest/src/gtest_main.cc
 )
 target_link_libraries(gtest_main gtest)
 
 # Find all tests with pattern *Test.cpp in this directory
-include_directories(${MBGL_SOURCE_DIR}/tests)
+include_directories(${MLN_SOURCE_DIR}/tests)
 file(GLOB_RECURSE _sources ${PROJECT_SOURCE_DIR}/tests/*.cpp CONFIGURE_DEPEND)
 add_executable(
     pymgl_test

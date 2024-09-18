@@ -1,5 +1,12 @@
 # CHANGELOG
 
+## 0.5.0 (in progress)
+
+### Breaking changes
+
+-   dropped support for Python 3.8; now requires >= 3.9
+-   dropped support for MacOS 10 and 11; now requires MacOS >= 12
+
 ## 0.4.0 (6/12/2023)
 
 ### Improvements

@@ -21,7 +21,7 @@ For a stand-alone service implmenting rendering functionality, see
 
 ### Supported operating systems
 
-#### MacOS 10.15+ (x86_64 only)
+#### MacOS 12+
 
 Wheels are available on PyPI:
 
@@ -36,11 +36,11 @@ python -m pip install pytest Pillow numpy pixelmatch python-dotenv
 python -m pytest --pyargs pymgl -v
 ```
 
-#### Ubuntu 22.04 & 20.04
+#### Ubuntu 20.04 - 24.04
 
 Due to the complexity of building manylinux wheels that include OpenGL and
 successfully compile `maplibre-gl-native`, wheels are only available for
-Ubuntu 22.04 and 20.04.
+Ubuntu 24.04, 22.04, and 20.04.
 
 Wheels are available on the release page in Github. Download and install from there.
 
@@ -59,6 +59,31 @@ python3 -m pip install --find-links . pymgl
 ```
 
 You also need to install the following runtime dependencies:
+
+**Ubuntu 24.04:**
+
+```bash
+apt-get install
+    libicu74 \
+    libcurl4 \
+    libjpeg-turbo8 \
+    libpng16-16 \
+    libprotobuf32 \
+    libuv1 \
+    libx11-6 \
+    libegl1 \
+    libopengl0 \
+    xvfb
+```
+
+You will also likely need to upgrade the Mesa packages:
+
+```bash
+apt-get install -y software-properties-common
+add-apt-repository -y ppa:kisak/kisak-mesa
+apt-get update
+apt-get install -y libglx-mesa0
+```
 
 **Ubuntu 22.04:**
 
@@ -439,7 +464,7 @@ via `homebrew`:
 -   cmake
 -   ninja
 
-#### Developing on Ubuntu 22.04 or 20.04 requires the following binary libraries:
+#### Developing on Ubuntu requires the following binary libraries:
 
 -   cmake
 -   ninja-build
@@ -448,7 +473,7 @@ via `homebrew`:
 -   libicu-dev
 -   libpng-dev
 -   libprotobuf-dev
--   libturbojpeg0-dev
+-   libjpeg-turbo8-dev
 -   libx11-dev
 -   libegl-dev
 -   libopengl-dev
@@ -481,7 +506,7 @@ apt-get -y install \
     pkg-config \
     libcurl4-openssl-dev \
     libicu-dev \
-    libturbojpeg0-dev \
+    libjpeg-turbo8-dev \
     libpng-dev \
     libprotobuf-dev \
     libuv1-dev \
@@ -524,6 +549,13 @@ It is included here as a git submodule, per the
 git submodule add https://github.com/wjakob/nanobind vendor/nanobind
 cd vendor/nanobind
 git submodule update --init --recursive
+```
+
+Then to upgrade to a specific version of nanobind for development, if needed:
+
+```bash
+cd vendor/nanobind
+git checkout <version tag>
 ```
 
 ### Maplibre-gl-native

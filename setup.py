@@ -62,32 +62,9 @@ cmdclass = versioneer.get_cmdclass()
 cmdclass.update({"build_ext": CMakeBuild})
 
 setup(
-    name="pymgl",
     version=versioneer.get_version(),
-    packages=["pymgl"],
     include_package_data=True,
-    url="https://github.com/brendan-ward/pymgl",
-    license="MIT",
-    license_file="LICENSE",
-    author="Brendan C. Ward",
-    author_email="bcward@astutespruce.com",
-    description="Python wrapper for MapLibre GL native",
-    long_description_content_type="text/markdown",
-    long_description=open("README.md").read(),
-    python_requires=">=3.8",
-    ext_modules=[CMakeExtension("pymgl._pymgl")],
+    exclude_package_data={"": ["*.h", "*.c"]},
     cmdclass=cmdclass,
-    zip_safe=False,
-    extras_require={
-        "test": [
-            "pytest",
-            "pytest-benchmark",
-            "pytest-cov",
-            "Pillow",
-            "python-dotenv",
-            "numpy",
-            "requests",
-            "pixelmatch",
-        ]
-    },
+    ext_modules=[CMakeExtension("pymgl._pymgl")],
 )

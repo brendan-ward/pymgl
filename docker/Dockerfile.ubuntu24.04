@@ -1,10 +1,11 @@
-FROM ubuntu:22.04
+FROM ubuntu:24.04
 
 ARG PYTHON_VERSION="3.12"
 
 WORKDIR /app
 
 ENV DISPLAY :99
+ENV XDG_RUNTIME_DIR /tmp
 ENV LIBGL_ALWAYS_SOFTWARE=1
 ENV DEBIAN_FRONTEND noninteractive
 ENV PYTHONMALLOC malloc
@@ -35,7 +36,12 @@ RUN apt-get update && \
     xvfb \
     # debugging utilities
     valgrind && \
-    /usr/sbin/update-ccache-symlinks
+    /usr/sbin/update-ccache-symlinks && \
+    # fix for Ubuntu 24.04 to install newer mesa packages
+    apt-get install -y software-properties-common && \
+    add-apt-repository -y ppa:kisak/kisak-mesa && \
+    apt-get update && \
+    apt-get install -y libglx-mesa0
 
 # # Install python and test deps using uv
 RUN curl -LsSf https://astral.sh/uv/install.sh | sh && \
@@ -43,4 +49,3 @@ RUN curl -LsSf https://astral.sh/uv/install.sh | sh && \
     mkdir /uv && \
     uv python install ${PYTHON_VERSION} && \
     uv venv /uv/.venv
-

@@ -1,4 +1,3 @@
-include versioneer.py
 recursive-include pymgl *.py *.pyi *.json *.geojson *.png *.mbtiles
 prune **/__pycache__
 exclude MANIFEST.in

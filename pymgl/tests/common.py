@@ -3,7 +3,7 @@ import os
 from pathlib import Path
 
 from dotenv import load_dotenv
-from PIL import Image, ImageChops
+from PIL import Image
 from pixelmatch.contrib.PIL import pixelmatch
 
 load_dotenv()

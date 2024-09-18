@@ -11,7 +11,7 @@ from .common import FIXTURES_PATH, MAPBOX_TOKEN, read_style, image_matches
 
 has_poorconn = False
 try:
-    import poorconn
+    import poorconn  # noqa
 
     pytest_plugins = ("poorconn",)
     has_poorconn = True
@@ -155,10 +155,10 @@ def test_invalid_local_mbtiles_raster_source():
     test = "example-style-mbtiles-raster-source"
     style = read_style(f"{test}.json")
 
-    style = style.replace("mbtiles://", f"mbtiles:///invalid/")
+    style = style.replace("mbtiles://", "mbtiles:///invalid/")
 
     with pytest.raises(RuntimeError, match="path not found"):
-        img_data = Map(style, 256, 256).renderPNG()
+        _ = Map(style, 256, 256).renderPNG()
 
 
 def test_image_pattern():
@@ -219,7 +219,7 @@ def test_invalid_style(style, error_type, match):
         """{"sources": []}""",
     ],
 )
-def test_style_parse_warnings(capsys, style):
+def test_style_parse_warnings(style):
     Map(style)
 
 
@@ -242,10 +242,10 @@ def test_layer_visibility():
     map.setBounds(-125, 37.5, -115, 42.5)
 
     map.setVisibility("box", False)
-    assert map.getVisibility("box") == False
+    assert not map.getVisibility("box")
 
     map.setVisibility("box2", True)
-    assert map.getVisibility("box2") == True
+    assert map.getVisibility("box2")
 
     img_data = map.renderPNG()
 
