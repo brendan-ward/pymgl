@@ -7,6 +7,11 @@
 -   dropped support for Python 3.8; now requires >= 3.9
 -   dropped support for MacOS 10 and 11; now requires MacOS >= 12
 
+### Improvements
+
+-   upgraded `maplibre-gl-native` to `9dbc0ae`, which enables the new Metal
+    rendering engine on MacOS.
+
 ## 0.4.0 (6/12/2023)
 
 ### Improvements

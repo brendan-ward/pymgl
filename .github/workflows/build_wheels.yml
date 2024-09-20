@@ -92,11 +92,13 @@ jobs:
             libicu-dev \
             libjpeg-turbo8-dev \
             libpng-dev \
+            libwebp-dev \
             libprotobuf-dev \
             libuv1-dev \
             libx11-dev \
             libegl-dev \
             libopengl-dev \
+            libgles2-mesa-dev \
             xvfb
           sudo /usr/sbin/update-ccache-symlinks
 
@@ -226,11 +228,13 @@ jobs:
             libcurl4 \
             libjpeg-turbo8 \
             libpng16-16 \
+            libwebp7 \
             libprotobuf32 \
             libuv1 \
             libx11-6 \
             libegl1 \
             libopengl0 \
+            libgles2 \
             xvfb && \
             # upgrade Mesa packages
             sudo apt-get install -y software-properties-common && \
@@ -247,11 +251,13 @@ jobs:
             libcurl4 \
             libjpeg-turbo8 \
             libpng16-16 \
+            libwebp7 \
             libprotobuf23 \
             libuv1 \
             libx11-6 \
             libegl1 \
             libopengl0 \
+            libgles2 \
             xvfb
 
       - name: Install Ubuntu 20.04 runtime dependencies
@@ -263,11 +269,13 @@ jobs:
             libcurl4 \
             libjpeg-turbo8 \
             libpng16-16 \
+            libwebp6 \
             libprotobuf17 \
             libuv1 \
             libx11-6 \
             libegl1 \
             libopengl0 \
+            libgles2 \
             xvfb
 
       - name: Install python & dependencies

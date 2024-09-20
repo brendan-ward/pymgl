@@ -26,11 +26,13 @@ RUN apt-get update && \
     libicu-dev \
     libjpeg-turbo8-dev \
     libpng-dev \
+    libwebp-dev \
     libprotobuf-dev \
     libuv1-dev \
     libx11-dev \
     libegl-dev \
     libopengl-dev \
+    libgles2-mesa-dev \
     # runtime dependencies
     xvfb \
     # debugging utilities

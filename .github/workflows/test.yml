@@ -44,7 +44,7 @@ jobs:
       - name: Checkout submodules
         run: |
           git submodule update --init
-          cd vendor/maplibre-gl-native && \
+          cd vendor/maplibre-native && \
             git submodule update --init --recursive \
               vendor/boost \
               vendor/cpp-httplib \
@@ -75,11 +75,13 @@ jobs:
             libicu-dev \
             libjpeg-turbo8-dev \
             libpng-dev \
+            libwebp-dev \
             libprotobuf-dev \
             libuv1-dev \
             libx11-dev \
             libegl-dev \
             libopengl-dev \
+            libgles2-mesa-dev \
             xvfb
           /usr/sbin/update-ccache-symlinks
 

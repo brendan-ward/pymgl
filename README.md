@@ -7,11 +7,11 @@ WARNING: this package is under active development and the API may change without
 
 ## Goals
 
-This package is intended to provide a lightweight interface to `maplibre-gl-native`
+This package is intended to provide a lightweight interface to `maplibre-native`
 for rendering Mapbox GL to PNG image data using Python. This is particularly useful for
 server-side rendering of maps for use in reports.
 
-This package provides only the Python API for interacting with `maplibre-gl-native`;
+This package provides only the Python API for interacting with `maplibre-native`;
 it does not provide higher-level functionality such as a web server or a CLI.
 
 For a stand-alone service implmenting rendering functionality, see
@@ -39,7 +39,7 @@ python -m pytest --pyargs pymgl -v
 #### Ubuntu 20.04 - 24.04
 
 Due to the complexity of building manylinux wheels that include OpenGL and
-successfully compile `maplibre-gl-native`, wheels are only available for
+successfully compile `maplibre-native`, wheels are only available for
 Ubuntu 24.04, 22.04, and 20.04.
 
 Wheels are available on the release page in Github. Download and install from there.
@@ -68,11 +68,13 @@ apt-get install
     libcurl4 \
     libjpeg-turbo8 \
     libpng16-16 \
+    libwebp7 \
     libprotobuf32 \
     libuv1 \
     libx11-6 \
     libegl1 \
     libopengl0 \
+    libgles2 \
     xvfb
 ```
 
@@ -93,11 +95,13 @@ apt-get install
     libcurl4 \
     libjpeg-turbo8 \
     libpng16-16 \
+    libwebp7 \
     libprotobuf23 \
     libuv1 \
     libx11-6 \
     libegl1 \
     libopengl0 \
+    libgles2 \
     xvfb
 ```
 
@@ -109,11 +113,13 @@ apt-get install
     libcurl4 \
     libjpeg-turbo8 \
     libpng16-16 \
+    libwebp6 \
     libprotobuf17 \
     libuv1 \
     libx11-6 \
     libegl1 \
     libopengl0 \
+    libgles2 \
     xvfb
 ```
 
@@ -472,6 +478,7 @@ via `homebrew`:
 -   libcurl4-openssl-dev
 -   libicu-dev
 -   libpng-dev
+-   libwebp-dev
 -   libprotobuf-dev
 -   libjpeg-turbo8-dev
 -   libx11-dev
@@ -508,6 +515,7 @@ apt-get -y install \
     libicu-dev \
     libjpeg-turbo8-dev \
     libpng-dev \
+    libwebp-dev \
     libprotobuf-dev \
     libuv1-dev \
     libx11-dev \
@@ -517,6 +525,7 @@ apt-get -y install \
     libjpeg-dev \
     libsqlite3-dev \
     libopengl0 \
+    libgles2 \
     git
 ```
 
@@ -530,6 +539,7 @@ apt install --no-install-recommends -y \
     libicu67 \
     libjpeg-turbo-progs \
     libpng16-16 \
+    libwebp7 \
     libprotobuf23 \
     libuv1 \
     libx11-6 \
@@ -540,7 +550,7 @@ apt install --no-install-recommends -y \
 ### nanobind
 
 `nanonbind` is used to provide bindings for Python against a C++ class that wraps
-`maplibre-gl-native` for easier rendering operations.
+`maplibre-native` for easier rendering operations.
 
 It is included here as a git submodule, per the
 [installation instructions]().
@@ -558,13 +568,13 @@ cd vendor/nanobind
 git checkout <version tag>
 ```
 
-### Maplibre-gl-native
+### Maplibre Native
 
-Maplibre-gl-native is included as a git submodule, and it includes many submodules
+Maplibre Native is included as a git submodule, and it includes many submodules
 of its own.
 
 ```bash
-git submodule add -b master https://github.com/maplibre/maplibre-gl-native vendor/maplibre-gl-native
+git submodule add -b main https://github.com/maplibre/maplibre-native vendor/maplibre-native
 ```
 
 ### Git submodules
@@ -575,13 +585,13 @@ Run
 git submodule update --init
 ```
 
-We only need some of the submodules under maplibre-gl-native. In particular,
+We only need some of the submodules under maplibre-native. In particular,
 we do not need `maplibre-gl-js` or Android / IOS dependencies.
 
 Run the following:
 
 ```bash
-cd vendor/maplibre-gl-native
+cd vendor/maplibre-native
 
 git submodule update --init --recursive \
     vendor/boost \
@@ -589,24 +599,26 @@ git submodule update --init --recursive \
     vendor/earcut.hpp \
     vendor/eternal \
     vendor/googletest \
+    vendor/metal-cpp \
     vendor/polylabel \
     vendor/protozero \
     vendor/mapbox-base \
     vendor/unique_resource \
+    vendor/unordered_dense \
     vendor/vector-tile \
     vendor/wagyu \
     vendor/zip-archive
 ```
 
-To later update `maplibre-gl-native`:
+To later update `maplibre-native`:
 
 ```bash
-cd vendor/maplibre-gl-native
+cd vendor/maplibre-native
 git checkout main
 git pull origin
 
 cd ../..
-git commit -am "update maplibre-gl-native" to latest
+git commit -am "update maplibre-native" to latest
 ```
 
 ### Architecture
@@ -678,4 +690,4 @@ This project is made possible because of the
 [mapbox-gl-native](https://github.com/mapbox/mapbox-gl-native/) project by
 [Mapbox](https://www.mapbox.com/)
 by the efforts of the Maplibre community maintaining the open-source fork of that
-project at [maplibre-gl-native](https://github.com/mapbox/mapbox-gl-native/).
+project at [maplibre-native](https://github.com/mapbox/mapbox-native/).
