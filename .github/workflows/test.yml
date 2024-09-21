@@ -19,24 +19,28 @@ jobs:
       fail-fast: false
       matrix:
         os:
-          - "ubuntu-24.04"
-          - "ubuntu-22.04"
+          # FIXME:
+          # - "ubuntu-24.04"
+          # - "ubuntu-22.04"
           - "ubuntu-20.04"
-          - "macos-14"
-          - "macos-14-large"
+          # - "macos-14"
+          - "macos-13"
         include:
-          - os: "ubuntu-24.04"
-            platform: "x86_64"
-          - os: "ubuntu-22.04"
-            platform: "x86_64"
+          # - os: "ubuntu-24.04"
+          #   platform: "x86_64"
+          # - os: "ubuntu-22.04"
+          #   platform: "x86_64"
           - os: "ubuntu-20.04"
             platform: "x86_64"
-          - os: "macos-14"
-            platform: "arm64"
-          - os: "macos-14-large"
+          # - os: "macos-14"
+          #   platform: "arm64"
+          - os: "macos-13"
             platform: "x86_64"
 
-        python-version: ["3.9", "3.10", "3.11", "3.12"]
+        python-version: [
+            # "3.9", "3.10", "3.11",
+            "3.12",
+          ]
 
     steps:
       - name: Checkout repository
@@ -95,11 +99,15 @@ jobs:
           sudo apt-get update && \
           sudo apt-get install -y libglx-mesa0
 
-      - name: fix Ubuntu 20.04 GCC
+      - name: Upgrade Ubuntu 20.04 GCC
         if: ${{ matrix.os == 'ubuntu-20.04' }}
         run: |
+          sudo apt-get install -y software-properties-common && \
           sudo add-apt-repository --update -y ppa:ubuntu-toolchain-r/test && \
-          sudo apt-get -y --fix-broken install gcc-11 g++-11
+          sudo apt-get update && \
+          sudo apt-get -y --fix-broken install gcc-13 g++-13 && \
+          sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-13 131 --slave /usr/bin/g++ g++ /usr/bin/g++-13 --slave /usr/bin/gcov gcov /usr/bin/gcov-13 && \
+          gcc -v
 
       - name: Install MacOS dependencies
         if: runner.os == 'macOS'
