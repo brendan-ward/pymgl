@@ -35,7 +35,6 @@ jobs:
           - "ubuntu-22.04"
           - "ubuntu-20.04"
           - "macos-14"
-          - "macos-14-large"
         include:
           - os: "ubuntu-24.04"
             platform: "x86_64"
@@ -49,7 +48,7 @@ jobs:
           - os: "macos-14"
             platform: "arm64"
             wheel: pymgl-wheel-macos-arm64
-          - os: "macos-14-large"
+          - os: "macos-13"
             platform: "x86_64"
             wheel: pymgl-wheel-macos-x86_64
 
@@ -107,6 +106,12 @@ jobs:
             libgles2-mesa-dev \
             xvfb
           sudo /usr/sbin/update-ccache-symlinks
+
+      - name: fix Ubuntu 20.04 GCC
+        if: ${{ matrix.os == 'ubuntu-20.04' }}
+        run: |
+          sudo add-apt-repository --update -y ppa:ubuntu-toolchain-r/test && \
+          sudo apt-get -y --fix-broken install gcc-11 g++-11
 
       - name: Install MacOS dependencies
         if: runner.os == 'macOS'
@@ -199,7 +204,7 @@ jobs:
           - "ubuntu-22.04"
           - "ubuntu-20.04"
           - "macos-14"
-          - "macos-14-large"
+          - "macos-13"
           - "macos-12"
         include:
           - os: "ubuntu-24.04"
@@ -214,7 +219,7 @@ jobs:
           - os: "macos-14"
             platform: "arm64"
             wheel: pymgl-wheel-macos-arm64
-          - os: "macos-14-large"
+          - os: "macos-13"
             platform: "x86_64"
             wheel: pymgl-wheel-macos-x86_64
           - os: "macos-12"
