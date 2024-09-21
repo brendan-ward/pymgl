@@ -32,24 +32,28 @@ jobs:
       matrix:
         os:
           - "ubuntu-24.04"
-          # FIXME:
-          # - "ubuntu-22.04"
-          # - "ubuntu-20.04"
+          - "ubuntu-22.04"
+          - "ubuntu-20.04"
           - "macos-14"
+          - "macos-14-large"
         include:
           - os: "ubuntu-24.04"
             platform: "x86_64"
-          # - os: "ubuntu-22.04"
-          #   platform: "x86_64"
-          # - os: "ubuntu-20.04"
-          #   platform: "x86_64"
+            wheel: pymgl-wheel-ubuntu-24.04-x86_64
+          - os: "ubuntu-22.04"
+            platform: "x86_64"
+            wheel: pymgl-wheel-ubuntu-22.04-x86_64
+          - os: "ubuntu-20.04"
+            platform: "x86_64"
+            wheel: pymgl-wheel-ubuntu-20.04-x86_64
           - os: "macos-14"
             platform: "arm64"
+            wheel: pymgl-wheel-macos-arm64
+          - os: "macos-14-large"
+            platform: "x86_64"
+            wheel: pymgl-wheel-macos-x86_64
 
-        python-version: [
-            # "3.9", "3.10", "3.11",
-            "3.12",
-          ]
+        python-version: ["3.9", "3.10", "3.11", "3.12"]
     env:
       PLATFORM_OS: ${{ matrix.os }}
 
@@ -180,7 +184,7 @@ jobs:
       - name: "Upload artifacts"
         uses: actions/upload-artifact@v4
         with:
-          name: pymgl-wheel-${{ matrix.os }}-${{ matrix.platform }}-${{ matrix.python-version }}
+          name: ${{ matrix.wheel }}-${{ matrix.python-version }}
           path: ./dist/*
 
   test-wheels:
@@ -192,33 +196,42 @@ jobs:
       matrix:
         os:
           - "ubuntu-24.04"
-          # FIXME:
-          # - "ubuntu-22.04"
-          # - "ubuntu-20.04"
+          - "ubuntu-22.04"
+          - "ubuntu-20.04"
           - "macos-14"
+          - "macos-14-large"
+          - "macos-12"
         include:
           - os: "ubuntu-24.04"
             platform: "x86_64"
-          # - os: "ubuntu-22.04"
-          #   platform: "x86_64"
-          # - os: "ubuntu-20.04"
-          #   platform: "x86_64"
+            wheel: pymgl-wheel-ubuntu-24.04-x86_64
+          - os: "ubuntu-22.04"
+            platform: "x86_64"
+            wheel: pymgl-wheel-ubuntu-22.04-x86_64
+          - os: "ubuntu-20.04"
+            platform: "x86_64"
+            wheel: pymgl-wheel-ubuntu-20.04-x86_64
           - os: "macos-14"
             platform: "arm64"
+            wheel: pymgl-wheel-macos-arm64
+          - os: "macos-14-large"
+            platform: "x86_64"
+            wheel: pymgl-wheel-macos-x86_64
+          - os: "macos-12"
+            platform: "x86_64"
+            wheel: pymgl-wheel-macos-x86_64
 
-        python-version: [
-            # "3.9", "3.10", "3.11",
-            "3.12",
-          ]
+        python-version: ["3.9", "3.10", "3.11", "3.12"]
 
     env:
       PLATFORM_OS: ${{ matrix.os }}
+      LIBGL_ALWAYS_SOFTWARE: 1
 
     steps:
       - name: Download wheels from artifacts
         uses: actions/download-artifact@v4
         with:
-          pattern: pymgl-wheel-${{ matrix.os }}-${{ matrix.platform }}-${{ matrix.python-version }}
+          pattern: ${{ matrix.wheel }}-${{ matrix.python-version }}
           path: wheelhouse
           merge-multiple: true
 

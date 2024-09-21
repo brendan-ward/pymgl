@@ -9,6 +9,7 @@ on:
 
 env:
   BUILD_TEMP_DIR: "build"
+  LIBGL_ALWAYS_SOFTWARE: 1
 
 jobs:
   test:
@@ -19,24 +20,23 @@ jobs:
       matrix:
         os:
           - "ubuntu-24.04"
-          # FIXME:
-          # - "ubuntu-22.04"
-          # - "ubuntu-20.04"
+          - "ubuntu-22.04"
+          - "ubuntu-20.04"
           - "macos-14"
+          - "macos-14-large"
         include:
           - os: "ubuntu-24.04"
             platform: "x86_64"
-          # - os: "ubuntu-22.04"
-          #   platform: "x86_64"
-          # - os: "ubuntu-20.04"
-          #   platform: "x86_64"
+          - os: "ubuntu-22.04"
+            platform: "x86_64"
+          - os: "ubuntu-20.04"
+            platform: "x86_64"
           - os: "macos-14"
             platform: "arm64"
+          - os: "macos-14-large"
+            platform: "x86_64"
 
-        python-version: [
-            # "3.9", "3.10", "3.11",
-            "3.12",
-          ]
+        python-version: ["3.9", "3.10", "3.11", "3.12"]
 
     steps:
       - name: Checkout repository
