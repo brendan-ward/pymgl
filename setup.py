@@ -6,6 +6,7 @@ from setuptools import setup, Extension
 from setuptools.command.build_ext import build_ext
 import versioneer
 
+
 # A CMakeExtension needs a sourcedir instead of a file list.
 # The name must be the _single_ output extension from the CMake build.
 # If you need multiple extensions, see scikit-build.
@@ -31,7 +32,7 @@ class CMakeBuild(build_ext):
 
         cmake_args = [
             "-DCMAKE_LIBRARY_OUTPUT_DIRECTORY={}".format(extdir),
-            "-DPYTHON_EXECUTABLE={}".format(sys.executable),
+            # "-DPYTHON_EXECUTABLE={}".format(sys.executable),
             "-DVERSION_INFO={}".format(self.distribution.get_version()),
             "-DCMAKE_BUILD_TYPE={}".format(cfg),
         ]

@@ -117,6 +117,7 @@ add_library(
     ${MLN_SOURCE_DIR}/src/mbgl/renderer/image_manager.cpp
     ${MLN_SOURCE_DIR}/src/mbgl/renderer/layers/render_background_layer.cpp
     ${MLN_SOURCE_DIR}/src/mbgl/renderer/layers/render_circle_layer.cpp
+    ${MLN_SOURCE_DIR}/src/mbgl/renderer/layers/render_custom_layer.cpp
     ${MLN_SOURCE_DIR}/src/mbgl/renderer/layers/render_fill_extrusion_layer.cpp
     ${MLN_SOURCE_DIR}/src/mbgl/renderer/layers/render_fill_layer.cpp
     ${MLN_SOURCE_DIR}/src/mbgl/renderer/layers/render_heatmap_layer.cpp
@@ -371,7 +372,9 @@ target_compile_definitions(
     mln-core
     PUBLIC
     MLN_USE_UNORDERED_DENSE=1
-    NDEBUG=0
+
+    # disable location indicator; not used for static rendering
+    MBGL_LAYER_LOCATION_INDICATOR_DISABLE_ALL=1
 )
 
 if(EXISTS ${MLN_SOURCE_DIR}/.git/HEAD)

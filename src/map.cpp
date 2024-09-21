@@ -344,7 +344,7 @@ const std::vector<std::string> Map::listLayers() {
         auto layerId = layer->getID();
 
         // ignore builtin layer
-        if (layerId == "com.mapbox.annotations.points") {
+        if (layerId == "org.maplibre.annotations.points") {
             continue;
         }
 
@@ -363,7 +363,7 @@ const std::vector<std::string> Map::listSources() {
         auto sourceId = source->getID();
 
         // ignore builtin source
-        if (sourceId == "com.mapbox.annotations") {
+        if (sourceId == "org.maplibre.annotations") {
             continue;
         }
 

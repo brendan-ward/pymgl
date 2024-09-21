@@ -160,10 +160,8 @@ TEST(Style, MapboxStyle) {
         GTEST_SKIP_("Missing Mapbox Token");
     }
 
-    Map map = Map("mapbox://styles/mapbox/streets-v11", 256, 256, 1, 0, 0, 0, token, "mapbox");
-    std::cout << "Before render map" << std::endl;
+    Map map  = Map("mapbox://styles/mapbox/streets-v11", 256, 256, 1, 0, 0, 0, token, "mapbox");
     auto img = map.renderPNG();
-    std::cout << "After render map" << std::endl;
 
     const string img_filename = "mapbox-streets-v11.png";
 
@@ -233,7 +231,8 @@ TEST(Style, LocalMBtilesVectorSource) {
     // write_test_image(img, img_filename, true);
 
     write_test_image(img, img_filename, false);
-    EXPECT_TRUE(image_matches(img_filename, 100));
+    // New metal renderer varies a bit from the old renderer
+    EXPECT_TRUE(image_matches(img_filename, 250));
 }
 
 TEST(Style, LocalMBtilesVectorSourceX2) {
@@ -253,7 +252,8 @@ TEST(Style, LocalMBtilesVectorSourceX2) {
     // write_test_image(img, img_filename, true);
 
     write_test_image(img, img_filename, false);
-    EXPECT_TRUE(image_matches(img_filename, 100));
+    // New metal renderer varies a bit from the old renderer
+    EXPECT_TRUE(image_matches(img_filename, 1300));
 }
 
 TEST(Style, InvalidLocalMBtilesRasterSource) {

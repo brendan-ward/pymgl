@@ -2,8 +2,8 @@ set(CMAKE_OSX_DEPLOYMENT_TARGET "12")
 
 set_target_properties(mln-core PROPERTIES XCODE_ATTRIBUTE_CLANG_ENABLE_OBJC_ARC YES)
 
-# Always require metal
-find_library(METAL_FRAMEWORK Metal REQURIED)
+# Always require Metal
+find_library(METAL_FRAMEWORK Metal REQUIRED)
 
 include(${MLN_SOURCE_DIR}/vendor/metal-cpp.cmake)
 
@@ -101,6 +101,7 @@ target_sources(
     ${MLN_SOURCE_DIR}/src/mbgl/shaders/mtl/symbol_icon.cpp
     ${MLN_SOURCE_DIR}/src/mbgl/shaders/mtl/symbol_sdf.cpp
     ${MLN_SOURCE_DIR}/src/mbgl/shaders/mtl/symbol_text_and_icon.cpp
+    ${MLN_SOURCE_DIR}/src/mbgl/style/layers/mtl/custom_layer_render_parameters.cpp
 
     # from macos.cmake metal section
     ${MLN_SOURCE_DIR}/platform/default/src/mbgl/mtl/headless_backend.cpp

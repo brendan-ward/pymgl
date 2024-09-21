@@ -34,8 +34,7 @@ jobs:
           - "ubuntu-24.04"
           - "ubuntu-22.04"
           - "ubuntu-20.04"
-          # - "macos-14"
-          - "macos-12"
+          - "macos-14"
         include:
           - os: "ubuntu-24.04"
             platform: "x86_64"
@@ -43,10 +42,8 @@ jobs:
             platform: "x86_64"
           - os: "ubuntu-20.04"
             platform: "x86_64"
-          # - os: "macos-14"
-          #   platform: "arm64"
-          - os: "macos-12"
-            platform: "x86_64"
+          - os: "macos-14"
+            platform: "arm64"
 
         python-version: ["3.9", "3.10", "3.11", "3.12"]
     env:
@@ -192,8 +189,7 @@ jobs:
           - "ubuntu-24.04"
           - "ubuntu-22.04"
           - "ubuntu-20.04"
-          # - "macos-14"
-          - "macos-12"
+          - "macos-14"
         include:
           - os: "ubuntu-24.04"
             platform: "x86_64"
@@ -201,10 +197,8 @@ jobs:
             platform: "x86_64"
           - os: "ubuntu-20.04"
             platform: "x86_64"
-          # - os: "macos-14"
-          #   platform: "arm64"
-          - os: "macos-12"
-            platform: "x86_64"
+          - os: "macos-14"
+            platform: "arm64"
 
         python-version: ["3.9", "3.10", "3.11", "3.12"]
 
