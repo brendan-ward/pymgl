@@ -151,6 +151,7 @@ jobs:
         if: runner.os == 'macOS'
         continue-on-error: ${{ matrix.os == 'macos-13' }}
         run: |
+          brew install ninja
           mkdir build
           cmake . -B build -G Ninja -DCMAKE_BUILD_TYPE=Debug -DCMAKE_CXX_COMPILER_LAUNCHER=ccache
           cmake --build build
