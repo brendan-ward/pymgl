@@ -24,8 +24,7 @@ jobs:
           # - "ubuntu-22.04"
           # - "ubuntu-20.04"
           # - "macos-14"
-          # - "macos-13"
-          - "macos-12"
+          - "macos-13"
         include:
           # - os: "ubuntu-24.04"
           #   platform: "x86_64"
@@ -35,9 +34,7 @@ jobs:
           #   platform: "x86_64"
           # - os: "macos-14"
           #   platform: "arm64"
-          # - os: "macos-13"
-          #   platform: "x86_64"
-          - os: "macos-12"
+          - os: "macos-13"
             platform: "x86_64"
 
         python-version: [
@@ -148,6 +145,16 @@ jobs:
           ccache --zero-stats --set-config cache_dir=~/.ccache
           ccache --max-size=2G --set-config cache_dir=~/.ccache
           ccache --show-stats --set-config cache_dir=~/.ccache
+
+      # FIXME: remove
+      - name: MacOS build with debug
+        if: runner.os == 'macOS'
+        continue-on-error: ${{ matrix.os == 'macos-13' }}
+        run: |
+          mkdir build
+          cmake . -B build -G Ninja -DCMAKE_BUILD_TYPE=Debug -DCMAKE_CXX_COMPILER_LAUNCHER=ccache
+          cmake --build build
+          build/tests/pymgl_test
 
       - name: Build package
         env:

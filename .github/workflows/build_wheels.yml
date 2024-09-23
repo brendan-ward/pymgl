@@ -35,7 +35,6 @@ jobs:
           - "ubuntu-22.04"
           - "ubuntu-20.04"
           - "macos-14"
-          - "macos-13"
         include:
           - os: "ubuntu-24.04"
             platform: "x86_64"
@@ -49,9 +48,6 @@ jobs:
           - os: "macos-14"
             platform: "arm64"
             wheel: pymgl-wheel-macos-arm64
-          - os: "macos-13"
-            platform: "x86_64"
-            wheel: pymgl-wheel-macos-x86_64
 
         python-version: ["3.9", "3.10", "3.11", "3.12"]
     env:
@@ -209,8 +205,6 @@ jobs:
           - "ubuntu-22.04"
           - "ubuntu-20.04"
           - "macos-14"
-          - "macos-13"
-          - "macos-12"
         include:
           - os: "ubuntu-24.04"
             platform: "x86_64"
@@ -224,12 +218,6 @@ jobs:
           - os: "macos-14"
             platform: "arm64"
             wheel: pymgl-wheel-macos-arm64
-          - os: "macos-13"
-            platform: "x86_64"
-            wheel: pymgl-wheel-macos-x86_64
-          - os: "macos-12"
-            platform: "x86_64"
-            wheel: pymgl-wheel-macos-x86_64
 
         python-version: ["3.9", "3.10", "3.11", "3.12"]
 
@@ -289,8 +277,11 @@ jobs:
       - name: Install Ubuntu 20.04 runtime dependencies
         if: matrix.os == 'ubuntu-20.04'
         run: |
+          sudo apt-get install -y software-properties-common
+          sudo add-apt-repository --update -y ppa:ubuntu-toolchain-r/test
           sudo apt-get update
           sudo apt-get -y install \
+            libstdc++6 \
             libicu66 \
             libcurl4 \
             libjpeg-turbo8 \
