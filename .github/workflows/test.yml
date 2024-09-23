@@ -24,7 +24,8 @@ jobs:
           # - "ubuntu-22.04"
           # - "ubuntu-20.04"
           # - "macos-14"
-          - "macos-13"
+          # - "macos-13"
+          - "macos-12"
         include:
           # - os: "ubuntu-24.04"
           #   platform: "x86_64"
@@ -34,7 +35,9 @@ jobs:
           #   platform: "x86_64"
           # - os: "macos-14"
           #   platform: "arm64"
-          - os: "macos-13"
+          # - os: "macos-13"
+          #   platform: "x86_64"
+          - os: "macos-12"
             platform: "x86_64"
 
         python-version: [
@@ -171,7 +174,7 @@ jobs:
 
       - name: "Upload render outputs"
         uses: actions/upload-artifact@v4
-        if: ${{ matrix.os == 'macos-13' }}
+        # if: ${{ matrix.os == 'macos-13' }}
         with:
           name: render-outputs-${{ matrix.os }}-${{ matrix.arch }}-${{ matrix.python-version }}
           path: /tmp/*.png
