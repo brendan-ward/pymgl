@@ -164,7 +164,7 @@ jobs:
 
       - name: Run MacOS tests
         if: runner.os == 'macOS'
-        continue-on-error: ${{ matrix.ox == 'macos-13' }}
+        continue-on-error: ${{ matrix.os == 'macos-13' }}
         run: |
           build/tests/pymgl_test
           python -m pytest pymgl/tests
