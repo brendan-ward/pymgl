@@ -2,9 +2,9 @@ FROM quay.io/pypa/manylinux_2_28_x86_64:2024-09-23-f703caa
 
 WORKDIR /app
 
-ENV DISPLAY :99
+ENV DISPLAY=:99
 ENV LIBGL_ALWAYS_SOFTWARE=1
-ENV BUILD_TEMP_DIR /tmp/build
+ENV BUILD_TEMP_DIR=/tmp/build
 
 RUN dnf -y install \
     curl \
