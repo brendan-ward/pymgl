@@ -53,11 +53,6 @@ slownetwork = ["poorconn"]
 Home = "https://github.com/brendan-ward/pymgl"
 Repository = "https://github.com/brendan-ward/pymgl"
 
-[tool.cibuildwheel]
-skip = ["pp*", "*musllinux*"]
-archs = ["auto64"]
-build-verbosity = 3
-
 [tool.setuptools]
 packages = ["pymgl", "pymgl.tests", "pymgl.tests.fixtures"]
 

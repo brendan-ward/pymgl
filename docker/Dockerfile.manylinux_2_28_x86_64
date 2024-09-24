@@ -1,0 +1,31 @@
+FROM quay.io/pypa/manylinux_2_28_x86_64:2024-09-23-f703caa
+
+WORKDIR /app
+
+ENV DISPLAY :99
+ENV LIBGL_ALWAYS_SOFTWARE=1
+ENV BUILD_TEMP_DIR /tmp/build
+
+RUN dnf -y install \
+    curl \
+    cmake \
+    pkg-config \
+    libcurl-devel \
+    libjpeg-turbo-devel \
+    libpng-devel \
+    libwebp-devel \
+    libuv-devel \
+    libX11-devel \
+    mesa-libGL-devel \
+    mesa-libEGL-devel \
+    mesa-libOSMesa \
+    mesa-dri-drivers \
+    xorg-x11-server-Xvfb
+
+# Install newer version of libicu
+RUN dnf install -y git && \
+    git clone https://github.com/unicode-org/icu.git --depth=1 --branch=release-66-1 /tmp/icu && \
+    cd /tmp/icu/icu4c/source && \
+    ./runConfigureICU Linux && \
+    make -j -l4.5 && \
+    make install
