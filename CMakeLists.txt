@@ -2,9 +2,9 @@ cmake_minimum_required(VERSION 3.19 FATAL_ERROR)
 
 project("_pymgl" VERSION "")
 
-# find Python (note: this looks for at least Python 3.9)
+# find Python (note: this looks for at least Python 3.10)
 set(Python_FIND_FRAMEWORK LAST) # Prefer Brew/Conda to Apple framework python
-find_package(Python 3.9 COMPONENTS Interpreter Development.Module REQUIRED)
+find_package(Python 3.10 COMPONENTS Interpreter Development.Module REQUIRED)
 
 if(NOT CMAKE_BUILD_TYPE)
     set(CMAKE_BUILD_TYPE Release)

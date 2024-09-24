@@ -22,10 +22,10 @@ on:
 env:
   BUILD_TEMP_DIR: "build"
   MACOSX_DEPLOYMENT_TARGET: "12"
-  CIBW_SKIP: "cp38-* pp* *musllinux* *i686* *ppc64le* *s390x*"
+  CIBW_SKIP: "cp38-* cp39-* pp* *musllinux* *i686* *ppc64le* *s390x*"
   CIBW_ARCHS: "auto64"
   CIBW_MANYLINUX_X86_64_IMAGE: "pymgl-manylinux_2_28_x86_64:latest"
-  CIBW_BUILD_VERBOSITY: 3
+  CIBW_BUILD_VERBOSITY: 2
 
 jobs:
   build-wheels-linux:
@@ -193,7 +193,7 @@ jobs:
             platform: "arm64"
             wheel: pymgl-wheel-macos-arm64
 
-        python-version: ["3.9", "3.10", "3.11", "3.12"]
+        python-version: ["3.10", "3.11", "3.12"]
 
     env:
       PLATFORM_OS: ${{ matrix.os }}
