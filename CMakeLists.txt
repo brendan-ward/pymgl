@@ -2,7 +2,9 @@ cmake_minimum_required(VERSION 3.19 FATAL_ERROR)
 
 project("_pymgl" VERSION "")
 
-set(Python_FIND_FRAMEWORK LAST)
+# Only use the active virtual environment of Python
+set(Python_FIND_VIRTUALENV ONLY)
+set(Python_FIND_FRAMEWORK NEVER)
 find_package(Python COMPONENTS Interpreter Development.Module REQUIRED)
 
 if(NOT CMAKE_BUILD_TYPE)

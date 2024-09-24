@@ -31,6 +31,6 @@ RUN dnf install -y git && \
     make -j -l4.5 && \
     make install
 
-# setting git safe directory is required for properly building wheels when
-# git >= 2.35.3
-RUN git config --global --add safe.directory "*"
+# Install uv
+RUN curl -LsSf https://astral.sh/uv/install.sh | sh && \
+    . $HOME/.cargo/env

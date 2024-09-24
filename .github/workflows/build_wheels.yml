@@ -103,6 +103,12 @@ jobs:
         run: |
           brew install ccache ninja
 
+      - name: Install uv
+        run: |
+          curl -LsSf https://astral.sh/uv/install.sh | sh
+          . $HOME/.cargo/env
+          uv python install ${{ matrix.python-version }}
+
       - name: Prepare ccache
         run: ccache --clear --set-config cache_dir=~/.ccache
 
