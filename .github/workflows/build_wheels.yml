@@ -20,12 +20,11 @@ on:
   workflow_dispatch:
 
 env:
-  BUILD_TEMP_DIR: "build"
-  MACOSX_DEPLOYMENT_TARGET: "12"
   CIBW_SKIP: "cp38-* pp* *musllinux* *i686* *ppc64le* *s390x*"
   CIBW_ARCHS: "auto64"
   CIBW_MANYLINUX_X86_64_IMAGE: "pymgl-manylinux_2_28_x86_64:latest"
-  CIBW_BUILD_VERBOSITY: 2
+  CIBW_BUILD_FRONTEND: "build[uv]"
+  CIBW_BUILD_VERBOSITY: 1
 
 jobs:
   build-wheels-linux:
@@ -99,6 +98,8 @@ jobs:
           HOMEBREW_NO_AUTO_UPDATE: 1
           HOMEBREW_NO_INSTALL_CLEANUP: 1
           CMAKE_CXX_COMPILER_LAUNCHER: ccache
+          MACOSX_DEPLOYMENT_TARGET: "12"
+          CIBW_ENVIRONMENT_MACOS: "MACOSX_DEPLOYMENT_TARGET=12"
         run: |
           brew install ccache ninja
 
