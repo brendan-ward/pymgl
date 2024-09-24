@@ -3,6 +3,7 @@ set(CMAKE_OSX_DEPLOYMENT_TARGET "12")
 set_target_properties(mln-core PROPERTIES XCODE_ATTRIBUTE_CLANG_ENABLE_OBJC_ARC YES)
 
 # Always require Metal
+message(STATUS "Configuring Metal renderer backend")
 find_library(METAL_FRAMEWORK Metal REQUIRED)
 
 include(${MLN_SOURCE_DIR}/vendor/metal-cpp.cmake)
@@ -23,7 +24,6 @@ target_link_libraries(
     ${METAL_FRAMEWORK}
     mbgl-vendor-metal-cpp
 )
-
 target_sources(
     mln-core
     PRIVATE
@@ -110,7 +110,6 @@ target_sources(
     ${MLN_SOURCE_DIR}/platform/darwin/src/async_task.cpp
     ${MLN_SOURCE_DIR}/platform/darwin/src/run_loop.cpp
     ${MLN_SOURCE_DIR}/platform/darwin/src/timer.cpp
-
     ${MLN_SOURCE_DIR}/platform/darwin/src/collator.mm
     ${MLN_SOURCE_DIR}/platform/darwin/src/http_file_source.mm
     ${MLN_SOURCE_DIR}/platform/darwin/src/image.mm

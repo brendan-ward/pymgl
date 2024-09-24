@@ -2,8 +2,7 @@ find_package(CURL REQUIRED)
 
 # NOTE: ICU is optional and backfilled by vendored library in maplibre-native
 # but we require installing a modern version of it
-find_package(ICU REQUIRED i18n)
-find_package(ICU REQUIRED uc)
+find_package(ICU 66.1 COMPONENTS i18n uc REQUIRED)
 
 find_package(JPEG REQUIRED)
 find_package(PNG REQUIRED)
