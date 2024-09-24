@@ -169,7 +169,7 @@ jobs:
 
   test-wheels:
     name: TST ${{ matrix.os }} ${{ matrix.platform }} (Python ${{ matrix.python-version }})
-    needs: [build_wheels-linux, build-wheels-macos]
+    needs: [build-wheels-linux, build-wheels-macos]
     runs-on: ${{ matrix.os }}
     strategy:
       fail-fast: false
