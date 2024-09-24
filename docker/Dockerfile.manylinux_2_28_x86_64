@@ -9,6 +9,7 @@ ENV BUILD_TEMP_DIR=/tmp/build
 RUN dnf -y install \
     curl \
     cmake \
+    ninja-build \
     pkg-config \
     libcurl-devel \
     libjpeg-turbo-devel \
@@ -29,3 +30,7 @@ RUN dnf install -y git && \
     ./runConfigureICU Linux && \
     make -j -l4.5 && \
     make install
+
+# setting git safe directory is required for properly building wheels when
+# git >= 2.35.3
+RUN git config --global --add safe.directory "*"

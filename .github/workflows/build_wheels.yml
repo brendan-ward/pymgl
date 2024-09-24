@@ -22,7 +22,7 @@ on:
 env:
   BUILD_TEMP_DIR: "build"
   MACOSX_DEPLOYMENT_TARGET: "12"
-  CIBW_SKIP: "cp38-*, pp*, *musllinux*"
+  CIBW_SKIP: "cp38-* pp* *musllinux* *i686* *ppc64le* *s390x*"
   CIBW_ARCHS: "auto64"
   CIBW_MANYLINUX_X86_64_IMAGE: "pymgl-manylinux_2_28_x86_64:latest"
   CIBW_BUILD_VERBOSITY: 3
@@ -86,74 +86,58 @@ jobs:
           path: ./wheelhouse/*.whl
           compression-level: 0
 
-  # build-wheels-macos:
-  #   name: Build wheels on linux
-  #   runs-on: macos-14
-  #   strategy:
-  #     fail-fast: false
-  #     matrix:
-  #       os:
-  #         - "macos-14"
-  #       include:
-  #         - os: "macos-14"
-  #           platform: "arm64"
-  #           wheel: pymgl-wheel-macos-arm64
+  build-wheels-macos:
+    name: Build wheels on linux
+    runs-on: macos-14
 
-  #       python-version: ["3.9", "3.10", "3.11", "3.12"]
+    steps:
+      - name: Install MacOS dependencies
+        if: runner.os == 'macOS'
+        env:
+          HOMEBREW_NO_AUTO_UPDATE: 1
+          HOMEBREW_NO_INSTALL_CLEANUP: 1
+          CMAKE_CXX_COMPILER_LAUNCHER: ccache
+        run: |
+          brew install ccache
 
-  #   steps:
-  #     - name: Install MacOS dependencies
-  #       if: runner.os == 'macOS'
-  #       env:
-  #         HOMEBREW_NO_AUTO_UPDATE: 1
-  #         HOMEBREW_NO_INSTALL_CLEANUP: 1
-  #       run: |
-  #         brew install ccache
+      - name: Install python & dependencies
+        run: |
+          curl -LsSf https://astral.sh/uv/install.sh | sh && \
+          . $HOME/.cargo/env && \
+          uv python install ${{ matrix.python-version }} && \
+          uv venv .venv
+          echo "VIRTUAL_ENV=.venv" >> $GITHUB_ENV
+          echo "$PWD/.venv/bin" >> $GITHUB_PATH
+          uv pip install versioneer[toml]==0.29 tomli setuptools
 
-  #     - name: Install python & dependencies
-  #       run: |
-  #         curl -LsSf https://astral.sh/uv/install.sh | sh && \
-  #         . $HOME/.cargo/env && \
-  #         uv python install ${{ matrix.python-version }} && \
-  #         uv venv .venv
-  #         echo "VIRTUAL_ENV=.venv" >> $GITHUB_ENV
-  #         echo "$PWD/.venv/bin" >> $GITHUB_PATH
-  #         uv pip install versioneer[toml]==0.29 tomli setuptools ninja
+      - name: Prepare ccache
+        run: ccache --clear --set-config cache_dir=~/.ccache
 
-  #     - name: Prepare ccache
-  #       run: ccache --clear --set-config cache_dir=~/.ccache
+      - name: Cache ccache
+        uses: actions/cache@v4
+        env:
+          cache-name: ccache-v1
+        with:
+          path: ~/.ccache
+          key: ${{ env.cache-name }}-${{ matrix.os }}-${{ github.job }}-${{ github.ref }}-${{ github.sha }}-${{ github.head_ref }}
+          restore-keys: |
+            ${{ env.cache-name }}-${{ matrix.os }}-${{ github.job }}-${{ github.ref }}-${{ github.sha }}
+            ${{ env.cache-name }}-${{ matrix.os }}-${{ github.job }}-${{ github.ref }}
+            ${{ env.cache-name }}-${{ matrix.os }}-${{ github.job }}
+      - name: Clear ccache statistics
+        run: |
+          ccache --zero-stats --set-config cache_dir=~/.ccache
+          ccache --max-size=2G --set-config cache_dir=~/.ccache
+          ccache --show-stats --set-config cache_dir=~/.ccache
 
-  #     - name: Cache ccache
-  #       uses: actions/cache@v4
-  #       env:
-  #         cache-name: ccache-v1
-  #       with:
-  #         path: ~/.ccache
-  #         key: ${{ env.cache-name }}-${{ matrix.os }}-${{ github.job }}-${{ github.ref }}-${{ github.sha }}-${{ github.head_ref }}
-  #         restore-keys: |
-  #           ${{ env.cache-name }}-${{ matrix.os }}-${{ github.job }}-${{ github.ref }}-${{ github.sha }}
-  #           ${{ env.cache-name }}-${{ matrix.os }}-${{ github.job }}-${{ github.ref }}
-  #           ${{ env.cache-name }}-${{ matrix.os }}-${{ github.job }}
-  #     - name: Clear ccache statistics
-  #       run: |
-  #         ccache --zero-stats --set-config cache_dir=~/.ccache
-  #         ccache --max-size=2G --set-config cache_dir=~/.ccache
-  #         ccache --show-stats --set-config cache_dir=~/.ccache
+      - name: Build wheels
+        uses: pypa/cibuildwheel@v2.21.0
 
-  #     - name: Build package for MacOS
-  #       if: runner.os == 'macOS'
-  #       env:
-  #         CMAKE_CXX_COMPILER_LAUNCHER: ccache
-  #       run: |
-  #         sudo mkdir -p $BUILD_TEMP_DIR
-  #         sudo chown -R $(id -u):$(id -g) $BUILD_TEMP_DIR
-  #         uv build --wheel
-
-  #     - name: "Upload artifacts"
-  #       uses: actions/upload-artifact@v4
-  #       with:
-  #         name: ${{ matrix.wheel }}-${{ matrix.python-version }}
-  #         path: ./dist/*
+      - uses: actions/upload-artifact@v4
+        with:
+          name: pymgl-wheel-macos-arm64
+          path: ./wheelhouse/*.whl
+          compression-level: 0
 
   # build_wheels:
   #   name: BLD ${{ matrix.os }} ${{ matrix.platform }}  (Python ${{ matrix.python-version }})

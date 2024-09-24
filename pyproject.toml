@@ -4,8 +4,7 @@ requires = [
     "versioneer[toml]==0.29",
     # tomli is used by versioneer
     "tomli; python_version < '3.11'",
-    "ninja",
-    "cmake>=3.12",
+    # ninja and cmake>=12 need to be provided by the environment
 ]
 build-backend = "setuptools.build_meta"
 
@@ -28,15 +27,7 @@ requires-python = ">=3.9"
 dependencies = ["packaging"]
 
 [project.optional-dependencies]
-dev = [
-    "ninja",
-    "numpy",
-    "Pillow",
-    "pre-commit",
-    "ruff",
-    "setuptools",
-    "versioneer",
-]
+dev = ["numpy", "Pillow", "pre-commit", "ruff", "setuptools", "versioneer"]
 test = [
     "numpy",
     "Pillow",
