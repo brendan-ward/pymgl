@@ -32,9 +32,10 @@ RUN dnf install -y git && \
     make install
 
 # Install uv
-RUN curl -LsSf https://astral.sh/uv/install.sh
+RUN curl -LsSf https://astral.sh/uv/install.sh && \
+    . $HOME/.cargo/env
 
-ENV PATH=$HOME/.cargo/bin:$PATH
+ENV PATH=/root/.cargo/bin:$PATH
 
 # setting git safe directory is required for properly building wheels when
 # git >= 2.35.3
