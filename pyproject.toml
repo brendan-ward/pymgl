@@ -4,7 +4,8 @@ requires = [
     "versioneer[toml]==0.29",
     # tomli is used by versioneer
     "tomli; python_version < '3.11'",
-    # ninja and cmake>=12 need to be provided by the environment
+    # ninja needs to be provided by the environment
+    "cmake",
 ]
 build-backend = "setuptools.build_meta"
 
