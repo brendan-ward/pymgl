@@ -179,13 +179,13 @@ jobs:
         include:
           - os: "ubuntu-24.04"
             platform: "x86_64"
-            wheel: pymgl-wheel-ubuntu-24.04-x86_64
+            wheel: pymgl-wheel-manylinux_2_28-x86_64
           - os: "ubuntu-22.04"
             platform: "x86_64"
-            wheel: pymgl-wheel-ubuntu-22.04-x86_64
+            wheel: pymgl-wheel-manylinux_2_28-x86_64
           - os: "ubuntu-20.04"
             platform: "x86_64"
-            wheel: pymgl-wheel-ubuntu-20.04-x86_64
+            wheel: pymgl-wheel-manylinux_2_28-x86_64
           - os: "macos-14"
             platform: "arm64"
             wheel: pymgl-wheel-macos-arm64
@@ -200,7 +200,7 @@ jobs:
       - name: Download wheels from artifacts
         uses: actions/download-artifact@v4
         with:
-          pattern: ${{ matrix.wheel }}-${{ matrix.python-version }}
+          pattern: ${{ matrix.wheel }}
           path: wheelhouse
           merge-multiple: true
 
@@ -208,70 +208,7 @@ jobs:
         if: runner.os == 'Linux'
         run: |
           sudo apt-get update
-          sudo apt-get -y install
-          xvfb
-
-      #     - name: Install Ubuntu 24.04 runtime dependencies
-      #       if: matrix.os == 'ubuntu-24.04'
-      #       run: |
-      #         sudo apt-get update
-      #         sudo apt-get -y install \
-      #           libicu74 \
-      #           libcurl4 \
-      #           libjpeg-turbo8 \
-      #           libpng16-16 \
-      #           libwebp7 \
-      #           libprotobuf32 \
-      #           libuv1 \
-      #           libx11-6 \
-      #           libegl1 \
-      #           libopengl0 \
-      #           libgles2 \
-      #           xvfb && \
-      #           # upgrade Mesa packages
-      #           sudo apt-get install -y software-properties-common && \
-      #           sudo add-apt-repository -y ppa:kisak/kisak-mesa && \
-      #           sudo apt-get update && \
-      #           sudo apt-get install -y libglx-mesa0
-
-      #     - name: Install Ubuntu 22.04 runtime dependencies
-      #       if: matrix.os == 'ubuntu-22.04'
-      #       run: |
-      #         sudo apt-get update
-      #         sudo apt-get -y install \
-      #           libicu70 \
-      #           libcurl4 \
-      #           libjpeg-turbo8 \
-      #           libpng16-16 \
-      #           libwebp7 \
-      #           libprotobuf23 \
-      #           libuv1 \
-      #           libx11-6 \
-      #           libegl1 \
-      #           libopengl0 \
-      #           libgles2 \
-      #           xvfb
-
-      #     - name: Install Ubuntu 20.04 runtime dependencies
-      #       if: matrix.os == 'ubuntu-20.04'
-      #       run: |
-      #         sudo apt-get install -y software-properties-common
-      #         sudo add-apt-repository --update -y ppa:ubuntu-toolchain-r/test
-      #         sudo apt-get update
-      #         sudo apt-get -y install \
-      #           libstdc++6 \
-      #           libicu66 \
-      #           libcurl4 \
-      #           libjpeg-turbo8 \
-      #           libpng16-16 \
-      #           libwebp6 \
-      #           libprotobuf17 \
-      #           libuv1 \
-      #           libx11-6 \
-      #           libegl1 \
-      #           libopengl0 \
-      #           libgles2 \
-      #           xvfb
+          sudo apt-get -y install xvfb
 
       - name: Install python & dependencies
         run: |
@@ -281,7 +218,7 @@ jobs:
           uv venv .venv
           echo "VIRTUAL_ENV=.venv" >> $GITHUB_ENV
           echo "$PWD/.venv/bin" >> $GITHUB_PATH
-          uv pip install pytest Pillow numpy pixelmatch python-dotenv
+          uv pip install pytest Pillow numpy pixelmatch python-dotenv packaging
 
       - name: Install pymgl
         run: |
