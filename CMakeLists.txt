@@ -51,13 +51,14 @@ add_library(
     ${PROJECT_SOURCE_DIR}/src/spng.c
 )
 
+# link against mln-core
 target_link_libraries(
     mgl_wrapper PRIVATE
     Mapbox::Base
     mln-core
 )
 
-# ## Build Python module
+# Build Python module
 add_subdirectory(vendor/nanobind)
 
 nanobind_add_module(
@@ -66,7 +67,6 @@ nanobind_add_module(
     ${PROJECT_SOURCE_DIR}/src/_pymgl.cpp
 )
 
-# link against mln-core
 target_link_libraries(
     _pymgl
     PRIVATE
@@ -76,6 +76,6 @@ target_link_libraries(
 set_target_properties(_pymgl PROPERTIES INTERPROCEDURAL_OPTIMIZATION TRUE)
 target_compile_definitions(_pymgl PRIVATE VERSION_INFO=${VERSION_INFO})
 
-# ## C++ tests
+# C++ tests
 include(CTest)
 add_subdirectory(${PROJECT_SOURCE_DIR}/tests)

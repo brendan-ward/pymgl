@@ -37,6 +37,10 @@ include_directories(${MLN_SOURCE_DIR}/vendor/mapbox-base/deps/geometry.hpp/inclu
 include_directories(${MLN_SOURCE_DIR}/vendor/mapbox-base/deps/optional)
 include_directories(${MLN_SOURCE_DIR}/vendor/mapbox-base/deps/variant/include)
 
+# Set RPATH so that auditwheel repair fixes references within mln-core
+set(RPATH ${CMAKE_LIBRARY_OUTPUT_DIRECTORY})
+list(APPEND CMAKE_BUILD_RPATH ${RPATH})
+
 # NOTE: removed all *.hpp file entries from below
 add_library(
     mln-core STATIC
