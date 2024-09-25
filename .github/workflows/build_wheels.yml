@@ -29,8 +29,6 @@ jobs:
   build-wheels-linux:
     name: Build wheels on linux
     runs-on: ubuntu-latest
-    env:
-      CIBW_BUILD_FRONTEND: "build"
 
     steps:
       - name: Checkout repository
