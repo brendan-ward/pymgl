@@ -23,13 +23,14 @@ env:
   CIBW_SKIP: "cp38-* pp* *musllinux* *i686* *ppc64le* *s390x*"
   CIBW_ARCHS: "auto64"
   CIBW_MANYLINUX_X86_64_IMAGE: "pymgl-manylinux_2_28_x86_64:latest"
-  CIBW_BUILD_FRONTEND: "build[uv]"
   CIBW_BUILD_VERBOSITY: 1
 
 jobs:
   build-wheels-linux:
     name: Build wheels on linux
     runs-on: ubuntu-latest
+    env:
+      CIBW_BUILD_FRONTEND: "build"
 
     steps:
       - name: Checkout repository
@@ -57,11 +58,6 @@ jobs:
               vendor/vector-tile \
               vendor/wagyu \
               vendor/zip-archive
-
-      # - name: Install uv
-      #   uses: astral-sh/setup-uv@v3
-      #   with:
-      #     version: ">=0.4"
 
       - name: Set up Docker Buildx
         id: buildx
@@ -98,6 +94,7 @@ jobs:
     env:
       CMAKE_CXX_COMPILER_LAUNCHER: ccache
       MACOSX_DEPLOYMENT_TARGET: "12"
+      CIBW_BUILD_FRONTEND: "build[uv]"
 
     steps:
       - name: Install MacOS dependencies
