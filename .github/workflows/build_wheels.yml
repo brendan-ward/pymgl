@@ -29,6 +29,8 @@ jobs:
   build-wheels-linux:
     name: Build wheels on linux
     runs-on: ubuntu-latest
+    env:
+      CIBW_BEFORE_ALL: "rm -rf {project}/build"
 
     steps:
       - name: Checkout repository
@@ -229,6 +231,9 @@ jobs:
       - name: Test wheels on Linux
         if: runner.os == 'Linux'
         run: |
+          # Fix location for hardcoded certs file in different location on manylinux image
+          mkdir -p /etc/pki/tls/certs
+          ln -s /etc/ssl/certs/ca-certificates.crt /etc/pki/tls/certs/ca-bundle.crt
           xvfb-run -a --server-args="-screen 0 1024x768x24 -ac +render -noreset" pytest --pyargs pymgl -v
 
       - name: Test wheels on MacOS
