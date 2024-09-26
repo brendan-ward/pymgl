@@ -70,7 +70,7 @@ jobs:
         uses: docker/build-push-action@v6
         with:
           context: .
-          file: docker/Dockerfile.manylinux_2_28_x86_64
+          file: ci/Dockerfile.manylinux_2_28_x86_64
           tags: pymgl-manylinux_2_28_x86_64:latest
           push: false
           load: true
@@ -80,12 +80,13 @@ jobs:
           BUILDKIT_PROGRESS: plain
 
       - name: Build wheels
-        uses: pypa/cibuildwheel@v2.21.0
+        run: |
+          docker run --rm -it pymgl-manylinux_2_28_x86_64:latest ci/build_linux_wheels.sh
 
       - uses: actions/upload-artifact@v4
         with:
           name: pymgl-wheel-manylinux_2_28-x86_64
-          path: ./wheelhouse/*.whl
+          path: ./dist/*.whl
           compression-level: 0
 
   build-wheels-macos:

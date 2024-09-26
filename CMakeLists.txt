@@ -5,7 +5,10 @@ project("_pymgl" VERSION "")
 # Only use the active virtual environment of Python
 set(Python_FIND_VIRTUALENV ONLY)
 set(Python_FIND_FRAMEWORK NEVER)
-find_package(Python COMPONENTS Interpreter Development.Module REQUIRED)
+set(Python_ROOT_DIR ${CMAKE_PYTHON_PATH})
+find_package(Python REQUIRED COMPONENTS Interpreter Development.Module)
+
+message("Found python version: " ${Python_VERSION}", include dirs: "${Python_INCLUDE_DIRS})
 
 if(NOT CMAKE_BUILD_TYPE)
     set(CMAKE_BUILD_TYPE Release)

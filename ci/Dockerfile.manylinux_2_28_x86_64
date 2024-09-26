@@ -2,8 +2,6 @@ FROM quay.io/pypa/manylinux_2_28_x86_64:2024-09-23-f703caa
 
 WORKDIR /app
 
-ENV DISPLAY=:99
-ENV LIBGL_ALWAYS_SOFTWARE=1
 ENV BUILD_TEMP_DIR=/tmp/build
 
 RUN dnf -y install \
@@ -31,6 +29,18 @@ RUN dnf install -y git && \
     make -j -l4.5 && \
     make install
 
-# setting git safe directory is required for properly building wheels when
-# git >= 2.35.3
-RUN git config --global --add safe.directory "*"
+# Install ccache
+RUN curl -L -o /tmp/ccache.tar.gz https://github.com/ccache/ccache/releases/download/v4.10.2/ccache-4.10.2.tar.gz && \
+    cd /tmp && \
+    tar -zxvf ccache.tar.gz && \
+    rm -f /tmp/ccache.tar.gz && \
+    mv /tmp/ccache* /tmp/ccache && \
+    cd /tmp/ccache && \
+    cmake . -B /tmp/ccache-build -G Ninja -DCMAKE_BUILD_TYPE=Release && \
+    cmake --build /tmp/ccache-build --target install
+
+# install python versions
+RUN mkdir /uv && \
+    uv python install 3.9 3.10 3.11 3.12 3.13 && \
+    mkdir /wheels && \
+    mkdir /tmp/build
