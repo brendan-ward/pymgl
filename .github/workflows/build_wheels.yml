@@ -232,8 +232,8 @@ jobs:
         if: runner.os == 'Linux'
         run: |
           # Fix location for hardcoded certs file in different location on manylinux image
-          mkdir -p /etc/pki/tls/certs
-          ln -s /etc/ssl/certs/ca-certificates.crt /etc/pki/tls/certs/ca-bundle.crt
+          sudo mkdir -p /etc/pki/tls/certs
+          sudo ln -s /etc/ssl/certs/ca-certificates.crt /etc/pki/tls/certs/ca-bundle.crt
           xvfb-run -a --server-args="-screen 0 1024x768x24 -ac +render -noreset" pytest --pyargs pymgl -v
 
       - name: Test wheels on MacOS
