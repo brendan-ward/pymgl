@@ -81,7 +81,7 @@ jobs:
 
       - name: Build wheels
         run: |
-          docker run --rm -it pymgl-manylinux_2_28_x86_64:latest ci/build_linux_wheels.sh
+          docker run --rm pymgl-manylinux_2_28_x86_64:latest ci/build_linux_wheels.sh
 
       - uses: actions/upload-artifact@v4
         with:
@@ -158,13 +158,16 @@ jobs:
               vendor/wagyu \
               vendor/zip-archive
 
+      # - name: Build wheels
+      #   uses: pypa/cibuildwheel@v2.21.0
       - name: Build wheels
-        uses: pypa/cibuildwheel@v2.21.0
+        run: |
+          ci/build_macos_wheels.sh
 
       - uses: actions/upload-artifact@v4
         with:
           name: pymgl-wheel-macos-arm64
-          path: ./wheelhouse/*.whl
+          path: ./dist/*.whl
           compression-level: 0
 
   test-wheels:
