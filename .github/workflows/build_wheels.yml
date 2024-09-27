@@ -33,6 +33,29 @@ jobs:
       CIBW_BEFORE_ALL: "rm -rf {project}/build"
 
     steps:
+      - name: Prepare ccache
+        run: docker run -v "$PWD/:/app" pymgl-manylinux_2_28_aarch64 \
+          ccache --clear
+
+      - name: Cache ccache
+        uses: actions/cache@v4
+        env:
+          cache-name: ccache-v1
+        with:
+          path: ~/.ccache
+          key: ${{ env.cache-name }}-${{ matrix.os }}-${{ github.job }}-${{ github.ref }}-${{ github.sha }}-${{ github.head_ref }}
+          restore-keys: |
+            ${{ env.cache-name }}-${{ matrix.os }}-${{ github.job }}-${{ github.ref }}-${{ github.sha }}
+            ${{ env.cache-name }}-${{ matrix.os }}-${{ github.job }}-${{ github.ref }}
+            ${{ env.cache-name }}-${{ matrix.os }}-${{ github.job }}
+
+      - name: Clear ccache statistics
+        run: |
+          docker run -v "$PWD/:/app" pymgl-manylinux_2_28_aarch64 \
+            ccache --zero-stats && \
+            ccache --max-size=2G && \
+            ccache --show-stats
+
       - name: Checkout repository
         uses: actions/checkout@v4
         with:
@@ -113,7 +136,9 @@ jobs:
           version: ">=0.4"
 
       - name: Prepare ccache
-        run: ccache --clear --set-config cache_dir=~/.ccache
+        run: |
+          ccache --set-config cache_dir=~/.ccache
+          ccache --clear
 
       - name: Cache ccache
         uses: actions/cache@v4
@@ -126,11 +151,12 @@ jobs:
             ${{ env.cache-name }}-${{ matrix.os }}-${{ github.job }}-${{ github.ref }}-${{ github.sha }}
             ${{ env.cache-name }}-${{ matrix.os }}-${{ github.job }}-${{ github.ref }}
             ${{ env.cache-name }}-${{ matrix.os }}-${{ github.job }}
+
       - name: Clear ccache statistics
         run: |
-          ccache --zero-stats --set-config cache_dir=~/.ccache
-          ccache --max-size=2G --set-config cache_dir=~/.ccache
-          ccache --show-stats --set-config cache_dir=~/.ccache
+          ccache --zero-stats
+          ccache --max-size=2G
+          ccache --show-stats
 
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -244,42 +270,42 @@ jobs:
           cd ..
           pytest --pyargs pymgl -v
 
-  # # NOTE: publish is limited to MacOS wheels because Linux wheels are not accepted
-  # # for only Ubuntu, must be manylinux
-  # publish:
-  #   name: Publish to GitHub / PyPI
-  #   needs: [test-wheels]
-  #   runs-on: ubuntu-latest
-  #   # only publish on tags
-  #   if: github.event_name == 'push' && startsWith(github.event.ref, 'refs/tags/')
+  publish:
+    name: Publish to GitHub / PyPI
+    needs: [test-wheels]
+    runs-on: ubuntu-latest
+    environment:
+      # FIXME: use public PyPI
+      # name: pypi
+      # url: https://pypi.org/p/pymgl
+      name: testpypi
+      url: https://test.pypi.org/p/pymgl
+    permissions:
+      id-token: write # IMPORTANT: this permission is mandatory for trusted publishing to PyPI
+      contents: write # this permission is required for the Github release action
 
-  #   steps:
-  #     - uses: actions/download-artifact@v4
-  #       with:
-  #         pattern: pymgl-wheel-*
-  #         path: wheelhouse
-  #         merge-multiple: true
+    # only publish on tags
+    if: github.event_name == 'push' && startsWith(github.event.ref, 'refs/tags/')
 
-  #     # NOTE: MacOS wheel are the only ones that can be published to PyPI
-  #     - name: Copy MacOS wheel
-  #       run: |
-  #         mkdir wheelhouse/dist
-  #         cp wheelhouse/*macos*.whl wheelhouse/dist
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          pattern: pymgl-wheel-*
+          path: wheelhouse
+          merge-multiple: true
 
-  #     - name: Publish MacOS wheel to PyPI
-  #       uses: pypa/gh-action-pypi-publish@release/v1
-  #       with:
-  #         user: __token__
-  #         password: ${{ secrets.PYPI_API_TOKEN }}
-  #         packages_dir: wheelhouse/dist/
+      - name: Publish wheels to PyPI
+        uses: pypa/gh-action-pypi-publish@release/v1
+        # FIXME: remove
+        with:
+          repository-url: https://test.pypi.org/legacy/
 
-  #     - name: Release
-  #       uses: softprops/action-gh-release@v2
-  #       with:
-  #         name: Version ${{ github.ref_name }}
-  #         tag_name: ${{ github.ref }}
-  #         draft: false
-  #         prerelease: false
-  #         token: ${{ secrets.GITHUB_TOKEN }}
-  #         files: |
-  #           ./wheelhouse/*
+      - name: Create GitHub Release
+        id: create_release
+        uses: softprops/action-gh-release@v2
+        with:
+          name: Version ${{ github.ref_name }}
+          tag_name: ${{ github.ref }}
+          draft: false
+          prerelease: false
+          token: ${{ secrets.GITHUB_TOKEN }}

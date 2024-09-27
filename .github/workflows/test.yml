@@ -19,28 +19,21 @@ jobs:
       fail-fast: false
       matrix:
         os:
-          # FIXME:
-          # - "ubuntu-24.04"
-          # - "ubuntu-22.04"
-          # - "ubuntu-20.04"
-          # - "macos-14"
-          - "macos-13"
+          - "ubuntu-24.04"
+          - "ubuntu-22.04"
+          - "ubuntu-20.04"
+          - "macos-14"
         include:
-          # - os: "ubuntu-24.04"
-          #   platform: "x86_64"
-          # - os: "ubuntu-22.04"
-          #   platform: "x86_64"
-          # - os: "ubuntu-20.04"
-          #   platform: "x86_64"
-          # - os: "macos-14"
-          #   platform: "arm64"
-          - os: "macos-13"
+          - os: "ubuntu-24.04"
             platform: "x86_64"
+          - os: "ubuntu-22.04"
+            platform: "x86_64"
+          - os: "ubuntu-20.04"
+            platform: "x86_64"
+          - os: "macos-14"
+            platform: "arm64"
 
-        python-version: [
-            # "3.9", "3.10", "3.11",
-            "3.12",
-          ]
+        python-version: ["3.9", "3.10", "3.11", "3.12"]
 
     steps:
       - name: Checkout repository
@@ -146,17 +139,6 @@ jobs:
           ccache --max-size=2G --set-config cache_dir=~/.ccache
           ccache --show-stats --set-config cache_dir=~/.ccache
 
-      # FIXME: remove
-      - name: MacOS build with debug
-        if: runner.os == 'macOS'
-        continue-on-error: ${{ matrix.os == 'macos-13' }}
-        run: |
-          brew install ninja
-          mkdir build
-          cmake . -B build -G Ninja -DCMAKE_BUILD_TYPE=Debug -DCMAKE_CXX_COMPILER_LAUNCHER=ccache
-          cmake --build build
-          build/tests/pymgl_test
-
       - name: Build package
         env:
           CMAKE_CXX_COMPILER_LAUNCHER: ccache
@@ -175,14 +157,6 @@ jobs:
 
       - name: Run MacOS tests
         if: runner.os == 'macOS'
-        continue-on-error: ${{ matrix.os == 'macos-13' }}
         run: |
           build/tests/pymgl_test
           python -m pytest pymgl/tests
-
-      - name: "Upload render outputs"
-        uses: actions/upload-artifact@v4
-        # if: ${{ matrix.os == 'macos-13' }}
-        with:
-          name: render-outputs-${{ matrix.os }}-${{ matrix.arch }}-${{ matrix.python-version }}
-          path: /tmp/*.png

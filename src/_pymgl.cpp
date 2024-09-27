@@ -19,7 +19,7 @@ NB_MODULE(_pymgl, m) {
     // TODO: pass errors / warnings back to Python
     mbgl::Log::setObserver(std::make_unique<LogObserver>());
 
-    m.doc() = "MapLibre GL native static renderer";
+    m.doc() = "MapLibre Native static renderer";
 
     nb::class_<Map>(m, "Map")
         .def(nb::init<const std::string &,
@@ -32,12 +32,12 @@ NB_MODULE(_pymgl, m) {
                       const std::optional<std::string> &,
                       const std::optional<std::string> &>(),
              R"pbdoc(
-            Create Maplibre GL map instance.
+            Create Maplibre Native map instance.
 
             Parameters
             ----------
             style : str
-                Mapbox GL style object as json-encoded string.
+                Mapbox GL / Maplibre GL style object as json-encoded string.
             width : int, optional (default: 256)
                 Width of output map.
             height : int, optional (default: 256)

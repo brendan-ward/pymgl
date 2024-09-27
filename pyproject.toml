@@ -14,7 +14,7 @@ name = "pymgl"
 dynamic = ["version"]
 authors = [{ name = "Brendan C. Ward", email = "bcward@astutespruce.com" }]
 license = { file = "LICENSE" }
-description = "Python wrapper for MapLibre GL native"
+description = "Python wrapper for MapLibre Native"
 readme = "README.md"
 classifiers = [
     "Development Status :: 4 - Beta",
@@ -33,10 +33,17 @@ test = [
     "numpy",
     "Pillow",
     "pixelmatch",
+    "python-dotenv",
+    "pytest",
+    "pytest-cov",
+]
+bench = [
+    "numpy",
+    "Pillow",
+    "pixelmatch",
+    "python-dotenv",
     "pytest",
     "pytest-benchmark",
-    "pytest-cov",
-    "python-dotenv",
     "requests",
 ]
 slownetwork = ["poorconn"]

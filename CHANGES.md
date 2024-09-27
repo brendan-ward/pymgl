@@ -5,12 +5,16 @@
 ### Breaking changes
 
 -   dropped support for Python 3.8; now requires >= 3.9
--   dropped support for MacOS 10 and 11; now requires MacOS >= 12
+-   dropped support for MacOS 10 and 11; now requires MacOS >= 12. Wheels are
+    only available for Apple Silicon (Arm64).
 
 ### Improvements
 
 -   upgraded `maplibre-gl-native` to `9dbc0ae`, which enables the new Metal
     rendering engine on MacOS.
+-   now building [manylinux](https://github.com/pypa/manylinux?tab=readme-ov-file#manylinux_2_28-almalinux-8-based)
+    wheels for Linux, including the required dependencies, which enables pymgl
+    to be installed directly from PyPI.
 
 ## 0.4.0 (6/12/2023)
 

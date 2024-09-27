@@ -4,14 +4,18 @@ ARG PYTHON_VERSION="3.12"
 
 WORKDIR /app
 
-ENV DISPLAY :99
-ENV XDG_RUNTIME_DIR /tmp
+ENV DISPLAY=:99
+ENV XDG_RUNTIME_DIR=/tmp
 ENV LIBGL_ALWAYS_SOFTWARE=1
-ENV DEBIAN_FRONTEND noninteractive
-ENV PYTHONMALLOC malloc
-ENV BUILD_TEMP_DIR /tmp/build
-ENV VIRTUAL_ENV /uv/.venv
-ENV PATH "/uv/.venv/bin:$PATH"
+ENV DEBIAN_FRONTEND=noninteractive
+ENV PYTHONMALLOC=malloc
+ENV BUILD_TEMP_DIR=/tmp/build
+ENV VIRTUAL_ENV=/uv/.venv
+ENV PATH="/uv/.venv/bin:$PATH"
+
+# Fix location for hardcoded certs file in different location on manylinux image
+RUN mkdir -p /etc/pki/tls/certs && \
+    ln -s /etc/ssl/certs/ca-certificates.crt /etc/pki/tls/certs/ca-bundle.crt
 
 RUN apt-get update && \
     apt-get -y install \
@@ -45,7 +49,7 @@ RUN apt-get update && \
     apt-get update && \
     apt-get install -y libglx-mesa0
 
-# # Install python and test deps using uv
+# Install python and test deps using uv
 RUN curl -LsSf https://astral.sh/uv/install.sh | sh && \
     . $HOME/.cargo/env && \
     mkdir /uv && \

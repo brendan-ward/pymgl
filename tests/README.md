@@ -1,13 +1,24 @@
+# PyMGL tests
+
 ## C++ tests
 
-The test suite is compiled by default using the CMake configuration in the root
-of this project. This creates an executable in `build/<subdir>/tests/pymgl_test`.
+Building using CMake directly is useful when building the C++ level tests of the
+Maplibre Native wrapper.
 
-`<subdir>` is only present if you used python to do the compilation via something
-like `python setup.py build_ext --inplace`. It will be something like
-`temp.macosx-12.6-arm64-cpython-310`.
+To build the tests directly:
 
-If you used CMake directly, the executable will be at `build/tests/pymgl_test`.
+```bash
+mkdir build
+
+cmake . -B build -G Ninja -DCMAKE_BUILD_TYPE=Debug -DCMAKE_CXX_COMPILER_LAUNCHER=ccache
+cmake --build build
+
+build/tests/pymgl_test -v
+```
+
+Alternatively, the test suite is automatically compiled as part of building the
+python extension, and will be located in `build/<subdir>/tests/pymgl_test`,
+where `<subdir>` is something like `temp.macosx-12.6-arm64-cpython-310`.
 
 Unit test files are contained in `tests/*Test.cpp` files using the
 [GoogleTest](https://google.github.io/googletest/) framework.

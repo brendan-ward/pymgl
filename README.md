@@ -1,137 +1,39 @@
 # PyMGL: Maplibre GL Native Static Renderer for Python
 
-This package provides an interface to `mapblibre-gl-native` to render Mapbox GL
-styles to PNG images.
+This package provides an interface to [Mapblibre Native](https://github.com/maplibre/maplibre-native)
+to render Mapbox GL / Maplibre GL styles to PNG images.
 
 WARNING: this package is under active development and the API may change without notice.
 
 ## Goals
 
 This package is intended to provide a lightweight interface to `maplibre-native`
-for rendering Mapbox GL to PNG image data using Python. This is particularly useful for
-server-side rendering of maps for use in reports.
+for rendering Mapbox GL / Maplibre GL styles to PNG image data using Python.
+This is particularly useful for server-side rendering of maps for use in reports.
 
 This package provides only the Python API for interacting with `maplibre-native`;
 it does not provide higher-level functionality such as a web server or a CLI.
-
-For a stand-alone service implmenting rendering functionality, see
-[mbgl-renderer](https://github.com/consbio/mbgl-renderer) (implemented in NodeJS).
 
 ## Install
 
 ### Supported operating systems
 
-#### MacOS 12+
+#### MacOS 12+, Ubuntu 18+, Debian 10+, Fedora 29+, RHEL 8+, Alma Linux 8+
 
-Wheels are available on PyPI:
+x86_64 and arm64 wheels are available on PyPI:
 
 ```bash
 pip install pymgl
 ```
 
-To verify that it installed correctly, run the included test suite:
+NOTE: x86_64 wheels are not currently available for MacOS.
+
+To verify that pymgl installed correctly, install with the test dependencies and
+run the included test suite:
 
 ```bash
-python -m pip install pytest Pillow numpy pixelmatch python-dotenv
-python -m pytest --pyargs pymgl -v
-```
-
-#### Ubuntu 20.04 - 24.04
-
-Due to the complexity of building manylinux wheels that include OpenGL and
-successfully compile `maplibre-native`, wheels are only available for
-Ubuntu 24.04, 22.04, and 20.04.
-
-Wheels are available on the release page in Github. Download and install from there.
-
-Unfortunately, Python wheel names are very restrictive, so we have added
-`.ubuntu-22.04` and `.ubuntu-20.04` suffixes to the wheel names, which have to
-be stripped off before you can install them.
-
-Something like this for Ubuntu 22.04:
-
-```bash
-
-wget https://github.com/brendan-ward/pymgl/releases/download/<release>/pymgl-<release>-<Python version>-<Python version>-linux_x86_64.whl.ubuntu-22.04
-# rename file to remove .ubuntu-22.04 suffix
-find . -type f -name  "*.whl.ubuntu-22.04" -print0 -exec bash -c 'mv "${0}" "${0//.ubuntu-22.04/}"' {} \;
-python3 -m pip install --find-links . pymgl
-```
-
-You also need to install the following runtime dependencies:
-
-**Ubuntu 24.04:**
-
-```bash
-apt-get install
-    libicu74 \
-    libcurl4 \
-    libjpeg-turbo8 \
-    libpng16-16 \
-    libwebp7 \
-    libprotobuf32 \
-    libuv1 \
-    libx11-6 \
-    libegl1 \
-    libopengl0 \
-    libgles2 \
-    xvfb
-```
-
-You will also likely need to upgrade the Mesa packages:
-
-```bash
-apt-get install -y software-properties-common
-add-apt-repository -y ppa:kisak/kisak-mesa
-apt-get update
-apt-get install -y libglx-mesa0
-```
-
-**Ubuntu 22.04:**
-
-```bash
-apt-get install
-    libicu70 \
-    libcurl4 \
-    libjpeg-turbo8 \
-    libpng16-16 \
-    libwebp7 \
-    libprotobuf23 \
-    libuv1 \
-    libx11-6 \
-    libegl1 \
-    libopengl0 \
-    libgles2 \
-    xvfb
-```
-
-**Ubuntu 20.04:**
-
-```bash
-apt-get install
-    libicu66 \
-    libcurl4 \
-    libjpeg-turbo8 \
-    libpng16-16 \
-    libwebp6 \
-    libprotobuf17 \
-    libuv1 \
-    libx11-6 \
-    libegl1 \
-    libopengl0 \
-    libgles2 \
-    xvfb
-```
-
-You must have Xvfb running in order to successfully use `pymgl`. You can
-setup and run Xvfb manually, or wrap calls to python in `Xvfb-run`.
-
-To verify that it installed correctly, run the included test suite:
-
-```bash
-python -m pip install pytest Pillow numpy pixelmatch python-dotenv
-xvfb-run -a --server-args="-screen 0 1024x768x24 -ac +render -noreset" \
-    python -m pytest --pyargs pymgl -v
+pip install pymgl[test]
+pytest --pyargs pymgl -v
 ```
 
 #### Windows
@@ -140,8 +42,8 @@ Windows is not and will not be supported.
 
 ## Usage
 
-To create a map object, you must always provide a Mapbox GL style JSON string or
-URL to a well-known style hosted by Mapbox or Maptiler:
+To create a map object, you must always provide a Mapbox GL / Maplibre GL style
+JSON string or URL to a well-known style hosted by Mapbox or Maptiler:
 
 ```Python
 from pymgl import Map
@@ -382,7 +284,7 @@ Example:
 
 ```
 
-WARNING: providing a URI to tiles under the `tiles` key of a source is NOT currently supported by Maplibre GL Native;
+WARNING: providing a URI to tiles under the `tiles` key of a source is NOT currently supported by Maplibre Native;
 attempting to do so will fail.
 
 ### Images
@@ -490,63 +392,6 @@ To run on Linux, XVFB must also be running; otherwise the process will segfault.
 
 See [`docker/README.md`](./docker/README.md) for more information.
 
-#### Developing on other Linux versions
-
-See `.github/workflows/build_wheels.yml` for the overall structure for building
-and testing on Linux. You will most likely need to adapt the names of the
-packages to the package manager for your version of Linux.
-
-##### Debian Bullseye
-
-We've heard (#7) that it is possible to successfully build and operate PyMGL
-on Debian Bullseye with the following dependencies:
-
-Build:
-
-```bash
-apt-get -y install \
-    curl \
-    build-essential \
-    cmake \
-    ccache \
-    ninja-build \
-    pkg-config \
-    libcurl4-openssl-dev \
-    libicu-dev \
-    libjpeg-turbo8-dev \
-    libpng-dev \
-    libwebp-dev \
-    libprotobuf-dev \
-    libuv1-dev \
-    libx11-dev \
-    libegl-dev \
-    libopengl-dev \
-    xvfb \
-    libjpeg-dev \
-    libsqlite3-dev \
-    libopengl0 \
-    libgles2 \
-    git
-```
-
-Runtime:
-
-```bash
-apt install --no-install-recommends -y \
-    xvfb \
-    xauth \
-    curl \
-    libicu67 \
-    libjpeg-turbo-progs \
-    libpng16-16 \
-    libwebp7 \
-    libprotobuf23 \
-    libuv1 \
-    libx11-6 \
-    libegl1 \
-    libopengl0
-```
-
 ### nanobind
 
 `nanonbind` is used to provide bindings for Python against a C++ class that wraps
@@ -625,7 +470,7 @@ git commit -am "update maplibre-native" to latest
 
 This package is composed of 2 main parts:
 
--   wrapper around Maplibre GL native classes to make constructing and managing
+-   wrapper around Maplibre Native classes to make constructing and managing
     properties of the map easier
 -   Python bindings created using nanobind against that wrapper
 
@@ -637,19 +482,6 @@ The wrapper is located in `src/map.cpp`.
 
 See [tests/README](tests/README.md) for more information.
 
-Building using CMake directly is useful when building the C++ level tests of the
-Maplibre GL wrapper.
-
-```bash
-mkdir build
-
-cd build
-
-cmake .. -G Ninja -DCMAKE_BUILD_TYPE=Debug
-
-ctest -V
-```
-
 #### Build Python extension
 
 The Python `setup.py` script manages building the library and extension using
@@ -658,7 +490,6 @@ CMake.
 From project root directory:
 
 ```bash
-
 python setup.py build_ext --inplace
 ```
 
@@ -671,6 +502,20 @@ Python-friendly type annotations are maintained in `pymgl/__init__.pyi`.
 Note: `pymgl/__init__.pyi` is necessary to support autocompletion and tooltips
 in VSCode.
 
+##### Building wheels
+
+Most wheels are automatically built by Github when pushing a new version tag.
+Linux Arm64 wheels must be built locally on an Arm64 machine (e.g., MacOS host).
+
+These are created using the manylinux_2_28 Docker container.
+
+```bash
+docker build -f docker/Dockerfile.manylinux_2_28_aarch64 -t pymgl-manylinux_2_28_aarch64 .
+docker run -v "$PWD/:/app" pymgl-manylinux_2_28_aarch64 ci/build_linux_wheels.sh
+```
+
+This will create aarch64 wheels in `dist` that can be uploaded directly to PyPI.
+
 ## See also
 
 [mbgl-renderer](https://github.com/consbio/mbgl-renderer)
@@ -682,9 +527,7 @@ This project was developed with the support of the
 [U.S. Fish and Wildlife Service](https://www.fws.gov/)
 [Southeast Conservation Adaptation Strategy](https://secassoutheast.org/) for
 use in the
-[Southeast Conservation Blueprint Viewer](https://blueprint.geoplatform.gov/southeast/)
-and
-[South Atlantic Conservation Blueprint Simple Viewer](https://blueprint.geoplatform.gov/southatlantic/).
+[Southeast Conservation Blueprint Viewer](https://blueprint.geoplatform.gov/southeast/).
 
 This project is made possible because of the
 [mapbox-gl-native](https://github.com/mapbox/mapbox-gl-native/) project by
