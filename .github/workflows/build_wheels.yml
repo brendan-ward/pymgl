@@ -33,6 +33,32 @@ jobs:
       CIBW_BEFORE_ALL: "rm -rf {project}/build"
 
     steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Checkout submodules
+        run: |
+          git submodule update --init
+          cd vendor/nanobind && \
+            git submodule update --init --recursive
+          cd ../maplibre-native && \
+            git submodule update --init --recursive \
+              vendor/boost \
+              vendor/cpp-httplib \
+              vendor/earcut.hpp \
+              vendor/eternal \
+              vendor/googletest \
+              vendor/polylabel \
+              vendor/protozero \
+              vendor/mapbox-base \
+              vendor/unique_resource \
+              vendor/unordered_dense \
+              vendor/vector-tile \
+              vendor/wagyu \
+              vendor/zip-archive
+
       - name: Set up Docker Buildx
         id: buildx
         uses: docker/setup-buildx-action@v3
@@ -75,32 +101,6 @@ jobs:
             ccache --zero-stats && \
             ccache --max-size=2G && \
             ccache --show-stats
-
-      - name: Checkout repository
-        uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-
-      - name: Checkout submodules
-        run: |
-          git submodule update --init
-          cd vendor/nanobind && \
-            git submodule update --init --recursive
-          cd ../maplibre-native && \
-            git submodule update --init --recursive \
-              vendor/boost \
-              vendor/cpp-httplib \
-              vendor/earcut.hpp \
-              vendor/eternal \
-              vendor/googletest \
-              vendor/polylabel \
-              vendor/protozero \
-              vendor/mapbox-base \
-              vendor/unique_resource \
-              vendor/unordered_dense \
-              vendor/vector-tile \
-              vendor/wagyu \
-              vendor/zip-archive
 
       - name: Build wheels
         run: |
