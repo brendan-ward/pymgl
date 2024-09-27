@@ -81,7 +81,7 @@ jobs:
 
       - name: Build wheels
         run: |
-          docker run --rm pymgl-manylinux_2_28_x86_64:latest ci/build_linux_wheels.sh
+          docker run --rm -v /app:/app pymgl-manylinux_2_28_x86_64:latest ci/build_linux_wheels.sh
 
       - uses: actions/upload-artifact@v4
         with:
@@ -158,8 +158,6 @@ jobs:
               vendor/wagyu \
               vendor/zip-archive
 
-      # - name: Build wheels
-      #   uses: pypa/cibuildwheel@v2.21.0
       - name: Build wheels
         run: |
           ci/build_macos_wheels.sh
@@ -217,18 +215,17 @@ jobs:
           sudo apt-get update
           sudo apt-get -y install libegl1 xvfb
 
-      - name: Install python & dependencies
-        run: |
-          curl -LsSf https://astral.sh/uv/install.sh | sh && \
-          . $HOME/.cargo/env && \
-          uv python install ${{ matrix.python-version }} && \
-          uv venv .venv
-          echo "VIRTUAL_ENV=.venv" >> $GITHUB_ENV
-          echo "$PWD/.venv/bin" >> $GITHUB_PATH
-          uv pip install pytest Pillow numpy pixelmatch python-dotenv
+            - name: Install uv
 
-      - name: Install pymgl
+      - name: Install uv
+        uses: astral-sh/setup-uv@v3
+        with:
+          version: ">=0.4"
+
+      - name: Install pymgl and deps
         run: |
+          uv python install ${{ matrix.python-version }}
+          uv pip install pytest Pillow numpy pixelmatch python-dotenv
           uv pip install --no-cache --pre --no-index --find-links wheelhouse pymgl
           uv pip list
 
