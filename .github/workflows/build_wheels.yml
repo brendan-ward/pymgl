@@ -223,6 +223,9 @@ jobs:
       - name: Install pymgl and deps
         run: |
           uv python install ${{ matrix.python-version }}
+          uv venv .venv
+          echo "VIRTUAL_ENV=.venv" >> $GITHUB_ENV
+          echo "$PWD/.venv/bin" >> $GITHUB_PATH
           uv pip install pytest Pillow numpy pixelmatch python-dotenv
           uv pip install --no-cache --pre --no-index --find-links wheelhouse pymgl
           uv pip list
