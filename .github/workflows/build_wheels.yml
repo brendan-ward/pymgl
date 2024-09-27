@@ -79,10 +79,6 @@ jobs:
         env:
           BUILDKIT_PROGRESS: plain
 
-      - name: Prepare ccache
-        run: docker run -v "$PWD/:/app" pymgl-manylinux_2_28_x86_64 \
-          ccache --clear
-
       - name: Cache ccache
         uses: actions/cache@v4
         env:
@@ -94,13 +90,6 @@ jobs:
             ${{ env.cache-name }}-${{ matrix.os }}-${{ github.job }}-${{ github.ref }}-${{ github.sha }}
             ${{ env.cache-name }}-${{ matrix.os }}-${{ github.job }}-${{ github.ref }}
             ${{ env.cache-name }}-${{ matrix.os }}-${{ github.job }}
-
-      - name: Clear ccache statistics
-        run: |
-          docker run -v "$PWD/:/app" pymgl-manylinux_2_28_x86_64 \
-            ccache --zero-stats && \
-            ccache --max-size=2G && \
-            ccache --show-stats
 
       - name: Build wheels
         run: |
