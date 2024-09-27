@@ -47,3 +47,4 @@ RUN mkdir /uv && \
     mkdir /wheels && \
     mkdir /tmp/build
 
+CMD ["/bin/bash"]

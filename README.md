@@ -510,7 +510,7 @@ Linux Arm64 wheels must be built locally on an Arm64 machine (e.g., MacOS host).
 These are created using the manylinux_2_28 Docker container.
 
 ```bash
-docker build -f docker/Dockerfile.manylinux_2_28_aarch64 -t pymgl-manylinux_2_28_aarch64 .
+docker build -f ci/Dockerfile.manylinux_2_28_aarch64 -t pymgl-manylinux_2_28_aarch64 .
 docker run -v "$PWD/:/app" pymgl-manylinux_2_28_aarch64 ci/build_linux_wheels.sh
 ```
 
