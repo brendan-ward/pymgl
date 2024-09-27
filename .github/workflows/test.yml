@@ -68,6 +68,7 @@ jobs:
             curl \
             build-essential \
             cmake \
+            ninja-build \
             ccache \
             pkg-config \
             libcurl4-openssl-dev \
@@ -108,7 +109,7 @@ jobs:
           HOMEBREW_NO_AUTO_UPDATE: 1
           HOMEBREW_NO_INSTALL_CLEANUP: 1
         run: |
-          brew install ccache
+          brew install ccache ninja
 
       - name: Install python
         run: |
