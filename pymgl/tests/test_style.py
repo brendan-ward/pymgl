@@ -148,7 +148,8 @@ def test_local_mbtiles_vector_source_2x():
 
     img_data = Map(style, 256, 256, 2).renderPNG()
 
-    assert image_matches(img_data, f"{test}@2x.png", 100)
+    # New Metal renderer differs by a bit more than standard tolerance
+    assert image_matches(img_data, f"{test}@2x.png", 250)
 
 
 def test_invalid_local_mbtiles_raster_source():

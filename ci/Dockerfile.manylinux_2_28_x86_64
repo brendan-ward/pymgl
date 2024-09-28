@@ -1,0 +1,48 @@
+FROM quay.io/pypa/manylinux_2_28_x86_64:2024-09-23-f703caa
+
+WORKDIR /app
+
+ENV BUILD_TEMP_DIR=/tmp/build
+
+RUN dnf -y install \
+    curl \
+    cmake \
+    ninja-build \
+    pkg-config \
+    libcurl-devel \
+    libjpeg-turbo-devel \
+    libpng-devel \
+    libwebp-devel \
+    libuv-devel \
+    libX11-devel \
+    mesa-libGL-devel \
+    mesa-libEGL-devel \
+    mesa-libOSMesa \
+    mesa-dri-drivers \
+    xorg-x11-server-Xvfb
+
+# Install newer version of libicu
+RUN dnf install -y git && \
+    git clone https://github.com/unicode-org/icu.git --depth=1 --branch=release-66-1 /tmp/icu && \
+    cd /tmp/icu/icu4c/source && \
+    ./runConfigureICU Linux && \
+    make -j -l4.5 && \
+    make install
+
+# Install ccache
+RUN curl -L -o /tmp/ccache.tar.gz https://github.com/ccache/ccache/releases/download/v4.10.2/ccache-4.10.2.tar.gz && \
+    cd /tmp && \
+    tar -zxvf ccache.tar.gz && \
+    rm -f /tmp/ccache.tar.gz && \
+    mv /tmp/ccache* /tmp/ccache && \
+    cd /tmp/ccache && \
+    cmake . -B /tmp/ccache-build -G Ninja -DCMAKE_BUILD_TYPE=Release && \
+    cmake --build /tmp/ccache-build --target install
+
+# install python versions
+RUN mkdir /uv && \
+    uv python install 3.9 3.10 3.11 3.12 3.13 && \
+    mkdir /wheels && \
+    mkdir /tmp/build
+
+CMD ["/bin/bash"]

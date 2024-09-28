@@ -193,7 +193,7 @@ void Map::addSource(const std::string &id, const std::string &options) {
     using namespace mbgl::style::conversion;
 
     Error error;
-    mbgl::optional<std::unique_ptr<Source>> source
+    std::optional<std::unique_ptr<Source>> source
         = convertJSON<std::unique_ptr<Source>>(options, error, id);
 
     if (!source.has_value()) {
@@ -208,7 +208,7 @@ void Map::addLayer(const std::string &options) {
     using namespace mbgl::style::conversion;
 
     Error error;
-    mbgl::optional<std::unique_ptr<Layer>> layer
+    std::optional<std::unique_ptr<Layer>> layer
         = convertJSON<std::unique_ptr<Layer>>(options, error);
 
     if (!layer.has_value()) {
@@ -344,7 +344,7 @@ const std::vector<std::string> Map::listLayers() {
         auto layerId = layer->getID();
 
         // ignore builtin layer
-        if (layerId == "com.mapbox.annotations.points") {
+        if (layerId == "org.maplibre.annotations.points") {
             continue;
         }
 
@@ -363,7 +363,7 @@ const std::vector<std::string> Map::listSources() {
         auto sourceId = source->getID();
 
         // ignore builtin source
-        if (sourceId == "com.mapbox.annotations") {
+        if (sourceId == "org.maplibre.annotations") {
             continue;
         }
 
@@ -456,12 +456,10 @@ void Map::setFeatureState(const std::string &sourceID,
     bool valueParsed = false;
     mbgl::FeatureState featureState;
 
-    // Adapted from maplibre-gl-native::platform/node/src/node_map.cpp
-    const std::function<std::experimental::optional<Error>(const std::string &,
-                                                           const Convertible &)>
-        convertFn
-        = [&](const std::string &k, const Convertible &v) -> std::experimental::optional<Error> {
-        std::experimental::optional<mbgl::Value> value = toValue(v);
+    // Adapted from maplibre-native::platform/node/src/node_map.cpp
+    const std::function<std::optional<Error>(const std::string &, const Convertible &)> convertFn
+        = [&](const std::string &k, const Convertible &v) -> std::optional<Error> {
+        std::optional<mbgl::Value> value = toValue(v);
         if (value) {
             stateValue  = std::move(*value);
             valueParsed = true;
@@ -470,7 +468,7 @@ void Map::setFeatureState(const std::string &sourceID,
             std::size_t length = arrayLength(v);
             array.reserve(length);
             for (size_t i = 0; i < length; ++i) {
-                std::experimental::optional<mbgl::Value> arrayVal = toValue(arrayMember(v, i));
+                std::optional<mbgl::Value> arrayVal = toValue(arrayMember(v, i));
                 if (arrayVal) {
                     array.emplace_back(*arrayVal);
                 }
@@ -490,7 +488,7 @@ void Map::setFeatureState(const std::string &sourceID,
 
         stateKey               = k;
         featureState[stateKey] = stateValue;
-        return std::experimental::nullopt;
+        return std::nullopt;
     };
 
     eachMember(stateJSON, convertFn);

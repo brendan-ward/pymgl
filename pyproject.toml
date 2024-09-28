@@ -4,8 +4,8 @@ requires = [
     "versioneer[toml]==0.29",
     # tomli is used by versioneer
     "tomli; python_version < '3.11'",
-    "ninja",
-    "cmake>=3.12",
+    # ninja needs to be provided by the environment
+    "cmake",
 ]
 build-backend = "setuptools.build_meta"
 
@@ -14,7 +14,7 @@ name = "pymgl"
 dynamic = ["version"]
 authors = [{ name = "Brendan C. Ward", email = "bcward@astutespruce.com" }]
 license = { file = "LICENSE" }
-description = "Python wrapper for MapLibre GL native"
+description = "Python wrapper for MapLibre Native"
 readme = "README.md"
 classifiers = [
     "Development Status :: 4 - Beta",
@@ -28,23 +28,22 @@ requires-python = ">=3.9"
 dependencies = ["packaging"]
 
 [project.optional-dependencies]
-dev = [
-    "ninja",
-    "numpy",
-    "Pillow",
-    "pre-commit",
-    "ruff",
-    "setuptools",
-    "versioneer",
-]
+dev = ["numpy", "Pillow", "pre-commit", "ruff", "setuptools", "versioneer"]
 test = [
     "numpy",
     "Pillow",
     "pixelmatch",
+    "python-dotenv",
+    "pytest",
+    "pytest-cov",
+]
+bench = [
+    "numpy",
+    "Pillow",
+    "pixelmatch",
+    "python-dotenv",
     "pytest",
     "pytest-benchmark",
-    "pytest-cov",
-    "python-dotenv",
     "requests",
 ]
 slownetwork = ["poorconn"]

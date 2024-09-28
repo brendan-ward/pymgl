@@ -1,7 +1,7 @@
-[submodule "vendor/maplibre-gl-native"]
-	path = vendor/maplibre-gl-native
-	url = https://github.com/maplibre/maplibre-gl-native
-	branch = main
 [submodule "vendor/nanobind"]
 	path = vendor/nanobind
 	url = https://github.com/wjakob/nanobind
+[submodule "vendor/maplibre-native"]
+	path = vendor/maplibre-native
+	url = https://github.com/maplibre/maplibre-native
+	branch = main

@@ -9,6 +9,7 @@ on:
 
 env:
   BUILD_TEMP_DIR: "build"
+  LIBGL_ALWAYS_SOFTWARE: 1
 
 jobs:
   test:
@@ -21,8 +22,7 @@ jobs:
           - "ubuntu-24.04"
           - "ubuntu-22.04"
           - "ubuntu-20.04"
-          # - "macos-14"
-          - "macos-12"
+          - "macos-14"
         include:
           - os: "ubuntu-24.04"
             platform: "x86_64"
@@ -30,10 +30,8 @@ jobs:
             platform: "x86_64"
           - os: "ubuntu-20.04"
             platform: "x86_64"
-          # - os: "macos-14"
-          #   platform: "arm64"
-          - os: "macos-12"
-            platform: "x86_64"
+          - os: "macos-14"
+            platform: "arm64"
 
         python-version: ["3.9", "3.10", "3.11", "3.12"]
 
@@ -44,7 +42,9 @@ jobs:
       - name: Checkout submodules
         run: |
           git submodule update --init
-          cd vendor/maplibre-gl-native && \
+          cd vendor/nanobind && \
+            git submodule update --init --recursive
+          cd ../maplibre-native && \
             git submodule update --init --recursive \
               vendor/boost \
               vendor/cpp-httplib \
@@ -55,11 +55,10 @@ jobs:
               vendor/protozero \
               vendor/mapbox-base \
               vendor/unique_resource \
+              vendor/unordered_dense \
               vendor/vector-tile \
               vendor/wagyu \
               vendor/zip-archive
-          cd ../nanobind && \
-            git submodule update --init --recursive
 
       - name: Install Linux dependencies
         if: runner.os == 'Linux'
@@ -69,17 +68,20 @@ jobs:
             curl \
             build-essential \
             cmake \
+            ninja-build \
             ccache \
             pkg-config \
             libcurl4-openssl-dev \
             libicu-dev \
             libjpeg-turbo8-dev \
             libpng-dev \
+            libwebp-dev \
             libprotobuf-dev \
             libuv1-dev \
             libx11-dev \
             libegl-dev \
             libopengl-dev \
+            libgles2-mesa-dev \
             xvfb
           /usr/sbin/update-ccache-symlinks
 
@@ -91,13 +93,23 @@ jobs:
           sudo apt-get update && \
           sudo apt-get install -y libglx-mesa0
 
+      - name: Upgrade Ubuntu 20.04 GCC
+        if: ${{ matrix.os == 'ubuntu-20.04' }}
+        run: |
+          sudo apt-get install -y software-properties-common && \
+          sudo add-apt-repository --update -y ppa:ubuntu-toolchain-r/test && \
+          sudo apt-get update && \
+          sudo apt-get -y --fix-broken install gcc-13 g++-13 && \
+          sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-13 131 --slave /usr/bin/g++ g++ /usr/bin/g++-13 --slave /usr/bin/gcov gcov /usr/bin/gcov-13 && \
+          gcc -v
+
       - name: Install MacOS dependencies
         if: runner.os == 'macOS'
         env:
           HOMEBREW_NO_AUTO_UPDATE: 1
           HOMEBREW_NO_INSTALL_CLEANUP: 1
         run: |
-          brew install ccache
+          brew install ccache ninja
 
       - name: Install python
         run: |

@@ -1,10 +1,13 @@
 import os
-import sys
+from pathlib import Path
+import shutil
 import subprocess
+import sys
 
 from setuptools import setup, Extension
 from setuptools.command.build_ext import build_ext
 import versioneer
+
 
 # A CMakeExtension needs a sourcedir instead of a file list.
 # The name must be the _single_ output extension from the CMake build.
@@ -30,11 +33,15 @@ class CMakeBuild(build_ext):
         print(f"Build mode: {cfg}")
 
         cmake_args = [
-            "-DCMAKE_LIBRARY_OUTPUT_DIRECTORY={}".format(extdir),
-            "-DPYTHON_EXECUTABLE={}".format(sys.executable),
-            "-DVERSION_INFO={}".format(self.distribution.get_version()),
-            "-DCMAKE_BUILD_TYPE={}".format(cfg),
+            f"-DCMAKE_PYTHON_PATH={Path(sys.executable).parent.parent}",
+            f"-DCMAKE_LIBRARY_OUTPUT_DIRECTORY={extdir}",
+            f"-DVERSION_INFO={self.distribution.get_version()}",
+            f"-DCMAKE_BUILD_TYPE={cfg}",
         ]
+
+        if shutil.which('ccache'):
+            cmake_args.append("-DCMAKE_CXX_COMPILER_LAUNCHER=ccache")
+
         build_args = []
 
         cmake_generator = os.environ.get("CMAKE_GENERATOR", "")

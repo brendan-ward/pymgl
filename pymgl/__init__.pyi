@@ -13,12 +13,12 @@ class Map:
         token: str = None,
         provider: str = None,
     ) -> Map:
-        """Create Maplibre GL map instance.
+        """Create Maplibre Native map instance.
 
         Parameters
         ----------
         style : str
-            Mapbox GL style object as json-encoded string.
+            Mapbox GL / Maplibre GL style object as json-encoded string.
         width : int, optional (default: 256)
             Width of output map.
         height : int, optional (default: 256)

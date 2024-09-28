@@ -5,21 +5,43 @@ add_library(
     mbgl-compiler-options INTERFACE
 )
 
+# Derived from settings in maplibre-native CMakeLists.txt and extended to suppress more warnings
 target_compile_options(
     mbgl-compiler-options
     INTERFACE
-    $<$<COMPILE_LANGUAGE:CXX>:-Wall>
-    $<$<COMPILE_LANGUAGE:CXX>:-Wshadow>
-    $<$<COMPILE_LANGUAGE:CXX>:-Wextra>
+    "-Wall"
+    "-Wextra"
     $<$<CXX_COMPILER_ID:GNU>:-Wno-error=maybe-uninitialized>
     $<$<CXX_COMPILER_ID:GNU>:-Wno-error=return-type>
     $<$<CXX_COMPILER_ID:GNU>:-Wno-error=unknown-pragmas>
+    $<$<CXX_COMPILER_ID:GNU>:-Wno-psabi >
     $<$<CXX_COMPILER_ID:AppleClang>:-Wno-error=deprecated-declarations>
     $<$<CXX_COMPILER_ID:AppleClang>:-Wno-error=unused-parameter>
     $<$<CXX_COMPILER_ID:AppleClang>:-Wno-error=unused-property-ivar>
+    $<$<CXX_COMPILER_ID:AppleClang>:-Wno-defaulted-function-deleted>
+    "-Wno-unused-parameter"
+    "-Wno-unused-variable"
+    "-Wno-deprecated-declarations"
 )
 
-# NOTE: removed all *.hpp file entries from below, and merged file lists to include OpenGL section
+# Include headers we need from from maplibre-native
+include_directories(${MLN_SOURCE_DIR}/include)
+include_directories(${MLN_SOURCE_DIR}/platform/default/include)
+
+# Some headers are in the src directory, just for fun
+include_directories(${MLN_SOURCE_DIR}/src)
+
+# Include headers we need from from maplibre-native dependencies
+include_directories(${MLN_SOURCE_DIR}/vendor/mapbox-base/include)
+include_directories(${MLN_SOURCE_DIR}/vendor/mapbox-base/deps/geometry.hpp/include)
+include_directories(${MLN_SOURCE_DIR}/vendor/mapbox-base/deps/optional)
+include_directories(${MLN_SOURCE_DIR}/vendor/mapbox-base/deps/variant/include)
+
+# Set RPATH so that auditwheel repair fixes references within mln-core
+set(RPATH ${CMAKE_LIBRARY_OUTPUT_DIRECTORY})
+list(APPEND CMAKE_BUILD_RPATH ${RPATH})
+
+# NOTE: removed all *.hpp file entries from below
 add_library(
     mln-core STATIC
     ${MLN_SOURCE_DIR}/src/mbgl/actor/mailbox.cpp
@@ -36,10 +58,15 @@ add_library(
     ${MLN_SOURCE_DIR}/src/mbgl/geometry/feature_index.cpp
     ${MLN_SOURCE_DIR}/src/mbgl/geometry/line_atlas.cpp
     ${MLN_SOURCE_DIR}/src/mbgl/gfx/attribute.cpp
+    ${MLN_SOURCE_DIR}/src/mbgl/gfx/polyline_generator.cpp
+    ${MLN_SOURCE_DIR}/src/mbgl/gfx/fill_generator.cpp
     ${MLN_SOURCE_DIR}/src/mbgl/gfx/renderer_backend.cpp
     ${MLN_SOURCE_DIR}/src/mbgl/gfx/rendering_stats.cpp
+    ${MLN_SOURCE_DIR}/src/mbgl/gfx/shader_group.cpp
+    ${MLN_SOURCE_DIR}/src/mbgl/gfx/shader_registry.cpp
     ${MLN_SOURCE_DIR}/src/mbgl/layermanager/background_layer_factory.cpp
     ${MLN_SOURCE_DIR}/src/mbgl/layermanager/circle_layer_factory.cpp
+    ${MLN_SOURCE_DIR}/src/mbgl/layermanager/custom_layer_factory.cpp
     ${MLN_SOURCE_DIR}/src/mbgl/layermanager/fill_extrusion_layer_factory.cpp
     ${MLN_SOURCE_DIR}/src/mbgl/layermanager/fill_layer_factory.cpp
     ${MLN_SOURCE_DIR}/src/mbgl/layermanager/heatmap_layer_factory.cpp
@@ -94,6 +121,7 @@ add_library(
     ${MLN_SOURCE_DIR}/src/mbgl/renderer/image_manager.cpp
     ${MLN_SOURCE_DIR}/src/mbgl/renderer/layers/render_background_layer.cpp
     ${MLN_SOURCE_DIR}/src/mbgl/renderer/layers/render_circle_layer.cpp
+    ${MLN_SOURCE_DIR}/src/mbgl/renderer/layers/render_custom_layer.cpp
     ${MLN_SOURCE_DIR}/src/mbgl/renderer/layers/render_fill_extrusion_layer.cpp
     ${MLN_SOURCE_DIR}/src/mbgl/renderer/layers/render_fill_layer.cpp
     ${MLN_SOURCE_DIR}/src/mbgl/renderer/layers/render_heatmap_layer.cpp
@@ -146,6 +174,7 @@ add_library(
     ${MLN_SOURCE_DIR}/src/mbgl/style/conversion/property_value.cpp
     ${MLN_SOURCE_DIR}/src/mbgl/style/conversion/rotation.cpp
     ${MLN_SOURCE_DIR}/src/mbgl/style/conversion/source.cpp
+    ${MLN_SOURCE_DIR}/src/mbgl/style/conversion/sprite.cpp
     ${MLN_SOURCE_DIR}/src/mbgl/style/conversion/tileset.cpp
     ${MLN_SOURCE_DIR}/src/mbgl/style/conversion/transition_options.cpp
     ${MLN_SOURCE_DIR}/src/mbgl/style/custom_tile_loader.cpp
@@ -170,6 +199,7 @@ add_library(
     ${MLN_SOURCE_DIR}/src/mbgl/style/expression/image.cpp
     ${MLN_SOURCE_DIR}/src/mbgl/style/expression/image_expression.cpp
     ${MLN_SOURCE_DIR}/src/mbgl/style/expression/in.cpp
+    ${MLN_SOURCE_DIR}/src/mbgl/style/expression/index_of.cpp
     ${MLN_SOURCE_DIR}/src/mbgl/style/expression/interpolate.cpp
     ${MLN_SOURCE_DIR}/src/mbgl/style/expression/is_constant.cpp
     ${MLN_SOURCE_DIR}/src/mbgl/style/expression/is_expression.cpp
@@ -179,6 +209,7 @@ add_library(
     ${MLN_SOURCE_DIR}/src/mbgl/style/expression/match.cpp
     ${MLN_SOURCE_DIR}/src/mbgl/style/expression/number_format.cpp
     ${MLN_SOURCE_DIR}/src/mbgl/style/expression/parsing_context.cpp
+    ${MLN_SOURCE_DIR}/src/mbgl/style/expression/slice.cpp
     ${MLN_SOURCE_DIR}/src/mbgl/style/expression/step.cpp
     ${MLN_SOURCE_DIR}/src/mbgl/style/expression/util.cpp
     ${MLN_SOURCE_DIR}/src/mbgl/style/expression/value.cpp
@@ -188,12 +219,25 @@ add_library(
     ${MLN_SOURCE_DIR}/src/mbgl/style/image_impl.cpp
     ${MLN_SOURCE_DIR}/src/mbgl/style/layer.cpp
     ${MLN_SOURCE_DIR}/src/mbgl/style/layer_impl.cpp
+    ${MLN_SOURCE_DIR}/src/mbgl/style/light.cpp
+    ${MLN_SOURCE_DIR}/src/mbgl/style/light_impl.cpp
+    ${MLN_SOURCE_DIR}/src/mbgl/style/parser.cpp
+    ${MLN_SOURCE_DIR}/src/mbgl/style/property_expression.cpp
+    ${MLN_SOURCE_DIR}/src/mbgl/style/source.cpp
+    ${MLN_SOURCE_DIR}/src/mbgl/style/source_impl.cpp
+    ${MLN_SOURCE_DIR}/src/mbgl/style/sprite.cpp
+    ${MLN_SOURCE_DIR}/src/mbgl/style/style.cpp
+    ${MLN_SOURCE_DIR}/src/mbgl/style/style_impl.cpp
+    ${MLN_SOURCE_DIR}/src/mbgl/style/types.cpp
     ${MLN_SOURCE_DIR}/src/mbgl/style/layers/background_layer.cpp
     ${MLN_SOURCE_DIR}/src/mbgl/style/layers/background_layer_impl.cpp
     ${MLN_SOURCE_DIR}/src/mbgl/style/layers/background_layer_properties.cpp
     ${MLN_SOURCE_DIR}/src/mbgl/style/layers/circle_layer.cpp
     ${MLN_SOURCE_DIR}/src/mbgl/style/layers/circle_layer_impl.cpp
     ${MLN_SOURCE_DIR}/src/mbgl/style/layers/circle_layer_properties.cpp
+    ${MLN_SOURCE_DIR}/src/mbgl/style/layers/custom_layer.cpp
+    ${MLN_SOURCE_DIR}/src/mbgl/style/layers/custom_layer_impl.cpp
+    ${MLN_SOURCE_DIR}/src/mbgl/style/layers/custom_layer_render_parameters.cpp
     ${MLN_SOURCE_DIR}/src/mbgl/style/layers/fill_extrusion_layer.cpp
     ${MLN_SOURCE_DIR}/src/mbgl/style/layers/fill_extrusion_layer_impl.cpp
     ${MLN_SOURCE_DIR}/src/mbgl/style/layers/fill_extrusion_layer_properties.cpp
@@ -215,12 +259,6 @@ add_library(
     ${MLN_SOURCE_DIR}/src/mbgl/style/layers/symbol_layer.cpp
     ${MLN_SOURCE_DIR}/src/mbgl/style/layers/symbol_layer_impl.cpp
     ${MLN_SOURCE_DIR}/src/mbgl/style/layers/symbol_layer_properties.cpp
-    ${MLN_SOURCE_DIR}/src/mbgl/style/light.cpp
-    ${MLN_SOURCE_DIR}/src/mbgl/style/light_impl.cpp
-    ${MLN_SOURCE_DIR}/src/mbgl/style/parser.cpp
-    ${MLN_SOURCE_DIR}/src/mbgl/style/property_expression.cpp
-    ${MLN_SOURCE_DIR}/src/mbgl/style/source.cpp
-    ${MLN_SOURCE_DIR}/src/mbgl/style/source_impl.cpp
     ${MLN_SOURCE_DIR}/src/mbgl/style/sources/custom_geometry_source.cpp
     ${MLN_SOURCE_DIR}/src/mbgl/style/sources/custom_geometry_source_impl.cpp
     ${MLN_SOURCE_DIR}/src/mbgl/style/sources/geojson_source.cpp
@@ -232,9 +270,6 @@ add_library(
     ${MLN_SOURCE_DIR}/src/mbgl/style/sources/raster_source_impl.cpp
     ${MLN_SOURCE_DIR}/src/mbgl/style/sources/vector_source.cpp
     ${MLN_SOURCE_DIR}/src/mbgl/style/sources/vector_source_impl.cpp
-    ${MLN_SOURCE_DIR}/src/mbgl/style/style.cpp
-    ${MLN_SOURCE_DIR}/src/mbgl/style/style_impl.cpp
-    ${MLN_SOURCE_DIR}/src/mbgl/style/types.cpp
     ${MLN_SOURCE_DIR}/src/mbgl/text/check_max_angle.cpp
     ${MLN_SOURCE_DIR}/src/mbgl/text/collision_feature.cpp
     ${MLN_SOURCE_DIR}/src/mbgl/text/collision_index.cpp
@@ -264,14 +299,13 @@ add_library(
     ${MLN_SOURCE_DIR}/src/mbgl/tile/tile_id_io.cpp
     ${MLN_SOURCE_DIR}/src/mbgl/tile/vector_tile.cpp
     ${MLN_SOURCE_DIR}/src/mbgl/tile/vector_tile_data.cpp
-    ${MLN_SOURCE_DIR}/src/mbgl/util/camera.cpp
-    ${MLN_SOURCE_DIR}/src/mbgl/util/client_options.cpp
     ${MLN_SOURCE_DIR}/src/mbgl/util/bounding_volumes.cpp
+    ${MLN_SOURCE_DIR}/src/mbgl/util/camera.cpp
     ${MLN_SOURCE_DIR}/src/mbgl/util/chrono.cpp
+    ${MLN_SOURCE_DIR}/src/mbgl/util/client_options.cpp
     ${MLN_SOURCE_DIR}/src/mbgl/util/color.cpp
     ${MLN_SOURCE_DIR}/src/mbgl/util/constants.cpp
     ${MLN_SOURCE_DIR}/src/mbgl/util/convert.cpp
-    ${MLN_SOURCE_DIR}/src/mbgl/util/dtoa.cpp
     ${MLN_SOURCE_DIR}/src/mbgl/util/event.cpp
     ${MLN_SOURCE_DIR}/src/mbgl/util/font_stack.cpp
     ${MLN_SOURCE_DIR}/src/mbgl/util/geo.cpp
@@ -281,6 +315,7 @@ add_library(
     ${MLN_SOURCE_DIR}/src/mbgl/util/http_header.cpp
     ${MLN_SOURCE_DIR}/src/mbgl/util/http_timeout.cpp
     ${MLN_SOURCE_DIR}/src/mbgl/util/i18n.cpp
+    ${MLN_SOURCE_DIR}/src/mbgl/util/identity.cpp
     ${MLN_SOURCE_DIR}/src/mbgl/util/interpolate.cpp
     ${MLN_SOURCE_DIR}/src/mbgl/util/intersection_tests.cpp
     ${MLN_SOURCE_DIR}/src/mbgl/util/io.cpp
@@ -294,6 +329,7 @@ add_library(
     ${MLN_SOURCE_DIR}/src/mbgl/util/rapidjson.cpp
     ${MLN_SOURCE_DIR}/src/mbgl/util/stopwatch.cpp
     ${MLN_SOURCE_DIR}/src/mbgl/util/string.cpp
+    ${MLN_SOURCE_DIR}/src/mbgl/util/string_indexer.cpp
     ${MLN_SOURCE_DIR}/src/mbgl/util/thread.cpp
     ${MLN_SOURCE_DIR}/src/mbgl/util/thread_pool.cpp
     ${MLN_SOURCE_DIR}/src/mbgl/util/tile_cover.cpp
@@ -305,67 +341,10 @@ add_library(
     ${MLN_SOURCE_DIR}/src/mbgl/util/version.cpp
     ${MLN_SOURCE_DIR}/src/mbgl/util/work_request.cpp
 
-    # OpenGL-specific files:
-    ${MLN_SOURCE_DIR}/src/mbgl/gl/attribute.cpp
-    ${MLN_SOURCE_DIR}/src/mbgl/gl/command_encoder.cpp
-    ${MLN_SOURCE_DIR}/src/mbgl/gl/context.cpp
-    ${MLN_SOURCE_DIR}/src/mbgl/gl/custom_layer.cpp
-    ${MLN_SOURCE_DIR}/src/mbgl/gl/custom_layer_factory.cpp
-    ${MLN_SOURCE_DIR}/src/mbgl/gl/custom_layer_impl.cpp
-    ${MLN_SOURCE_DIR}/src/mbgl/gl/debugging_extension.cpp
-    ${MLN_SOURCE_DIR}/src/mbgl/gl/enum.cpp
-    ${MLN_SOURCE_DIR}/src/mbgl/gl/index_buffer_resource.cpp
-    ${MLN_SOURCE_DIR}/src/mbgl/gl/object.cpp
-    ${MLN_SOURCE_DIR}/src/mbgl/gl/offscreen_texture.cpp
-    ${MLN_SOURCE_DIR}/src/mbgl/gl/render_custom_layer.cpp
-    ${MLN_SOURCE_DIR}/src/mbgl/gl/render_pass.cpp
-    ${MLN_SOURCE_DIR}/src/mbgl/gl/renderer_backend.cpp
-    ${MLN_SOURCE_DIR}/src/mbgl/gl/texture.cpp
-    ${MLN_SOURCE_DIR}/src/mbgl/gl/texture_resource.cpp
-    ${MLN_SOURCE_DIR}/src/mbgl/gl/uniform.cpp
-    ${MLN_SOURCE_DIR}/src/mbgl/gl/upload_pass.cpp
-    ${MLN_SOURCE_DIR}/src/mbgl/gl/value.cpp
-    ${MLN_SOURCE_DIR}/src/mbgl/gl/vertex_array.cpp
-    ${MLN_SOURCE_DIR}/src/mbgl/gl/vertex_buffer_resource.cpp
-    ${MLN_SOURCE_DIR}/src/mbgl/layermanager/location_indicator_layer_factory.cpp
-    ${MLN_SOURCE_DIR}/src/mbgl/platform/gl_functions.cpp
-    ${MLN_SOURCE_DIR}/src/mbgl/programs/gl/background.cpp
-    ${MLN_SOURCE_DIR}/src/mbgl/programs/gl/background_pattern.cpp
-    ${MLN_SOURCE_DIR}/src/mbgl/programs/gl/circle.cpp
-    ${MLN_SOURCE_DIR}/src/mbgl/programs/gl/clipping_mask.cpp
-    ${MLN_SOURCE_DIR}/src/mbgl/programs/gl/collision_box.cpp
-    ${MLN_SOURCE_DIR}/src/mbgl/programs/gl/collision_circle.cpp
-    ${MLN_SOURCE_DIR}/src/mbgl/programs/gl/debug.cpp
-    ${MLN_SOURCE_DIR}/src/mbgl/programs/gl/fill.cpp
-    ${MLN_SOURCE_DIR}/src/mbgl/programs/gl/fill_extrusion.cpp
-    ${MLN_SOURCE_DIR}/src/mbgl/programs/gl/fill_extrusion_pattern.cpp
-    ${MLN_SOURCE_DIR}/src/mbgl/programs/gl/fill_outline.cpp
-    ${MLN_SOURCE_DIR}/src/mbgl/programs/gl/fill_outline_pattern.cpp
-    ${MLN_SOURCE_DIR}/src/mbgl/programs/gl/fill_pattern.cpp
-    ${MLN_SOURCE_DIR}/src/mbgl/programs/gl/heatmap.cpp
-    ${MLN_SOURCE_DIR}/src/mbgl/programs/gl/heatmap_texture.cpp
-    ${MLN_SOURCE_DIR}/src/mbgl/programs/gl/hillshade.cpp
-    ${MLN_SOURCE_DIR}/src/mbgl/programs/gl/hillshade_prepare.cpp
-    ${MLN_SOURCE_DIR}/src/mbgl/programs/gl/line.cpp
-    ${MLN_SOURCE_DIR}/src/mbgl/programs/gl/line_gradient.cpp
-    ${MLN_SOURCE_DIR}/src/mbgl/programs/gl/line_pattern.cpp
-    ${MLN_SOURCE_DIR}/src/mbgl/programs/gl/line_sdf.cpp
-    ${MLN_SOURCE_DIR}/src/mbgl/programs/gl/raster.cpp
-    ${MLN_SOURCE_DIR}/src/mbgl/programs/gl/shader_source.cpp
-    ${MLN_SOURCE_DIR}/src/mbgl/programs/gl/shaders.cpp
-    ${MLN_SOURCE_DIR}/src/mbgl/programs/gl/symbol_icon.cpp
-    ${MLN_SOURCE_DIR}/src/mbgl/programs/gl/symbol_sdf_icon.cpp
-    ${MLN_SOURCE_DIR}/src/mbgl/programs/gl/symbol_sdf_text.cpp
-    ${MLN_SOURCE_DIR}/src/mbgl/programs/gl/symbol_text_and_icon.cpp
-    ${MLN_SOURCE_DIR}/src/mbgl/renderer/layers/render_location_indicator_layer.cpp
-    ${MLN_SOURCE_DIR}/src/mbgl/style/layers/location_indicator_layer.cpp
-    ${MLN_SOURCE_DIR}/src/mbgl/style/layers/location_indicator_layer_impl.cpp
-    ${MLN_SOURCE_DIR}/src/mbgl/style/layers/location_indicator_layer_properties.cpp
-
     # Consolidated from platform / default plus common ones shared between MacOS and Linux
     ${MLN_SOURCE_DIR}/platform/default/src/mbgl/gfx/headless_backend.cpp
     ${MLN_SOURCE_DIR}/platform/default/src/mbgl/gfx/headless_frontend.cpp
-    ${MLN_SOURCE_DIR}/platform/default/src/mbgl/gl/headless_backend.cpp
+
     ${MLN_SOURCE_DIR}/platform/default/src/mbgl/layermanager/layer_manager.cpp
     ${MLN_SOURCE_DIR}/platform/default/src/mbgl/map/map_snapshotter.cpp
     ${MLN_SOURCE_DIR}/platform/default/src/mbgl/platform/time.cpp
@@ -384,6 +363,7 @@ add_library(
     ${MLN_SOURCE_DIR}/platform/default/src/mbgl/storage/sqlite3.cpp
     ${MLN_SOURCE_DIR}/platform/default/src/mbgl/text/bidi.cpp
     ${MLN_SOURCE_DIR}/platform/default/src/mbgl/util/compression.cpp
+    ${MLN_SOURCE_DIR}/platform/default/src/mbgl/util/filesystem.cpp
     ${MLN_SOURCE_DIR}/platform/default/src/mbgl/util/monotonic_timer.cpp
     ${MLN_SOURCE_DIR}/platform/default/src/mbgl/util/png_writer.cpp
     ${MLN_SOURCE_DIR}/platform/default/src/mbgl/util/thread_local.cpp
@@ -394,7 +374,11 @@ set_target_properties(mln-core PROPERTIES POSITION_INDEPENDENT_CODE TRUE)
 
 target_compile_definitions(
     mln-core
-    PRIVATE MBGL_RENDER_BACKEND_OPENGL=1
+    PUBLIC
+    MLN_USE_UNORDERED_DENSE=1
+
+    # disable location indicator; not used for static rendering
+    MBGL_LAYER_LOCATION_INDICATOR_DISABLE_ALL=1
 )
 
 if(EXISTS ${MLN_SOURCE_DIR}/.git/HEAD)
@@ -419,16 +403,6 @@ set_source_files_properties(
     MBGL_VERSION_REV="${MBGL_VERSION_REV}"
 )
 
-# TODO: not needed, already globally defined?
-# target_include_directories(
-# mln-core
-# PRIVATE ${MLN_SOURCE_DIR}/src
-# )
-
-# target_include_directories(
-# mln-core
-# PUBLIC ${MLN_SOURCE_DIR}/include
-# )
 include(${MLN_SOURCE_DIR}/vendor/boost.cmake)
 include(${MLN_SOURCE_DIR}/vendor/csscolorparser.cmake)
 include(${MLN_SOURCE_DIR}/vendor/earcut.hpp.cmake)
@@ -438,6 +412,7 @@ include(${MLN_SOURCE_DIR}/vendor/parsedate.cmake)
 include(${MLN_SOURCE_DIR}/vendor/polylabel.cmake)
 include(${MLN_SOURCE_DIR}/vendor/protozero.cmake)
 include(${MLN_SOURCE_DIR}/vendor/unique_resource.cmake)
+add_subdirectory(${MLN_SOURCE_DIR}/vendor/unordered_dense)
 include(${MLN_SOURCE_DIR}/vendor/vector-tile.cmake)
 include(${MLN_SOURCE_DIR}/vendor/wagyu.cmake)
 
@@ -466,15 +441,15 @@ target_link_libraries(
     Mapbox::Base::Extras::rapidjson
     Mapbox::Base::geojson.hpp
     Mapbox::Base::geometry.hpp
-    Mapbox::Base::optional
     Mapbox::Base::variant
+    unordered_dense
 )
 
 add_library(
     Mapbox::Map ALIAS mln-core
 )
 
-# ## End maplibre-gl-core/CMakeLists.txt
+# # End maplibre-core/CMakeLists.txt
 
 # Build mln-core with specific platform requirements
 if(CMAKE_SYSTEM_NAME STREQUAL Linux)

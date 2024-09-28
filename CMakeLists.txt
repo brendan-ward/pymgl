@@ -1,24 +1,25 @@
 cmake_minimum_required(VERSION 3.19 FATAL_ERROR)
 
-# FIXME: remove
-# cmake_policy(SET CMP0079 NEW)
-# cmake_policy(SET CMP0048 NEW)
 project("_pymgl" VERSION "")
 
-# find Python (note: this looks for at least Python 3.9)
-set(Python_FIND_FRAMEWORK LAST) # Prefer Brew/Conda to Apple framework python
-find_package(Python 3.9 COMPONENTS Interpreter Development.Module REQUIRED)
+# Only use the active virtual environment of Python
+set(Python_FIND_VIRTUALENV ONLY)
+set(Python_FIND_FRAMEWORK NEVER)
+set(Python_ROOT_DIR ${CMAKE_PYTHON_PATH})
+find_package(Python REQUIRED COMPONENTS Interpreter Development.Module)
+
+message("Found python version: " ${Python_VERSION}", include dirs: "${Python_INCLUDE_DIRS})
 
 if(NOT CMAKE_BUILD_TYPE)
     set(CMAKE_BUILD_TYPE Release)
 endif()
 
-set(MLN_SOURCE_DIR ${PROJECT_SOURCE_DIR}/vendor/maplibre-gl-native)
+set(MLN_SOURCE_DIR ${PROJECT_SOURCE_DIR}/vendor/maplibre-native)
 
-# Adapted from maplibre-gl-native/CMakeLists.txt
+# Adapted from maplibre-native/CMakeLists.txt
 cmake_policy(SET CMP0063 NEW)
 set(CMAKE_CXX_EXTENSIONS OFF)
-set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_VISIBILITY_PRESET hidden)
 set(CMAKE_C_EXTENSIONS OFF)
@@ -41,23 +42,10 @@ SET(CMAKE_CXX_ARCHIVE_CREATE "<CMAKE_AR> Scr <TARGET> <LINK_FLAGS> <OBJECTS>")
 SET(CMAKE_C_ARCHIVE_FINISH "<CMAKE_RANLIB> -no_warning_for_no_symbols -c <TARGET>")
 SET(CMAKE_CXX_ARCHIVE_FINISH "<CMAKE_RANLIB> -no_warning_for_no_symbols -c <TARGET>")
 
-# ## Include headers we need from from maplibre-gl-native
-include_directories(${MLN_SOURCE_DIR}/include)
-include_directories(${MLN_SOURCE_DIR}/platform/default/include)
-
-# Some headers are in the src directory, just for fun
-include_directories(${MLN_SOURCE_DIR}/src)
-
-# ## Include headers we need from from maplibre-gl-native dependencies
-include_directories(${MLN_SOURCE_DIR}/vendor/mapbox-base/include)
-include_directories(${MLN_SOURCE_DIR}/vendor/mapbox-base/deps/geometry.hpp/include)
-include_directories(${MLN_SOURCE_DIR}/vendor/mapbox-base/deps/optional)
-include_directories(${MLN_SOURCE_DIR}/vendor/mapbox-base/deps/variant/include)
-
-# ## Build mln-core
+# Build mln-core
 include(${PROJECT_SOURCE_DIR}/mln-core/maplibre-native-core.cmake)
 
-# ## Include headers for pymgl and build the wrapper
+# Include headers for pymgl and build the wrapper
 include_directories(${PROJECT_SOURCE_DIR}/include)
 
 add_library(
@@ -66,13 +54,14 @@ add_library(
     ${PROJECT_SOURCE_DIR}/src/spng.c
 )
 
+# link against mln-core
 target_link_libraries(
     mgl_wrapper PRIVATE
     Mapbox::Base
     mln-core
 )
 
-# ## Build Python module
+# Build Python module
 add_subdirectory(vendor/nanobind)
 
 nanobind_add_module(
@@ -81,7 +70,6 @@ nanobind_add_module(
     ${PROJECT_SOURCE_DIR}/src/_pymgl.cpp
 )
 
-# link against mln-core
 target_link_libraries(
     _pymgl
     PRIVATE
@@ -91,6 +79,6 @@ target_link_libraries(
 set_target_properties(_pymgl PROPERTIES INTERPROCEDURAL_OPTIMIZATION TRUE)
 target_compile_definitions(_pymgl PRIVATE VERSION_INFO=${VERSION_INFO})
 
-# ## C++ tests
+# C++ tests
 include(CTest)
 add_subdirectory(${PROJECT_SOURCE_DIR}/tests)
