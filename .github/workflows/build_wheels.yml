@@ -94,6 +94,8 @@ jobs:
       - name: Build wheels
         run: |
           docker run --rm -v $PWD:/app pymgl-manylinux_2_28_x86_64:latest ci/build_linux_wheels.sh
+          echo "================ cache ================="
+          ls /app/.ccache
 
       - uses: actions/upload-artifact@v4
         with:

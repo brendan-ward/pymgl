@@ -39,7 +39,8 @@ RUN curl -L -o /tmp/ccache.tar.gz https://github.com/ccache/ccache/releases/down
     mv /tmp/ccache* /tmp/ccache && \
     cd /tmp/ccache && \
     cmake . -B /tmp/ccache-build -G Ninja -DCMAKE_BUILD_TYPE=Release && \
-    cmake --build /tmp/ccache-build --target install
+    cmake --build /tmp/ccache-build --target install && \
+    ccache --set-config cache_dir=/app/.ccache
 
 # install python versions
 RUN mkdir /uv && \
