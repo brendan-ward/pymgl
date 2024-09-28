@@ -22,7 +22,6 @@ on:
 env:
   CIBW_SKIP: "cp38-* pp* *musllinux* *i686* *ppc64le* *s390x*"
   CIBW_ARCHS: "auto64"
-  CIBW_MANYLINUX_X86_64_IMAGE: "pymgl-manylinux_2_28_x86_64:latest"
   CIBW_BUILD_VERBOSITY: 1
 
 jobs:
@@ -69,7 +68,7 @@ jobs:
         with:
           context: .
           file: ci/Dockerfile.manylinux_2_28_x86_64
-          tags: pymgl-manylinux_2_28_x86_64:latest
+          tags: pymgl-manylinux_2_28_x86_64
           push: false
           load: true
           cache-from: type=gha
@@ -80,9 +79,8 @@ jobs:
       - name: Prepare ccache volume
         run: |
           sudo mkdir -p /mnt/ccache
-          sudo chown -R $(user -u):$(group -g) /mnt/ccache
           sudo chmod 777 /mnt/ccache
-          docker create -v /mnt/ccache:/ccache:rw --name ccache
+          docker create -v /mnt/ccache:/ccache:rw --name ccache pymgl-manylinux_2_28_x86_64
 
       - name: Cache ccache
         uses: actions/cache@v4
@@ -98,7 +96,7 @@ jobs:
 
       - name: Build wheels
         run: |
-          docker run --rm -e CCACHE_DIR=/ccache --volumes-from ccache -v $PWD:/app pymgl-manylinux_2_28_x86_64:latest ci/build_linux_wheels.sh
+          docker run -e CCACHE_DIR=/ccache --volumes-from ccache -v $PWD:/app pymgl-manylinux_2_28_x86_64 ci/build_linux_wheels.sh
           echo "================ cache ================="
           ls /mnt/ccache
 
