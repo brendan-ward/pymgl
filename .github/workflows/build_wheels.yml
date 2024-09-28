@@ -29,8 +29,6 @@ jobs:
   build-wheels-linux:
     name: Build wheels on linux
     runs-on: ubuntu-latest
-    env:
-      CIBW_BEFORE_ALL: "rm -rf {project}/build"
 
     steps:
       - name: Checkout repository
@@ -93,6 +91,7 @@ jobs:
 
       - name: Build wheels
         run: |
+          mkdir -p ~/.ccache
           docker run --rm -v $PWD:/app pymgl-manylinux_2_28_x86_64:latest ci/build_linux_wheels.sh
           echo "================ cache ================="
           ls ~/.ccache
