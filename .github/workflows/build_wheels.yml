@@ -82,7 +82,7 @@ jobs:
         env:
           cache-name: ccache-v1
         with:
-          path: ~/.ccache
+          path: ~/ccache_out
           key: ${{ env.cache-name }}-${{ matrix.os }}-${{ github.job }}-${{ github.ref }}-${{ github.sha }}-${{ github.head_ref }}
           restore-keys: |
             ${{ env.cache-name }}-${{ matrix.os }}-${{ github.job }}-${{ github.ref }}-${{ github.sha }}
@@ -91,10 +91,9 @@ jobs:
 
       - name: Build wheels
         run: |
-          mkdir -p ~/.ccache
           docker run --rm -v $PWD:/app pymgl-manylinux_2_28_x86_64:latest ci/build_linux_wheels.sh
           echo "================ cache ================="
-          ls ~/.ccache
+          ls ~/ccache_out
 
       - uses: actions/upload-artifact@v4
         with:
