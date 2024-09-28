@@ -285,7 +285,7 @@ jobs:
       - uses: actions/download-artifact@v4
         with:
           pattern: pymgl-wheel-*
-          path: wheelhouse
+          path: dist
           merge-multiple: true
 
       - name: Publish wheels to PyPI
