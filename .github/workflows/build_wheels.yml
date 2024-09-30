@@ -96,8 +96,8 @@ jobs:
 
       - name: Build wheels
         run: |
-          docker run -v $PWD:/app --privileged pymgl-manylinux_2_28_x86_64 git describe --tags --dirty --always --long --match v[[:digit:]]*
-          docker run -e CCACHE_DIR=/ccache --volumes-from ccache -v $PWD:/app --privileged pymgl-manylinux_2_28_x86_64 ci/build_linux_wheels.sh
+          docker run -v $PWD:/app pymgl-manylinux_2_28_x86_64 git describe --tags --dirty --always --long --match v[[:digit:]]*
+          docker run -e CCACHE_DIR=/ccache --volumes-from ccache -v $PWD:/app pymgl-manylinux_2_28_x86_64 ci/build_linux_wheels.sh
 
       - uses: actions/upload-artifact@v4
         with:
