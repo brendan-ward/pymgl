@@ -48,4 +48,8 @@ RUN mkdir /uv && \
     mkdir /wheels && \
     mkdir /tmp/build
 
+# setting git safe directory is required for properly building wheels when
+# git >= 2.35.3
+RUN git config --global --add safe.directory "*"
+
 CMD ["/bin/bash"]
