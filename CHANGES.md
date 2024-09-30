@@ -1,12 +1,12 @@
 # CHANGELOG
 
-## 0.5.0 (in progress)
+## 0.5.0 (9/30/2024)
 
 ### Breaking changes
 
 -   dropped support for Python 3.8; now requires >= 3.9
--   dropped support for MacOS 10 and 11; now requires MacOS >= 12. Wheels are
-    only available for Apple Silicon (Arm64).
+-   dropped support for MacOS 10 and 11; now requires MacOS >= 12. MacOS wheels
+    are only available for Apple Silicon (Arm64).
 
 ### Improvements
 

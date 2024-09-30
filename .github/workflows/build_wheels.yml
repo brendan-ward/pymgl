@@ -267,11 +267,8 @@ jobs:
     needs: [test-wheels]
     runs-on: ubuntu-latest
     environment:
-      # FIXME: use public PyPI
-      # name: pypi
-      # url: https://pypi.org/p/pymgl
-      name: testpypi
-      url: https://test.pypi.org/p/pymgl
+      name: pypi
+      url: https://pypi.org/p/pymgl
     permissions:
       id-token: write # IMPORTANT: this permission is mandatory for trusted publishing to PyPI
       contents: write # this permission is required for the Github release action
@@ -288,9 +285,6 @@ jobs:
 
       - name: Publish wheels to PyPI
         uses: pypa/gh-action-pypi-publish@release/v1
-        # FIXME: remove
-        with:
-          repository-url: https://test.pypi.org/legacy/
 
       - name: Create GitHub Release
         id: create_release
