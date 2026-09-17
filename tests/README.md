@@ -18,7 +18,7 @@ build/tests/pymgl_test -v
 
 Alternatively, the test suite is automatically compiled as part of building the
 python extension, and will be located in `build/<subdir>/tests/pymgl_test`,
-where `<subdir>` is something like `temp.macosx-12.6-arm64-cpython-310`.
+where `<subdir>` is something like `temp.macosx-12.6-arm64-cpython-312`.
 
 Unit test files are contained in `tests/*Test.cpp` files using the
 [GoogleTest](https://google.github.io/googletest/) framework.

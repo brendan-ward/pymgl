@@ -31,7 +31,7 @@ jobs:
 
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
         with:
           fetch-depth: 0
 
@@ -83,7 +83,7 @@ jobs:
           docker create -v /mnt/ccache:/ccache:rw --name ccache pymgl-manylinux_2_28_x86_64
 
       - name: Cache ccache
-        uses: actions/cache@v4
+        uses: actions/cache@v6
         env:
           cache-name: ccache-v1
         with:
@@ -98,7 +98,7 @@ jobs:
         run: |
           docker run -e CCACHE_DIR=/ccache --volumes-from ccache -v $PWD:/app pymgl-manylinux_2_28_x86_64 ci/build_linux_wheels.sh
 
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         with:
           name: pymgl-wheel-manylinux_2_28-x86_64
           path: ./dist/*.whl
@@ -133,7 +133,7 @@ jobs:
           ccache --clear
 
       - name: Cache ccache
-        uses: actions/cache@v4
+        uses: actions/cache@v6
         env:
           cache-name: ccache-v1
         with:
@@ -151,7 +151,7 @@ jobs:
           ccache --show-stats
 
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
         with:
           fetch-depth: 0
 
@@ -180,7 +180,7 @@ jobs:
         run: |
           ci/build_macos_wheels.sh
 
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         with:
           name: pymgl-wheel-macos-arm64
           path: ./dist/*.whl
@@ -212,7 +212,7 @@ jobs:
             platform: "arm64"
             wheel: pymgl-wheel-macos-arm64
 
-        python-version: ["3.9", "3.10", "3.11", "3.12"]
+        python-version: ["3.11", "3.12", "3.13", "3.14"]
 
     env:
       PLATFORM_OS: ${{ matrix.os }}
@@ -221,7 +221,7 @@ jobs:
 
     steps:
       - name: Download wheels from artifacts
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v8
         with:
           pattern: ${{ matrix.wheel }}
           path: wheelhouse
@@ -234,9 +234,7 @@ jobs:
           sudo apt-get -y install libegl1 xvfb
 
       - name: Install uv
-        uses: astral-sh/setup-uv@v3
-        with:
-          version: ">=0.4"
+        uses: astral-sh/setup-uv@v10
 
       - name: Install pymgl and deps
         run: |
@@ -277,7 +275,7 @@ jobs:
     if: github.event_name == 'push' && startsWith(github.event.ref, 'refs/tags/')
 
     steps:
-      - uses: actions/download-artifact@v4
+      - uses: actions/download-artifact@v8
         with:
           pattern: pymgl-wheel-*
           path: dist
@@ -288,7 +286,7 @@ jobs:
 
       - name: Create GitHub Release
         id: create_release
-        uses: softprops/action-gh-release@v2
+        uses: softprops/action-gh-release@v3
         with:
           name: Version ${{ github.ref_name }}
           tag_name: ${{ github.ref }}
