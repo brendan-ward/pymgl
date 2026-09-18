@@ -24,63 +24,69 @@ target_compile_definitions(
     PUBLIC
     MLN_LEGACY_RENDERER=1
     MLN_DRAWABLE_RENDERER=0
+
+    # TODO: vulkan instead
+    MLN_WITH_OPENGL=1
 )
 
-# NOTE: might need to use the legacy renderer and disable drawable renderer
 target_sources(
     mln-core
     PRIVATE
 
-    # OpenGL-specific files
+    # from vendor/maplibre-native/cmake/opengl.cmake (dropped hpp files)
     ${MLN_SOURCE_DIR}/src/mbgl/gl/attribute.cpp
     ${MLN_SOURCE_DIR}/src/mbgl/gl/command_encoder.cpp
     ${MLN_SOURCE_DIR}/src/mbgl/gl/context.cpp
+    ${MLN_SOURCE_DIR}/src/mbgl/gl/fence.cpp
     ${MLN_SOURCE_DIR}/src/mbgl/gl/debugging_extension.cpp
     ${MLN_SOURCE_DIR}/src/mbgl/gl/enum.cpp
-    ${MLN_SOURCE_DIR}/src/mbgl/gl/fence.cpp
     ${MLN_SOURCE_DIR}/src/mbgl/gl/index_buffer_resource.cpp
     ${MLN_SOURCE_DIR}/src/mbgl/gl/object.cpp
     ${MLN_SOURCE_DIR}/src/mbgl/gl/offscreen_texture.cpp
     ${MLN_SOURCE_DIR}/src/mbgl/gl/render_pass.cpp
-    ${MLN_SOURCE_DIR}/src/mbgl/gl/renderer_backend.cpp
     ${MLN_SOURCE_DIR}/src/mbgl/gl/renderbuffer_resource.cpp
+    ${MLN_SOURCE_DIR}/src/mbgl/gl/renderer_backend.cpp
     ${MLN_SOURCE_DIR}/src/mbgl/gl/resource_pool.cpp
-    ${MLN_SOURCE_DIR}/src/mbgl/gl/texture.cpp
-    ${MLN_SOURCE_DIR}/src/mbgl/gl/texture_resource.cpp
     ${MLN_SOURCE_DIR}/src/mbgl/gl/timestamp_query_extension.cpp
     ${MLN_SOURCE_DIR}/src/mbgl/gl/uniform.cpp
     ${MLN_SOURCE_DIR}/src/mbgl/gl/upload_pass.cpp
     ${MLN_SOURCE_DIR}/src/mbgl/gl/value.cpp
     ${MLN_SOURCE_DIR}/src/mbgl/gl/vertex_array.cpp
     ${MLN_SOURCE_DIR}/src/mbgl/gl/vertex_buffer_resource.cpp
-    ${MLN_SOURCE_DIR}/src/mbgl/layermanager/location_indicator_layer_factory.cpp
     ${MLN_SOURCE_DIR}/src/mbgl/platform/gl_functions.cpp
-    ${MLN_SOURCE_DIR}/src/mbgl/renderer/layers/render_custom_layer.cpp
-    ${MLN_SOURCE_DIR}/src/mbgl/renderer/layers/render_location_indicator_layer.cpp
-    ${MLN_SOURCE_DIR}/src/mbgl/style/layers/location_indicator_layer.cpp
-    ${MLN_SOURCE_DIR}/src/mbgl/style/layers/location_indicator_layer_impl.cpp
-    ${MLN_SOURCE_DIR}/src/mbgl/style/layers/location_indicator_layer_properties.cpp
+    ${MLN_SOURCE_DIR}/src/mbgl/shaders/gl/legacy/programs.cpp
 
-    # other Linux-specific files
+    ${MLN_SOURCE_DIR}/src/mbgl/shaders/gl/shader_info.cpp
+    ${MLN_SOURCE_DIR}/src/mbgl/shaders/gl/shader_program_gl.cpp
+    ${MLN_SOURCE_DIR}/src/mbgl/gl/buffer_allocator.cpp
+    ${MLN_SOURCE_DIR}/src/mbgl/gl/drawable_gl.cpp
+    ${MLN_SOURCE_DIR}/src/mbgl/gl/drawable_gl_builder.cpp
+    ${MLN_SOURCE_DIR}/src/mbgl/gl/drawable_gl_impl.hpp
+    ${MLN_SOURCE_DIR}/src/mbgl/gl/dynamic_texture.cpp
+    ${MLN_SOURCE_DIR}/src/mbgl/gl/layer_group_gl.cpp
+    ${MLN_SOURCE_DIR}/src/mbgl/gl/texture2d.cpp
+    ${MLN_SOURCE_DIR}/src/mbgl/gl/uniform_buffer_gl.cpp
+    ${MLN_SOURCE_DIR}/src/mbgl/gl/vertex_attribute_gl.cpp
+
+    # from vendor/maplibre-native/cmake/linux.cmake (dropped hpp files)
     ${MLN_SOURCE_DIR}/platform/default/src/mbgl/i18n/collator.cpp
     ${MLN_SOURCE_DIR}/platform/default/src/mbgl/i18n/number_format.cpp
     ${MLN_SOURCE_DIR}/platform/default/src/mbgl/storage/http_file_source.cpp
     ${MLN_SOURCE_DIR}/platform/default/src/mbgl/text/local_glyph_rasterizer.cpp
     ${MLN_SOURCE_DIR}/platform/default/src/mbgl/util/async_task.cpp
-    ${MLN_SOURCE_DIR}/platform/default/src/mbgl/util/compression.cpp
     ${MLN_SOURCE_DIR}/platform/default/src/mbgl/util/image.cpp
     ${MLN_SOURCE_DIR}/platform/default/src/mbgl/util/jpeg_reader.cpp
+    ${MLN_SOURCE_DIR}/platform/default/src/mbgl/util/webp_reader.cpp
     ${MLN_SOURCE_DIR}/platform/default/src/mbgl/util/logging_stderr.cpp
     ${MLN_SOURCE_DIR}/platform/default/src/mbgl/util/png_reader.cpp
+    ${MLN_SOURCE_DIR}/platform/default/src/mbgl/util/png_writer.cpp
     ${MLN_SOURCE_DIR}/platform/default/src/mbgl/util/run_loop.cpp
     ${MLN_SOURCE_DIR}/platform/default/src/mbgl/util/string_stdlib.cpp
     ${MLN_SOURCE_DIR}/platform/default/src/mbgl/util/thread.cpp
     ${MLN_SOURCE_DIR}/platform/default/src/mbgl/util/timer.cpp
-    ${MLN_SOURCE_DIR}/platform/default/src/mbgl/util/webp_reader.cpp
-
-    ${MLN_SOURCE_DIR}/platform/linux/src/gl_functions.cpp
 
     ${MLN_SOURCE_DIR}/platform/default/src/mbgl/gl/headless_backend.cpp
+    ${MLN_SOURCE_DIR}/platform/linux/src/gl_functions.cpp
     ${MLN_SOURCE_DIR}/platform/linux/src/headless_backend_egl.cpp
 )
 

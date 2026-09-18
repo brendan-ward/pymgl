@@ -18,7 +18,7 @@ it does not provide higher-level functionality such as a web server or a CLI.
 
 ### Supported operating systems
 
-#### MacOS 12+, Ubuntu 18+, Debian 10+, Fedora 29+, RHEL 8+, Alma Linux 8+
+#### MacOS 14.3+, Ubuntu 18+, Debian 10+, Fedora 29+, RHEL 8+, Alma Linux 8+
 
 x86_64 and arm64 wheels are available on PyPI:
 
@@ -26,7 +26,7 @@ x86_64 and arm64 wheels are available on PyPI:
 pip install pymgl
 ```
 
-NOTE: x86_64 wheels are not currently available for MacOS.
+NOTE: x86_64 wheels are not available for MacOS.
 
 To verify that pymgl installed correctly, install with the test dependencies and
 run the included test suite:
@@ -369,24 +369,24 @@ PyMGL does not support alternative projections or 3D terrain.
 Developing on MacOS requires the following binary libraries to be installed
 via `homebrew`:
 
--   cmake
--   ninja
+- cmake
+- ninja
 
 #### Developing on Ubuntu requires the following binary libraries:
 
--   cmake
--   ninja-build
--   build-essential
--   libcurl4-openssl-dev
--   libicu-dev
--   libpng-dev
--   libwebp-dev
--   libprotobuf-dev
--   libjpeg-turbo8-dev
--   libx11-dev
--   libegl-dev
--   libopengl-dev
--   xvfb
+- cmake
+- ninja-build
+- build-essential
+- libcurl4-openssl-dev
+- libicu-dev
+- libpng-dev
+- libwebp-dev
+- libprotobuf-dev
+- libjpeg-turbo8-dev
+- libx11-dev
+- libegl-dev
+- libopengl-dev
+- xvfb
 
 To run on Linux, XVFB must also be running; otherwise the process will segfault.
 
@@ -441,18 +441,27 @@ cd vendor/maplibre-native
 git submodule update --init --recursive \
     vendor/boost \
     vendor/cpp-httplib \
+    vendor/csscolorparser \
     vendor/earcut.hpp \
     vendor/eternal \
+    vendor/expected-lite \
+    vendor/freetype \
     vendor/googletest \
+    vendor/harfbuzz \
+    vendor/kdbush.hpp \
+    vendor/maplibre-native-base \
+    vendor/maplibre-tile-spec \
     vendor/metal-cpp \
+    vendor/parsedate \
+    vendor/PMTiles \
     vendor/polylabel \
     vendor/protozero \
-    vendor/mapbox-base \
+    vendor/rapidjson \
+    vendor/supercluster \
     vendor/unique_resource \
     vendor/unordered_dense \
     vendor/vector-tile \
-    vendor/wagyu \
-    vendor/zip-archive
+    vendor/wagyu
 ```
 
 To later update `maplibre-native`:
@@ -470,9 +479,9 @@ git commit -am "update maplibre-native" to latest
 
 This package is composed of 2 main parts:
 
--   wrapper around Maplibre Native classes to make constructing and managing
-    properties of the map easier
--   Python bindings created using nanobind against that wrapper
+- wrapper around Maplibre Native classes to make constructing and managing
+  properties of the map easier
+- Python bindings created using nanobind against that wrapper
 
 The wrapper is located in `src/map.cpp`.
 

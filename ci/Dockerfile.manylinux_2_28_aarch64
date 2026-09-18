@@ -44,7 +44,7 @@ RUN curl -L -o /tmp/ccache.tar.gz https://github.com/ccache/ccache/releases/down
 
 # install python versions
 RUN mkdir /uv && \
-    uv python install 3.11 3.12 3.13 3.14 && \
+    uv python install 3.12 3.13 3.14 && \
     mkdir /wheels && \
     mkdir /tmp/build
 

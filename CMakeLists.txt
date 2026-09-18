@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.19 FATAL_ERROR)
+cmake_minimum_required(VERSION 3.25 FATAL_ERROR)
 
 project("_pymgl" VERSION "")
 
@@ -57,7 +57,7 @@ add_library(
 # link against mln-core
 target_link_libraries(
     mgl_wrapper PRIVATE
-    Mapbox::Base
+    MapLibreNative::Base
     mln-core
 )
 

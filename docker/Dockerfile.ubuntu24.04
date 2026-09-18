@@ -25,6 +25,7 @@ RUN apt-get update && \
     build-essential \
     cmake \
     ccache \
+    ninja-build \
     pkg-config \
     # required dependencies
     libcurl4-openssl-dev \
@@ -51,7 +52,7 @@ RUN apt-get update && \
 
 # Install python and test deps using uv
 RUN curl -LsSf https://astral.sh/uv/install.sh | sh && \
-    . $HOME/.cargo/env && \
+    . $HOME/.local/bin/env && \
     mkdir /uv && \
     uv python install ${PYTHON_VERSION} && \
     uv venv /uv/.venv

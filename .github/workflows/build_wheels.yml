@@ -27,7 +27,7 @@ env:
 jobs:
   build-wheels-linux:
     name: Build wheels on linux
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
 
     steps:
       - name: Checkout repository
@@ -44,17 +44,27 @@ jobs:
             git submodule update --init --recursive \
               vendor/boost \
               vendor/cpp-httplib \
+              vendor/csscolorparser \
               vendor/earcut.hpp \
               vendor/eternal \
+              vendor/expected-lite \
+              vendor/freetype \
               vendor/googletest \
+              vendor/harfbuzz \
+              vendor/kdbush.hpp \
+              vendor/maplibre-native-base \
+              vendor/maplibre-tile-spec \
+              vendor/metal-cpp \
+              vendor/parsedate \
+              vendor/PMTiles \
               vendor/polylabel \
               vendor/protozero \
-              vendor/mapbox-base \
+              vendor/rapidjson \
+              vendor/supercluster \
               vendor/unique_resource \
               vendor/unordered_dense \
               vendor/vector-tile \
-              vendor/wagyu \
-              vendor/zip-archive
+              vendor/wagyu
 
       - name: Set up Docker Buildx
         id: buildx
@@ -106,10 +116,10 @@ jobs:
 
   build-wheels-macos:
     name: Build wheels on MacOS
-    runs-on: macos-14
+    runs-on: macos-26
     env:
       CMAKE_CXX_COMPILER_LAUNCHER: ccache
-      MACOSX_DEPLOYMENT_TARGET: "12"
+      MACOSX_DEPLOYMENT_TARGET: "14.3"
       CIBW_BUILD_FRONTEND: "build[uv]"
 
     steps:
@@ -197,7 +207,7 @@ jobs:
           - "ubuntu-24.04"
           - "ubuntu-22.04"
           - "ubuntu-20.04"
-          - "macos-14"
+          - "macos-26"
         include:
           - os: "ubuntu-24.04"
             platform: "x86_64"
@@ -208,11 +218,11 @@ jobs:
           - os: "ubuntu-20.04"
             platform: "x86_64"
             wheel: pymgl-wheel-manylinux_2_28-x86_64
-          - os: "macos-14"
+          - os: "macos-26"
             platform: "arm64"
             wheel: pymgl-wheel-macos-arm64
 
-        python-version: ["3.11", "3.12", "3.13", "3.14"]
+        python-version: ["3.12", "3.13", "3.14"]
 
     env:
       PLATFORM_OS: ${{ matrix.os }}
@@ -263,7 +273,7 @@ jobs:
   publish:
     name: Publish to GitHub / PyPI
     needs: [test-wheels]
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     environment:
       name: pypi
       url: https://pypi.org/p/pymgl

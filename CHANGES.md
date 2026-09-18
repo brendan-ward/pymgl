@@ -4,7 +4,8 @@
 
 ### Breaking changes
 
-- dropped support for Python 3.9, 3.10; now requires >= 3.11
+- dropped support for Python 3.9, 3.10, 3.11; now requires >= 3.12
+- dropped support for MacOS < 14.3; now requires MacOS >= 14.3
 
 ### Improvements
 

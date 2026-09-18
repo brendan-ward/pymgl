@@ -2,7 +2,7 @@
 
 # this runs on a MacOS host; wheels do not need to be delocated
 
-for PYTHON_VERSION in 3.11 3.12 3.13 3.14
+for PYTHON_VERSION in 3.12 3.13 3.14
 do
     uv build --wheel --python $PYTHON_VERSION --out-dir dist
     echo
