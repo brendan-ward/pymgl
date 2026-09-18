@@ -29,6 +29,7 @@ jobs:
             platform: "x86_64"
           - os: "ubuntu-24.04-arm"
             platform: "arm64"
+            python-version: "3.14"
           - os: "ubuntu-22.04"
             platform: "x86_64"
           - os: "ubuntu-20.04"
@@ -49,19 +50,29 @@ jobs:
             git submodule update --init --recursive
           cd ../maplibre-native && \
             git submodule update --init --recursive \
-              vendor/boost \
-              vendor/cpp-httplib \
-              vendor/earcut.hpp \
-              vendor/eternal \
-              vendor/googletest \
-              vendor/polylabel \
-              vendor/protozero \
-              vendor/mapbox-base \
-              vendor/unique_resource \
-              vendor/unordered_dense \
-              vendor/vector-tile \
-              vendor/wagyu \
-              vendor/zip-archive
+                vendor/boost \
+                vendor/cpp-httplib \
+                vendor/csscolorparser \
+                vendor/earcut.hpp \
+                vendor/eternal \
+                vendor/expected-lite \
+                vendor/freetype \
+                vendor/googletest \
+                vendor/harfbuzz \
+                vendor/kdbush.hpp \
+                vendor/maplibre-native-base \
+                vendor/maplibre-tile-spec \
+                vendor/metal-cpp \
+                vendor/parsedate \
+                vendor/PMTiles \
+                vendor/polylabel \
+                vendor/protozero \
+                vendor/rapidjson \
+                vendor/supercluster \
+                vendor/unique_resource \
+                vendor/unordered_dense \
+                vendor/vector-tile \
+                vendor/wagyu
 
       - name: Install Linux dependencies
         if: runner.os == 'Linux'

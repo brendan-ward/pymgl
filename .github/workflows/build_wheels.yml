@@ -174,17 +174,27 @@ jobs:
             git submodule update --init --recursive \
               vendor/boost \
               vendor/cpp-httplib \
+              vendor/csscolorparser \
               vendor/earcut.hpp \
               vendor/eternal \
+              vendor/expected-lite \
+              vendor/freetype \
               vendor/googletest \
+              vendor/harfbuzz \
+              vendor/kdbush.hpp \
+              vendor/maplibre-native-base \
+              vendor/maplibre-tile-spec \
+              vendor/metal-cpp \
+              vendor/parsedate \
+              vendor/PMTiles \
               vendor/polylabel \
               vendor/protozero \
-              vendor/mapbox-base \
+              vendor/rapidjson \
+              vendor/supercluster \
               vendor/unique_resource \
               vendor/unordered_dense \
               vendor/vector-tile \
-              vendor/wagyu \
-              vendor/zip-archive
+              vendor/wagyu
 
       - name: Build wheels
         run: |
