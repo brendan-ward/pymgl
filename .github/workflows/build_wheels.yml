@@ -38,6 +38,13 @@ jobs:
         os:
           - "ubuntu-24.04"
           - "ubuntu-24.04-arm"
+        include:
+          - os: "ubuntu-24.04"
+            dockerfile: ci/Dockerfile.manylinux_2_28_x86_64
+            tags: pymgl-manylinux_2_28_x86_64
+          - os: "ubuntu-24.04-arm"
+            dockerfile: ci/Dockerfile.manylinux_2_28_aarch64
+            tags: pymgl-manylinux_2_28_aarch64
 
     steps:
       - name: Checkout repository
@@ -87,8 +94,8 @@ jobs:
         uses: docker/build-push-action@v6
         with:
           context: .
-          file: ci/Dockerfile.manylinux_2_28_x86_64
-          tags: pymgl-manylinux_2_28_x86_64
+          file: ${{ matrix.dockerfile }}
+          tags: ${{ matrix.tags }}
           push: false
           load: true
           cache-from: type=gha
@@ -224,18 +231,26 @@ jobs:
       fail-fast: false
       matrix:
         os:
+          - "ubuntu-26.04"
+          - "ubuntu-26.04-arm"
           - "ubuntu-24.04"
+          - "ubuntu-24.04-arm"
           - "ubuntu-22.04"
-          - "ubuntu-20.04"
           - "macos-26"
         include:
+          - os: "ubuntu-26.04"
+            platform: "x86_64"
+            wheel: pymgl-wheel-manylinux_2_28-x86_64
+          - os: "ubuntu-26.04-arm"
+            platform: "arm64"
+            wheel: pymgl-wheel-manylinux_2_28-aarch64
           - os: "ubuntu-24.04"
             platform: "x86_64"
             wheel: pymgl-wheel-manylinux_2_28-x86_64
+          - os: "ubuntu-24.04-arm"
+            platform: "arm64"
+            wheel: pymgl-wheel-manylinux_2_28-aarch64
           - os: "ubuntu-22.04"
-            platform: "x86_64"
-            wheel: pymgl-wheel-manylinux_2_28-x86_64
-          - os: "ubuntu-20.04"
             platform: "x86_64"
             wheel: pymgl-wheel-manylinux_2_28-x86_64
           - os: "macos-26"

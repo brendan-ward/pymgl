@@ -18,15 +18,26 @@ it does not provide higher-level functionality such as a web server or a CLI.
 
 ### Supported operating systems
 
-#### MacOS 14.3+, Ubuntu 18+, Debian 10+, Fedora 29+, RHEL 8+, Alma Linux 8+
-
-x86_64 and arm64 wheels are available on PyPI:
+MacOS (arm64 only) and Linux (manylinux x86_64/arm64) wheels are available on PyPI:
 
 ```bash
 pip install pymgl
 ```
 
-NOTE: x86_64 wheels are not available for MacOS.
+Windows is not and will not be supported.
+
+The manylinux wheels currently target Ubuntu 18+, Debian 10+, Fedora 29+, RHEL 8+,
+Alma Linux 8+. However, several of these are EOL and not tested. Ubuntu 22.04,
+24.04, and 26.04 are actively tested.
+
+You may need to set the SSL CA certificate path specific to your version of Linux,
+because they might be in a different location than on your version than in the
+manylinux builder. For example, on Ubuntu 22+:
+
+```bash
+sudo mkdir -p /etc/pki/tls/certs
+sudo ln -s /etc/ssl/certs/ca-certificates.crt /etc/pki/tls/certs/ca-bundle.crt
+```
 
 To verify that pymgl installed correctly, install with the test dependencies and
 run the included test suite:
@@ -35,10 +46,6 @@ run the included test suite:
 pip install pymgl[test]
 pytest --pyargs pymgl -v
 ```
-
-#### Windows
-
-Windows is not and will not be supported.
 
 ## Usage
 

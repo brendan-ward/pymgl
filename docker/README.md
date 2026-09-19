@@ -2,16 +2,23 @@
 
 ## Development container
 
+Two example development containers are available:
+
+- `docker/Dockerfile.ubuntu24.04` (default: Python 3.12)
+- `docker/Dockerfile.ubuntu26.04` (default: Python 3.14)
+
+You can pass Python version using `--build-args PYTHON_VERSION=<version>`.
+
 Build the development container (using source files on host):
 
 ```bash
-docker build -f docker/Dockerfile.ubuntu24.04 -t pymgl-dev-ubuntu24.04 .
+docker build -f docker/Dockerfile.ubuntu26.04 -t pymgl-dev-ubuntu26.04 .
 ```
 
 Run the container mounted to the host filesystem for source files:
 
 ```bash
-docker run -it -v "$PWD/:/app" pymgl-dev-ubuntu24.04 /bin/bash
+docker run -it -v "$PWD/:/app" pymgl-dev-ubuntu26.04 /bin/bash
 ```
 
 Then from within the container, run:
@@ -36,6 +43,9 @@ You can also run the tests using `xvfb-run` to sidestep the need to start Xvfb:
 ```bash
 xvfb-run -a --server-args="-screen 0 1024x768x24 -ac +render -noreset" /tmp/build/tests/pymgl_test
 ```
+
+Note: if you are not running `xvfb` you will get an error message that may include
+something like `eglInitialize() failed.`. That is your clue to run `xvfb`.
 
 To copy rendered PNG files from the running container:
 

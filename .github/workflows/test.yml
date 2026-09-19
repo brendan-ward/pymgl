@@ -23,22 +23,26 @@ jobs:
       fail-fast: false
       matrix:
         os:
+          - "ubuntu-26.04"
           - "ubuntu-24.04"
           - "ubuntu-24.04-arm"
           - "ubuntu-22.04"
-          - "ubuntu-20.04"
           - "macos-26"
         python-version: ["3.12", "3.13", "3.14"]
         include:
+          - os: "ubuntu-26.04"
+            platform: "x86_64"
+            python-version: "3.14"
+          - os: "ubuntu-26.04-arm"
+            platform: "x86_64"
+            python-version: "3.14"
           - os: "ubuntu-24.04"
             platform: "x86_64"
           - os: "ubuntu-24.04-arm"
             platform: "arm64"
-            python-version: "3.14"
           - os: "ubuntu-22.04"
             platform: "x86_64"
-          - os: "ubuntu-20.04"
-            platform: "x86_64"
+            python-version: "3.12"
           - os: "macos-26"
             platform: "arm64"
 
@@ -110,15 +114,15 @@ jobs:
           sudo apt-get update && \
           sudo apt-get install -y libglx-mesa0
 
-      - name: Upgrade Ubuntu 20.04 GCC
-        if: ${{ matrix.os == 'ubuntu-20.04' }}
-        run: |
-          sudo apt-get install -y software-properties-common && \
-          sudo add-apt-repository --update -y ppa:ubuntu-toolchain-r/test && \
-          sudo apt-get update && \
-          sudo apt-get -y --fix-broken install gcc-13 g++-13 && \
-          sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-13 131 --slave /usr/bin/g++ g++ /usr/bin/g++-13 --slave /usr/bin/gcov gcov /usr/bin/gcov-13 && \
-          gcc -v
+      # - name: Upgrade Ubuntu 20.04 GCC
+      #   if: ${{ matrix.os == 'ubuntu-20.04' }}
+      #   run: |
+      #     sudo apt-get install -y software-properties-common && \
+      #     sudo add-apt-repository --update -y ppa:ubuntu-toolchain-r/test && \
+      #     sudo apt-get update && \
+      #     sudo apt-get -y --fix-broken install gcc-13 g++-13 && \
+      #     sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-13 131 --slave /usr/bin/g++ g++ /usr/bin/g++-13 --slave /usr/bin/gcov gcov /usr/bin/gcov-13 && \
+      #     gcc -v
 
       - name: Install MacOS dependencies
         if: runner.os == 'macOS'

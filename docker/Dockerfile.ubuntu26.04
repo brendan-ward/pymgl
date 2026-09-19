@@ -1,0 +1,53 @@
+FROM ubuntu:26.04
+
+ARG PYTHON_VERSION="3.14"
+
+WORKDIR /app
+
+ENV DISPLAY=:99
+ENV XDG_RUNTIME_DIR=/tmp
+ENV LIBGL_ALWAYS_SOFTWARE=1
+ENV DEBIAN_FRONTEND=noninteractive
+ENV PYTHONMALLOC=malloc
+ENV BUILD_TEMP_DIR=/tmp/build
+ENV VIRTUAL_ENV=/uv/.venv
+ENV PATH="/uv/.venv/bin:$PATH"
+
+# Fix location for hardcoded certs file in different location on manylinux image
+RUN mkdir -p /etc/pki/tls/certs && \
+    ln -s /etc/ssl/certs/ca-certificates.crt /etc/pki/tls/certs/ca-bundle.crt
+
+RUN apt-get update && \
+    apt-get -y install \
+    curl \
+    git \
+    # build tools
+    build-essential \
+    cmake \
+    ccache \
+    ninja-build \
+    pkg-config \
+    # required dependencies
+    libcurl4-openssl-dev \
+    libicu-dev \
+    libjpeg-turbo8-dev \
+    libpng-dev \
+    libwebp-dev \
+    libprotobuf-dev \
+    libuv1-dev \
+    libx11-dev \
+    libegl-dev \
+    libopengl-dev \
+    libgles2-mesa-dev \
+    # runtime dependencies
+    xvfb \
+    # debugging utilities
+    valgrind && \
+    /usr/sbin/update-ccache-symlinks
+
+# Install python and test deps using uv
+RUN curl -LsSf https://astral.sh/uv/install.sh | sh && \
+    . $HOME/.local/bin/env && \
+    mkdir /uv && \
+    uv python install ${PYTHON_VERSION} && \
+    uv venv /uv/.venv
