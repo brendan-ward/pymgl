@@ -1,6 +1,6 @@
 # CHANGELOG
 
-## 0.6.0 (in development)
+## 0.6.0 (9/19/2026)
 
 ### Breaking changes
 
