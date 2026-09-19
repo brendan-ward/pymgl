@@ -1,0 +1,18 @@
+{
+    "version": 8,
+    "sources": {
+        "basemap": {
+            "type": "raster",
+            "url": "pmtiles://file://geography-class-png.pmtiles",
+
+            "tileSize": 256
+        }
+    },
+    "layers": [
+        {
+            "id": "basemap",
+            "type": "raster",
+            "source": "basemap"
+        }
+    ]
+}

@@ -18,15 +18,26 @@ it does not provide higher-level functionality such as a web server or a CLI.
 
 ### Supported operating systems
 
-#### MacOS 12+, Ubuntu 18+, Debian 10+, Fedora 29+, RHEL 8+, Alma Linux 8+
-
-x86_64 and arm64 wheels are available on PyPI:
+MacOS (arm64 only) and Linux (manylinux x86_64/arm64) wheels are available on PyPI:
 
 ```bash
 pip install pymgl
 ```
 
-NOTE: x86_64 wheels are not currently available for MacOS.
+Windows is not and will not be supported.
+
+The manylinux wheels currently target Ubuntu 18+, Debian 10+, Fedora 29+, RHEL 8+,
+Alma Linux 8+. However, several of these are EOL and not tested. Ubuntu 22.04,
+24.04, and 26.04 are actively tested.
+
+You may need to set the SSL CA certificate path specific to your version of Linux,
+because they might be in a different location than on your version than in the
+manylinux builder. For example, on Ubuntu 22+:
+
+```bash
+sudo mkdir -p /etc/pki/tls/certs
+sudo ln -s /etc/ssl/certs/ca-certificates.crt /etc/pki/tls/certs/ca-bundle.crt
+```
 
 To verify that pymgl installed correctly, install with the test dependencies and
 run the included test suite:
@@ -35,10 +46,6 @@ run the included test suite:
 pip install pymgl[test]
 pytest --pyargs pymgl -v
 ```
-
-#### Windows
-
-Windows is not and will not be supported.
 
 ## Usage
 
@@ -263,6 +270,29 @@ Example:
 }
 ```
 
+### PMTiles
+
+Local and remote [PMTiles](https://github.com/protomaps/PMTiles) files are supported,
+but must include a `file://` with the absolute path or `https://` remote URL.
+
+```json
+{
+    "sources": {
+        "local_pmtiles": {
+            "url": "pmtiles://file:///<pymgl_root_dir>/tests/fixtures/geography-class-png.pmtiles",
+            ...
+        },
+        "remote_pmtiles": {
+            "url": "pmtiles://https://latest.protomaps.com/v4.pmtiles",
+            ...
+        },
+    },
+    "layers": [...],
+    ...
+}
+
+```
+
 ### Local files
 
 GeoJSON files and other local file assets are supported, but must be provided
@@ -369,24 +399,24 @@ PyMGL does not support alternative projections or 3D terrain.
 Developing on MacOS requires the following binary libraries to be installed
 via `homebrew`:
 
--   cmake
--   ninja
+- cmake
+- ninja
 
 #### Developing on Ubuntu requires the following binary libraries:
 
--   cmake
--   ninja-build
--   build-essential
--   libcurl4-openssl-dev
--   libicu-dev
--   libpng-dev
--   libwebp-dev
--   libprotobuf-dev
--   libjpeg-turbo8-dev
--   libx11-dev
--   libegl-dev
--   libopengl-dev
--   xvfb
+- cmake
+- ninja-build
+- build-essential
+- libcurl4-openssl-dev
+- libicu-dev
+- libpng-dev
+- libwebp-dev
+- libprotobuf-dev
+- libjpeg-turbo8-dev
+- libx11-dev
+- libegl-dev
+- libopengl-dev
+- xvfb
 
 To run on Linux, XVFB must also be running; otherwise the process will segfault.
 
@@ -441,18 +471,27 @@ cd vendor/maplibre-native
 git submodule update --init --recursive \
     vendor/boost \
     vendor/cpp-httplib \
+    vendor/csscolorparser \
     vendor/earcut.hpp \
     vendor/eternal \
+    vendor/expected-lite \
+    vendor/freetype \
     vendor/googletest \
+    vendor/harfbuzz \
+    vendor/kdbush.hpp \
+    vendor/maplibre-native-base \
+    vendor/maplibre-tile-spec \
     vendor/metal-cpp \
+    vendor/parsedate \
+    vendor/PMTiles \
     vendor/polylabel \
     vendor/protozero \
-    vendor/mapbox-base \
+    vendor/rapidjson \
+    vendor/supercluster \
     vendor/unique_resource \
     vendor/unordered_dense \
     vendor/vector-tile \
-    vendor/wagyu \
-    vendor/zip-archive
+    vendor/wagyu
 ```
 
 To later update `maplibre-native`:
@@ -466,13 +505,15 @@ cd ../..
 git commit -am "update maplibre-native" to latest
 ```
 
+Note: this can also checkout a recent release of the core.
+
 ### Architecture
 
 This package is composed of 2 main parts:
 
--   wrapper around Maplibre Native classes to make constructing and managing
-    properties of the map easier
--   Python bindings created using nanobind against that wrapper
+- wrapper around Maplibre Native classes to make constructing and managing
+  properties of the map easier
+- Python bindings created using nanobind against that wrapper
 
 The wrapper is located in `src/map.cpp`.
 
@@ -505,16 +546,7 @@ in VSCode.
 ##### Building wheels
 
 Most wheels are automatically built by Github when pushing a new version tag.
-Linux Arm64 wheels must be built locally on an Arm64 machine (e.g., MacOS host).
-
-These are created using the manylinux_2_28 Docker container.
-
-```bash
-docker build -f ci/Dockerfile.manylinux_2_28_aarch64 -t pymgl-manylinux_2_28_aarch64 .
-docker run -v "$PWD/:/app" pymgl-manylinux_2_28_aarch64 ci/build_linux_wheels.sh
-```
-
-This will create aarch64 wheels in `dist` that can be uploaded directly to PyPI.
+These are created for Linux using the `manylinux_2_28` Docker container.
 
 ## See also
 

@@ -2,8 +2,6 @@
 requires = [
     "setuptools",
     "versioneer[toml]==0.29",
-    # tomli is used by versioneer
-    "tomli; python_version < '3.11'",
     # ninja needs to be provided by the environment
     "cmake",
 ]
@@ -13,22 +11,23 @@ build-backend = "setuptools.build_meta"
 name = "pymgl"
 dynamic = ["version"]
 authors = [{ name = "Brendan C. Ward", email = "bcward@astutespruce.com" }]
-license = { file = "LICENSE" }
+license = "MIT"
+license-files = ["LICENSE"]
 description = "Python wrapper for MapLibre Native"
 readme = "README.md"
 classifiers = [
     "Development Status :: 4 - Beta",
     "Intended Audience :: Science/Research",
-    "License :: OSI Approved :: MIT License",
-    "Operating System :: OS Independent",
+    "Operating System :: MacOS",
+    "Operating System :: POSIX :: Linux",
     "Programming Language :: Python :: 3",
     "Topic :: Scientific/Engineering :: GIS",
 ]
-requires-python = ">=3.9"
-dependencies = ["packaging"]
+requires-python = ">=3.12"
+dependencies = ["packaging>=24.2"]
 
 [project.optional-dependencies]
-dev = ["numpy", "Pillow", "pre-commit", "ruff", "setuptools", "versioneer"]
+dev = ["numpy", "Pillow", "pre-commit", "ruff", "setuptools>=77", "versioneer"]
 test = [
     "numpy",
     "Pillow",

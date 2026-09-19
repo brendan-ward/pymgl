@@ -7,6 +7,10 @@ on:
   pull_request:
   workflow_dispatch:
 
+concurrency:
+  group: test
+  cancel-in-progress: true
+
 env:
   BUILD_TEMP_DIR: "build"
   LIBGL_ALWAYS_SOFTWARE: 1
@@ -19,25 +23,32 @@ jobs:
       fail-fast: false
       matrix:
         os:
+          - "ubuntu-26.04"
           - "ubuntu-24.04"
+          - "ubuntu-24.04-arm"
           - "ubuntu-22.04"
-          - "ubuntu-20.04"
-          - "macos-14"
+          - "macos-26"
+        python-version: ["3.12", "3.13", "3.14"]
         include:
+          - os: "ubuntu-26.04"
+            platform: "x86_64"
+            python-version: "3.14"
+          - os: "ubuntu-26.04-arm"
+            platform: "x86_64"
+            python-version: "3.14"
           - os: "ubuntu-24.04"
             platform: "x86_64"
+          - os: "ubuntu-24.04-arm"
+            platform: "arm64"
           - os: "ubuntu-22.04"
             platform: "x86_64"
-          - os: "ubuntu-20.04"
-            platform: "x86_64"
-          - os: "macos-14"
+            python-version: "3.12"
+          - os: "macos-26"
             platform: "arm64"
-
-        python-version: ["3.9", "3.10", "3.11", "3.12"]
 
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
 
       - name: Checkout submodules
         run: |
@@ -46,19 +57,29 @@ jobs:
             git submodule update --init --recursive
           cd ../maplibre-native && \
             git submodule update --init --recursive \
-              vendor/boost \
-              vendor/cpp-httplib \
-              vendor/earcut.hpp \
-              vendor/eternal \
-              vendor/googletest \
-              vendor/polylabel \
-              vendor/protozero \
-              vendor/mapbox-base \
-              vendor/unique_resource \
-              vendor/unordered_dense \
-              vendor/vector-tile \
-              vendor/wagyu \
-              vendor/zip-archive
+                vendor/boost \
+                vendor/cpp-httplib \
+                vendor/csscolorparser \
+                vendor/earcut.hpp \
+                vendor/eternal \
+                vendor/expected-lite \
+                vendor/freetype \
+                vendor/googletest \
+                vendor/harfbuzz \
+                vendor/kdbush.hpp \
+                vendor/maplibre-native-base \
+                vendor/maplibre-tile-spec \
+                vendor/metal-cpp \
+                vendor/parsedate \
+                vendor/PMTiles \
+                vendor/polylabel \
+                vendor/protozero \
+                vendor/rapidjson \
+                vendor/supercluster \
+                vendor/unique_resource \
+                vendor/unordered_dense \
+                vendor/vector-tile \
+                vendor/wagyu
 
       - name: Install Linux dependencies
         if: runner.os == 'Linux'
@@ -93,15 +114,15 @@ jobs:
           sudo apt-get update && \
           sudo apt-get install -y libglx-mesa0
 
-      - name: Upgrade Ubuntu 20.04 GCC
-        if: ${{ matrix.os == 'ubuntu-20.04' }}
-        run: |
-          sudo apt-get install -y software-properties-common && \
-          sudo add-apt-repository --update -y ppa:ubuntu-toolchain-r/test && \
-          sudo apt-get update && \
-          sudo apt-get -y --fix-broken install gcc-13 g++-13 && \
-          sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-13 131 --slave /usr/bin/g++ g++ /usr/bin/g++-13 --slave /usr/bin/gcov gcov /usr/bin/gcov-13 && \
-          gcc -v
+      # - name: Upgrade Ubuntu 20.04 GCC
+      #   if: ${{ matrix.os == 'ubuntu-20.04' }}
+      #   run: |
+      #     sudo apt-get install -y software-properties-common && \
+      #     sudo add-apt-repository --update -y ppa:ubuntu-toolchain-r/test && \
+      #     sudo apt-get update && \
+      #     sudo apt-get -y --fix-broken install gcc-13 g++-13 && \
+      #     sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-13 131 --slave /usr/bin/g++ g++ /usr/bin/g++-13 --slave /usr/bin/gcov gcov /usr/bin/gcov-13 && \
+      #     gcc -v
 
       - name: Install MacOS dependencies
         if: runner.os == 'macOS'
@@ -124,7 +145,7 @@ jobs:
         run: ccache --clear --set-config cache_dir=~/.ccache
 
       - name: Cache ccache
-        uses: actions/cache@v4
+        uses: actions/cache@v6
         env:
           cache-name: ccache-v1
         with:
@@ -146,7 +167,7 @@ jobs:
         run: |
           sudo mkdir -p $BUILD_TEMP_DIR
           sudo chown -R $(id -u):$(id -g) $BUILD_TEMP_DIR
-          uv pip install -e .[dev,test]
+          uv pip install -e .[dev,test] -v
 
       - name: Run Linux tests
         if: runner.os == 'Linux'

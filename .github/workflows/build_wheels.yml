@@ -19,6 +19,10 @@ on:
       - "setup.py"
   workflow_dispatch:
 
+concurrency:
+  group: build-wheels
+  cancel-in-progress: true
+
 env:
   CIBW_SKIP: "cp38-* pp* *musllinux* *i686* *ppc64le* *s390x*"
   CIBW_ARCHS: "auto64"
@@ -26,12 +30,23 @@ env:
 
 jobs:
   build-wheels-linux:
-    name: Build wheels on linux
-    runs-on: ubuntu-latest
+    name: Build wheels on ${{ matrix.os }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os:
+          - "ubuntu-24.04"
+          - "ubuntu-24.04-arm"
+        include:
+          - os: "ubuntu-24.04"
+            manylinux: manylinux_2_28_x86_64
+          - os: "ubuntu-24.04-arm"
+            manylinux: manylinux_2_28_aarch64
 
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
         with:
           fetch-depth: 0
 
@@ -44,17 +59,27 @@ jobs:
             git submodule update --init --recursive \
               vendor/boost \
               vendor/cpp-httplib \
+              vendor/csscolorparser \
               vendor/earcut.hpp \
               vendor/eternal \
+              vendor/expected-lite \
+              vendor/freetype \
               vendor/googletest \
+              vendor/harfbuzz \
+              vendor/kdbush.hpp \
+              vendor/maplibre-native-base \
+              vendor/maplibre-tile-spec \
+              vendor/metal-cpp \
+              vendor/parsedate \
+              vendor/PMTiles \
               vendor/polylabel \
               vendor/protozero \
-              vendor/mapbox-base \
+              vendor/rapidjson \
+              vendor/supercluster \
               vendor/unique_resource \
               vendor/unordered_dense \
               vendor/vector-tile \
-              vendor/wagyu \
-              vendor/zip-archive
+              vendor/wagyu
 
       - name: Set up Docker Buildx
         id: buildx
@@ -67,8 +92,8 @@ jobs:
         uses: docker/build-push-action@v6
         with:
           context: .
-          file: ci/Dockerfile.manylinux_2_28_x86_64
-          tags: pymgl-manylinux_2_28_x86_64
+          file: ci/Dockerfile.${{ matrix.manylinux }}
+          tags: pymgl-${{ matrix.manylinux }}
           push: false
           load: true
           cache-from: type=gha
@@ -80,10 +105,10 @@ jobs:
         run: |
           sudo mkdir -p /mnt/ccache
           sudo chmod 777 /mnt/ccache
-          docker create -v /mnt/ccache:/ccache:rw --name ccache pymgl-manylinux_2_28_x86_64
+          docker create -v /mnt/ccache:/ccache:rw --name ccache pymgl-${{ matrix.manylinux }}
 
       - name: Cache ccache
-        uses: actions/cache@v4
+        uses: actions/cache@v6
         env:
           cache-name: ccache-v1
         with:
@@ -96,20 +121,20 @@ jobs:
 
       - name: Build wheels
         run: |
-          docker run -e CCACHE_DIR=/ccache --volumes-from ccache -v $PWD:/app pymgl-manylinux_2_28_x86_64 ci/build_linux_wheels.sh
+          docker run -e CCACHE_DIR=/ccache --volumes-from ccache -v $PWD:/app pymgl-${{ matrix.manylinux }} ci/build_linux_wheels.sh
 
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         with:
-          name: pymgl-wheel-manylinux_2_28-x86_64
+          name: pymgl-wheel-${{ matrix.manylinux }}
           path: ./dist/*.whl
           compression-level: 0
 
   build-wheels-macos:
     name: Build wheels on MacOS
-    runs-on: macos-14
+    runs-on: macos-26
     env:
       CMAKE_CXX_COMPILER_LAUNCHER: ccache
-      MACOSX_DEPLOYMENT_TARGET: "12"
+      MACOSX_DEPLOYMENT_TARGET: "14.3"
       CIBW_BUILD_FRONTEND: "build[uv]"
 
     steps:
@@ -123,7 +148,7 @@ jobs:
           brew install ccache ninja
 
       - name: Install uv
-        uses: astral-sh/setup-uv@v3
+        uses: astral-sh/setup-uv@bec219d24cd3e171d82865faccec33120bb574f4 # v10.1.0
         with:
           version: ">=0.4"
 
@@ -133,7 +158,7 @@ jobs:
           ccache --clear
 
       - name: Cache ccache
-        uses: actions/cache@v4
+        uses: actions/cache@v6
         env:
           cache-name: ccache-v1
         with:
@@ -151,7 +176,7 @@ jobs:
           ccache --show-stats
 
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
         with:
           fetch-depth: 0
 
@@ -164,23 +189,33 @@ jobs:
             git submodule update --init --recursive \
               vendor/boost \
               vendor/cpp-httplib \
+              vendor/csscolorparser \
               vendor/earcut.hpp \
               vendor/eternal \
+              vendor/expected-lite \
+              vendor/freetype \
               vendor/googletest \
+              vendor/harfbuzz \
+              vendor/kdbush.hpp \
+              vendor/maplibre-native-base \
+              vendor/maplibre-tile-spec \
+              vendor/metal-cpp \
+              vendor/parsedate \
+              vendor/PMTiles \
               vendor/polylabel \
               vendor/protozero \
-              vendor/mapbox-base \
+              vendor/rapidjson \
+              vendor/supercluster \
               vendor/unique_resource \
               vendor/unordered_dense \
               vendor/vector-tile \
-              vendor/wagyu \
-              vendor/zip-archive
+              vendor/wagyu
 
       - name: Build wheels
         run: |
           ci/build_macos_wheels.sh
 
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         with:
           name: pymgl-wheel-macos-arm64
           path: ./dist/*.whl
@@ -194,25 +229,33 @@ jobs:
       fail-fast: false
       matrix:
         os:
+          - "ubuntu-26.04"
+          - "ubuntu-26.04-arm"
           - "ubuntu-24.04"
+          - "ubuntu-24.04-arm"
           - "ubuntu-22.04"
-          - "ubuntu-20.04"
-          - "macos-14"
+          - "macos-26"
         include:
+          - os: "ubuntu-26.04"
+            platform: "x86_64"
+            wheel: pymgl-wheel-manylinux_2_28_x86_64
+          - os: "ubuntu-26.04-arm"
+            platform: "arm64"
+            wheel: pymgl-wheel-manylinux_2_28_aarch64
           - os: "ubuntu-24.04"
             platform: "x86_64"
-            wheel: pymgl-wheel-manylinux_2_28-x86_64
+            wheel: pymgl-wheel-manylinux_2_28_x86_64
+          - os: "ubuntu-24.04-arm"
+            platform: "arm64"
+            wheel: pymgl-wheel-manylinux_2_28_aarch64
           - os: "ubuntu-22.04"
             platform: "x86_64"
-            wheel: pymgl-wheel-manylinux_2_28-x86_64
-          - os: "ubuntu-20.04"
-            platform: "x86_64"
-            wheel: pymgl-wheel-manylinux_2_28-x86_64
-          - os: "macos-14"
+            wheel: pymgl-wheel-manylinux_2_28_x86_64
+          - os: "macos-26"
             platform: "arm64"
             wheel: pymgl-wheel-macos-arm64
 
-        python-version: ["3.9", "3.10", "3.11", "3.12"]
+        python-version: ["3.12", "3.13", "3.14"]
 
     env:
       PLATFORM_OS: ${{ matrix.os }}
@@ -221,7 +264,7 @@ jobs:
 
     steps:
       - name: Download wheels from artifacts
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v8
         with:
           pattern: ${{ matrix.wheel }}
           path: wheelhouse
@@ -234,9 +277,7 @@ jobs:
           sudo apt-get -y install libegl1 xvfb
 
       - name: Install uv
-        uses: astral-sh/setup-uv@v3
-        with:
-          version: ">=0.4"
+        uses: astral-sh/setup-uv@bec219d24cd3e171d82865faccec33120bb574f4 # v10.1.0
 
       - name: Install pymgl and deps
         run: |
@@ -265,7 +306,7 @@ jobs:
   publish:
     name: Publish to GitHub / PyPI
     needs: [test-wheels]
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     environment:
       name: pypi
       url: https://pypi.org/p/pymgl
@@ -277,7 +318,7 @@ jobs:
     if: github.event_name == 'push' && startsWith(github.event.ref, 'refs/tags/')
 
     steps:
-      - uses: actions/download-artifact@v4
+      - uses: actions/download-artifact@v8
         with:
           pattern: pymgl-wheel-*
           path: dist
@@ -288,7 +329,7 @@ jobs:
 
       - name: Create GitHub Release
         id: create_release
-        uses: softprops/action-gh-release@v2
+        uses: softprops/action-gh-release@v3
         with:
           name: Version ${{ github.ref_name }}
           tag_name: ${{ github.ref }}

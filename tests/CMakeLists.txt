@@ -28,8 +28,8 @@ unset(_sources)
 target_link_libraries(
     pymgl_test PRIVATE
     gtest_main
-    Mapbox::Base::pixelmatch-cpp
-    Mapbox::Base::Extras::rapidjson
+    MapLibreNative::Base::pixelmatch-cpp
+    mbgl-vendor-rapidjson
     mgl_wrapper
 )
 

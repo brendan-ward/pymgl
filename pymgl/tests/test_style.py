@@ -1,13 +1,12 @@
 import json
 import os
 
-from PIL import Image
 import pytest
+from PIL import Image
 
 from pymgl import Map
 
-from .common import FIXTURES_PATH, MAPBOX_TOKEN, read_style, image_matches
-
+from .common import FIXTURES_PATH, MAPBOX_TOKEN, image_matches, read_style
 
 has_poorconn = False
 try:
@@ -159,6 +158,58 @@ def test_invalid_local_mbtiles_raster_source():
     style = style.replace("mbtiles://", "mbtiles:///invalid/")
 
     with pytest.raises(RuntimeError, match="path not found"):
+        _ = Map(style, 256, 256).renderPNG()
+
+
+def test_local_pmtiles_raster_source():
+    test = "example-style-pmtiles-raster-source"
+    style = read_style(f"{test}.json")
+
+    # update style from relative to absolute path
+    style = style.replace("file://", f"file://{FIXTURES_PATH}/")
+
+    img_data = Map(style, 256, 256).renderPNG()
+
+    assert image_matches(img_data, f"{test}.png")
+
+
+def test_local_pmtiles_vector_source():
+    test = "example-style-pmtiles-vector-source"
+    style = read_style(f"{test}.json")
+
+    # update style from relative to absolute path
+    style = style.replace("file://", f"file://{FIXTURES_PATH}/")
+
+    img_data = Map(style, 256, 256).renderPNG()
+
+    assert image_matches(img_data, f"{test}.png", 100)
+
+
+def test_invalid_local_pmtiles_vector_source():
+    test = "example-style-pmtiles-vector-source"
+    style = read_style(f"{test}.json")
+
+    style = style.replace("file://", "file:///invalid/")
+
+    with pytest.raises(RuntimeError, match="path not found"):
+        _ = Map(style, 256, 256).renderPNG()
+
+
+def test_remote_pmtiles_vector_source():
+    test = "example-style-pmtiles-remote-vector-source"
+    style = read_style(f"{test}.json")
+    img_data = Map(style, 256, 256).renderPNG()
+
+    assert image_matches(img_data, f"{test}.png", 100)
+
+
+def test_invalid_remote_pmtiles_vector_source():
+    test = "example-style-pmtiles-remote-vector-source"
+    style = read_style(f"{test}.json")
+
+    style = style.replace("latest.protomaps.com", "latest.protomaps.invalid")
+
+    with pytest.raises(RuntimeError, match="Error fetching PMTiles header"):
         _ = Map(style, 256, 256).renderPNG()
 
 
