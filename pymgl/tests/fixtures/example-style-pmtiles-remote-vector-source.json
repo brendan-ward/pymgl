@@ -1,0 +1,21 @@
+{
+    "version": 8,
+    "sources": {
+        "protomaps": {
+            "type": "vector",
+            "url": "pmtiles://https://latest.protomaps.com/v4.pmtiles"
+        }
+    },
+    "layers": [
+        {
+            "id": "earth",
+            "type": "fill",
+            "filter": ["==", "$type", "Polygon"],
+            "source": "protomaps",
+            "source-layer": "earth",
+            "paint": {
+                "fill-color": "#e2dfda"
+            }
+        }
+    ]
+}

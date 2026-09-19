@@ -276,6 +276,62 @@ TEST(Style, InvalidLocalMBtilesRasterSource) {
         std::exception);
 }
 
+TEST(Style, LocalPMTilesRasterSource) {
+    const string test = "example-style-pmtiles-raster-source";
+    string style      = read_style(test + ".json");
+
+    // update style from relative to pmtiles_path to absolute based on file:// prefix
+    style = regex_replace(style, regex("file://"), "file://" + FIXTURES_PATH);
+
+    Map map  = Map(style, 256, 256, 1);
+    auto img = map.renderPNG();
+
+    const string img_filename = test + ".png";
+
+    // to write out expected image, uncomment
+    // write_test_image(img, img_filename, true);
+
+    write_test_image(img, img_filename, false);
+    EXPECT_TRUE(image_matches(img_filename, 10));
+}
+
+TEST(Style, LocalPMTilesVectorSource) {
+    const string test = "example-style-pmtiles-vector-source";
+    string style      = read_style(test + ".json");
+
+    // update style from relative to pmtiles_path to absolute based on file:// prefix
+    style = regex_replace(style, regex("file://"), "file://" + FIXTURES_PATH);
+
+    Map map  = Map(style, 256, 256, 1);
+    auto img = map.renderPNG();
+
+    const string img_filename = test + ".png";
+
+    // to write out expected image, uncomment
+    // write_test_image(img, img_filename, true);
+
+    write_test_image(img, img_filename, false);
+    // New metal renderer varies a bit from the old renderer
+    EXPECT_TRUE(image_matches(img_filename, 250));
+}
+
+TEST(Style, RemotePMTilesVectorSource) {
+    const string test = "example-style-pmtiles-remote-vector-source";
+    string style      = read_style(test + ".json");
+
+    Map map  = Map(style, 256, 256, 1);
+    auto img = map.renderPNG();
+
+    const string img_filename = test + ".png";
+
+    // to write out expected image, uncomment
+    // write_test_image(img, img_filename, true);
+
+    write_test_image(img, img_filename, false);
+    // New metal renderer varies a bit from the old renderer
+    EXPECT_TRUE(image_matches(img_filename, 250));
+}
+
 TEST(Style, ImagePattern) {
     const string test = "example-style-image-pattern";
     string style      = read_style(test + ".json");

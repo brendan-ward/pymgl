@@ -10,6 +10,9 @@ find_package(PkgConfig REQUIRED)
 find_package(X11 REQUIRED)
 find_package(Threads REQUIRED)
 
+# NOTE: we can't use Vulkan reliably for software-only rendering; it fails on some textures
+# that succeed on OpenGL
+
 # NOTE: EGL is optional and backfilled by GLX in mapblibre-native, but
 # we require installing EGL to simplify build
 find_package(OpenGL REQUIRED EGL)
@@ -24,8 +27,6 @@ target_compile_definitions(
     PUBLIC
     MLN_LEGACY_RENDERER=1
     MLN_DRAWABLE_RENDERER=0
-
-    # TODO: vulkan instead
     MLN_WITH_OPENGL=1
 )
 

@@ -475,6 +475,8 @@ cd ../..
 git commit -am "update maplibre-native" to latest
 ```
 
+Note: this can also checkout a recent release of the core.
+
 ### Architecture
 
 This package is composed of 2 main parts:

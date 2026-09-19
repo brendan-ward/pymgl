@@ -24,10 +24,10 @@ classifiers = [
     "Topic :: Scientific/Engineering :: GIS",
 ]
 requires-python = ">=3.12"
-dependencies = ["packaging"]
+dependencies = ["packaging>=24.2"]
 
 [project.optional-dependencies]
-dev = ["numpy", "Pillow", "pre-commit", "ruff", "setuptools", "versioneer"]
+dev = ["numpy", "Pillow", "pre-commit", "ruff", "setuptools>=77", "versioneer"]
 test = [
     "numpy",
     "Pillow",
