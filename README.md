@@ -263,6 +263,29 @@ Example:
 }
 ```
 
+### PMTiles
+
+Local and remote [PMTiles](https://github.com/protomaps/PMTiles) files are supported,
+but must include a `file://` with the absolute path or `https://` remote URL.
+
+```json
+{
+    "sources": {
+        "local_pmtiles": {
+            "url": "pmtiles://file:///<pymgl_root_dir>/tests/fixtures/geography-class-png.pmtiles",
+            ...
+        },
+        "remote_pmtiles": {
+            "url": "pmtiles://https://latest.protomaps.com/v4.pmtiles",
+            ...
+        },
+    },
+    "layers": [...],
+    ...
+}
+
+```
+
 ### Local files
 
 GeoJSON files and other local file assets are supported, but must be provided
@@ -516,16 +539,7 @@ in VSCode.
 ##### Building wheels
 
 Most wheels are automatically built by Github when pushing a new version tag.
-Linux Arm64 wheels must be built locally on an Arm64 machine (e.g., MacOS host).
-
-These are created using the manylinux_2_28 Docker container.
-
-```bash
-docker build -f ci/Dockerfile.manylinux_2_28_aarch64 -t pymgl-manylinux_2_28_aarch64 .
-docker run -v "$PWD/:/app" pymgl-manylinux_2_28_aarch64 ci/build_linux_wheels.sh
-```
-
-This will create aarch64 wheels in `dist` that can be uploaded directly to PyPI.
+These are created for Linux using the `manylinux_2_28` Docker container.
 
 ## See also
 

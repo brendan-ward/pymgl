@@ -10,6 +10,7 @@
 ### Improvements
 
 - added support for Python 3.13 and 3.14
+- new version of maplibre-native adds support for [PMTiles](https://github.com/protomaps/PMTiles)
 
 ## 0.5.0 (9/30/2024)
 

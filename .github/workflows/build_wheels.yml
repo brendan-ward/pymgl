@@ -30,8 +30,14 @@ env:
 
 jobs:
   build-wheels-linux:
-    name: Build wheels on linux
-    runs-on: ubuntu-24.04
+    name: Build wheels on ${{ matrix.os }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os:
+          - "ubuntu-24.04"
+          - "ubuntu-24.04-arm"
 
     steps:
       - name: Checkout repository
