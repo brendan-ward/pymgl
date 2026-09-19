@@ -40,11 +40,9 @@ jobs:
           - "ubuntu-24.04-arm"
         include:
           - os: "ubuntu-24.04"
-            dockerfile: ci/Dockerfile.manylinux_2_28_x86_64
-            tags: pymgl-manylinux_2_28_x86_64
+            manylinux: manylinux_2_28_x86_64
           - os: "ubuntu-24.04-arm"
-            dockerfile: ci/Dockerfile.manylinux_2_28_aarch64
-            tags: pymgl-manylinux_2_28_aarch64
+            manylinux: manylinux_2_28_aarch64
 
     steps:
       - name: Checkout repository
@@ -94,8 +92,8 @@ jobs:
         uses: docker/build-push-action@v6
         with:
           context: .
-          file: ${{ matrix.dockerfile }}
-          tags: ${{ matrix.tags }}
+          file: ci/Dockerfile.${{ matrix.manylinux }}
+          tags: pymgl-${{ matrix.manylinux }}
           push: false
           load: true
           cache-from: type=gha
@@ -107,7 +105,7 @@ jobs:
         run: |
           sudo mkdir -p /mnt/ccache
           sudo chmod 777 /mnt/ccache
-          docker create -v /mnt/ccache:/ccache:rw --name ccache pymgl-manylinux_2_28_x86_64
+          docker create -v /mnt/ccache:/ccache:rw --name ccache pymgl-${{ matrix.manylinux }}
 
       - name: Cache ccache
         uses: actions/cache@v6
@@ -123,11 +121,11 @@ jobs:
 
       - name: Build wheels
         run: |
-          docker run -e CCACHE_DIR=/ccache --volumes-from ccache -v $PWD:/app pymgl-manylinux_2_28_x86_64 ci/build_linux_wheels.sh
+          docker run -e CCACHE_DIR=/ccache --volumes-from ccache -v $PWD:/app pymgl-${{ matrix.manylinux }} ci/build_linux_wheels.sh
 
       - uses: actions/upload-artifact@v7
         with:
-          name: pymgl-wheel-manylinux_2_28-x86_64
+          name: pymgl-wheel-${{ matrix.manylinux }}
           path: ./dist/*.whl
           compression-level: 0
 
