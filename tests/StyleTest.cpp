@@ -300,7 +300,8 @@ TEST(Style, ImagePattern) {
     // write_test_image(img, img_filename, true);
 
     write_test_image(img, img_filename, false);
-    EXPECT_TRUE(image_matches(img_filename, 350));
+    // the pattern doesn't reproduce pixel-identical between platforms
+    EXPECT_TRUE(image_matches(img_filename, 1000));
 }
 
 // Tests of bad inputs

@@ -7,6 +7,10 @@ on:
   pull_request:
   workflow_dispatch:
 
+concurrency:
+  group: test
+  cancel-in-progress: true
+
 env:
   BUILD_TEMP_DIR: "build"
   LIBGL_ALWAYS_SOFTWARE: 1
@@ -24,6 +28,7 @@ jobs:
           - "ubuntu-22.04"
           - "ubuntu-20.04"
           - "macos-26"
+        python-version: ["3.12", "3.13", "3.14"]
         include:
           - os: "ubuntu-24.04"
             platform: "x86_64"
@@ -36,8 +41,6 @@ jobs:
             platform: "x86_64"
           - os: "macos-26"
             platform: "arm64"
-
-        python-version: ["3.12", "3.13", "3.14"]
 
     steps:
       - name: Checkout repository
@@ -160,7 +163,7 @@ jobs:
         run: |
           sudo mkdir -p $BUILD_TEMP_DIR
           sudo chown -R $(id -u):$(id -g) $BUILD_TEMP_DIR
-          uv pip install -e .[dev,test]
+          uv pip install -e .[dev,test] -v
 
       - name: Run Linux tests
         if: runner.os == 'Linux'
