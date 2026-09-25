@@ -260,10 +260,10 @@ jobs:
             wheel: pymgl-wheel-manylinux_2_28_x86_64
           - os: "macos-15"
             platform: "arm64"
-            wheel: pymgl-wheel-${{ matrix.os }}-arm64
+            wheel: pymgl-wheel-macos-15-arm64
           - os: "macos-26"
             platform: "arm64"
-            wheel: pymgl-wheel-${{ matrix.os }}-arm64
+            wheel: pymgl-wheel-macos-26-arm64
 
         python-version: ["3.12", "3.13", "3.14"]
 
