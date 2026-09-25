@@ -131,7 +131,13 @@ jobs:
 
   build-wheels-macos:
     name: Build wheels on MacOS
-    runs-on: macos-26
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os:
+          - "macos-15"
+          - "macos-26"
     env:
       CMAKE_CXX_COMPILER_LAUNCHER: ccache
       MACOSX_DEPLOYMENT_TARGET: "14.3"
@@ -217,7 +223,7 @@ jobs:
 
       - uses: actions/upload-artifact@v7
         with:
-          name: pymgl-wheel-macos-arm64
+          name: pymgl-wheel-${{ matrix.os}}-arm64
           path: ./dist/*.whl
           compression-level: 0
 
@@ -234,6 +240,7 @@ jobs:
           - "ubuntu-24.04"
           - "ubuntu-24.04-arm"
           - "ubuntu-22.04"
+          - "macos-15"
           - "macos-26"
         include:
           - os: "ubuntu-26.04"
@@ -251,9 +258,12 @@ jobs:
           - os: "ubuntu-22.04"
             platform: "x86_64"
             wheel: pymgl-wheel-manylinux_2_28_x86_64
+          - os: "macos-15"
+            platform: "arm64"
+            wheel: pymgl-wheel-${{ matrix.os }}-arm64
           - os: "macos-26"
             platform: "arm64"
-            wheel: pymgl-wheel-macos-arm64
+            wheel: pymgl-wheel-${{ matrix.os }}-arm64
 
         python-version: ["3.12", "3.13", "3.14"]
 
