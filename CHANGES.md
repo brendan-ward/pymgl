@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## 0.6.1 (10/12/2026)
+
+- added back wheels for MacOS 15 (0.6.0 only provided wheels for MacOS 26)
+
 ## 0.6.0 (9/19/2026)
 
 ### Breaking changes
